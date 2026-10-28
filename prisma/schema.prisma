@@ -1,0 +1,239 @@
+// Woulé — modèle de données
+// Les valeurs « énumérées » sont stockées en texte (compatibilité SQLite) ;
+// leurs valeurs autorisées sont définies dans src/lib/constants.ts.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String    @id @default(cuid())
+  email             String    @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  phone             String?
+  territory         String    @default("guadeloupe")
+  bio               String?
+  avatarUrl         String?
+  role              String    @default("USER") // USER | ADMIN
+  birthDate         DateTime?
+  // Permis de conduire
+  licenseNumber     String?
+  licenseIssuedAt   DateTime?
+  licenseFileUrl    String?
+  licenseStatus     String    @default("NONE") // NONE | PENDING | VERIFIED | REJECTED
+  // Versement des revenus propriétaire
+  iban              String?
+  createdAt         DateTime  @default(now())
+
+  vehicles          Vehicle[]
+  bookings          Booking[]      @relation("RenterBookings")
+  messages          Message[]
+  reviewsWritten    Review[]       @relation("ReviewAuthor")
+  reviewsReceived   Review[]       @relation("ReviewTarget")
+  favorites         Favorite[]
+  notifications     Notification[]
+  inspections       Inspection[]
+}
+
+model Vehicle {
+  id                 String   @id @default(cuid())
+  ownerId            String
+  owner              User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  make               String
+  model              String
+  year               Int
+  category           String   // CITADINE | BERLINE | SUV | QUATRE_QUATRE | MONOSPACE | UTILITAIRE | CABRIOLET | SCOOTER
+  transmission       String   // MANUELLE | AUTOMATIQUE
+  fuel               String   // ESSENCE | DIESEL | HYBRIDE | ELECTRIQUE
+  seats              Int      @default(5)
+  doors              Int      @default(5)
+  airConditioning    Boolean  @default(true)
+  color              String   @default("#0E9F8E")
+  features           String   @default("") // liste séparée par des virgules
+  description        String   @default("")
+  rules              String   @default("")
+
+  // Localisation (approximative tant que la réservation n'est pas confirmée)
+  territory          String
+  commune            String
+  address            String   @default("")
+  lat                Float
+  lng                Float
+
+  // Tarifs (en centimes d'euro)
+  pricePerDay        Int
+  weeklyDiscountPct  Int      @default(10)
+  monthlyDiscountPct Int      @default(25)
+  depositAmount      Int      @default(80000)
+  kmIncludedPerDay   Int      @default(200)
+  extraKmPrice       Int      @default(25)
+  minDays            Int      @default(1)
+  maxDays            Int      @default(60)
+  instantBooking     Boolean  @default(false)
+
+  // Spécificités Antilles-Guyane
+  airportDelivery    Boolean  @default(false)
+  airportFee         Int      @default(2500)
+  portDelivery       Boolean  @default(false)
+  portFee            Int      @default(2000)
+  ferryAllowed       Boolean  @default(false) // Marie-Galante, Les Saintes, La Désirade…
+  trackAllowed       Boolean  @default(false) // pistes / routes non goudronnées (Guyane)
+
+  status             String   @default("ACTIVE") // DRAFT | ACTIVE | PAUSED | SUSPENDED
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  photos             VehiclePhoto[]
+  blocks             VehicleBlock[]
+  bookings           Booking[]
+  favorites          Favorite[]
+  reviews            Review[]
+
+  @@index([territory, status])
+}
+
+model VehiclePhoto {
+  id        String   @id @default(cuid())
+  vehicleId String
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  url       String
+  position  Int      @default(0)
+  createdAt DateTime @default(now())
+}
+
+model VehicleBlock {
+  id        String   @id @default(cuid())
+  vehicleId String
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  startAt   DateTime
+  endAt     DateTime
+  reason    String   @default("")
+  createdAt DateTime @default(now())
+}
+
+model Booking {
+  id              String    @id @default(cuid())
+  vehicleId       String
+  vehicle         Vehicle   @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  renterId        String
+  renter          User      @relation("RenterBookings", fields: [renterId], references: [id], onDelete: Cascade)
+
+  startAt         DateTime
+  endAt           DateTime
+  status          String    @default("PENDING") // PENDING | AWAITING_PAYMENT | CONFIRMED | IN_PROGRESS | COMPLETED | CANCELLED | DECLINED
+  pickupOption    String    @default("SUR_PLACE") // SUR_PLACE | AEROPORT | PORT
+  pickupLabel     String    @default("")
+  insurancePlan   String    @default("ESSENTIELLE") // ESSENTIELLE | CONFORT | SERENITE
+  message         String    @default("")
+
+  // Détail du prix figé au moment de la demande (centimes)
+  days            Int
+  basePrice       Int
+  discount        Int       @default(0)
+  deliveryFee     Int       @default(0)
+  insuranceFee    Int       @default(0)
+  youngDriverFee  Int       @default(0)
+  serviceFee      Int       @default(0)
+  total           Int
+  ownerPayout     Int
+  deposit         Int
+
+  paymentStatus   String    @default("UNPAID") // UNPAID | PAID | REFUNDED | PARTIALLY_REFUNDED
+  paymentRef      String?
+  refundAmount    Int       @default(0)
+  cancelledBy     String?   // RENTER | OWNER | ADMIN
+  cancelReason    String?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  messages        Message[]
+  inspections     Inspection[]
+  reviews         Review[]
+
+  @@index([vehicleId, startAt, endAt])
+}
+
+model Inspection {
+  id          String   @id @default(cuid())
+  bookingId   String
+  booking     Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  authorId    String
+  author      User     @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  type        String   // CHECKIN | CHECKOUT
+  mileage     Int
+  fuelLevel   Int      // en huitièmes (0 à 8)
+  cleanliness String   @default("PROPRE") // PROPRE | CORRECT | SALE
+  damages     String   @default("")
+  photos      String   @default("") // URLs séparées par des virgules
+  createdAt   DateTime @default(now())
+
+  @@unique([bookingId, type])
+}
+
+model Message {
+  id        String    @id @default(cuid())
+  bookingId String
+  booking   Booking   @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User      @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  body      String
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+model Review {
+  id           String   @id @default(cuid())
+  bookingId    String
+  booking      Booking  @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  vehicleId    String
+  vehicle      Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  authorId     String
+  author       User     @relation("ReviewAuthor", fields: [authorId], references: [id], onDelete: Cascade)
+  targetUserId String
+  targetUser   User     @relation("ReviewTarget", fields: [targetUserId], references: [id], onDelete: Cascade)
+  direction    String   // RENTER_TO_OWNER | OWNER_TO_RENTER
+  rating       Int
+  comment      String
+  createdAt    DateTime @default(now())
+
+  @@unique([bookingId, authorId])
+}
+
+model Favorite {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  vehicleId String
+  vehicle   Vehicle  @relation(fields: [vehicleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@id([userId, vehicleId])
+}
+
+model Notification {
+  id        String    @id @default(cuid())
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  link      String?
+  readAt    DateTime?
+  createdAt DateTime  @default(now())
+}
+
+// Vigilance météo (Météo-France) : déclenche la « Garantie Cyclone »
+model WeatherAlert {
+  id        String   @id @default(cuid())
+  territory String
+  level     String   // JAUNE | ORANGE | ROUGE | VIOLET | GRIS
+  title     String
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

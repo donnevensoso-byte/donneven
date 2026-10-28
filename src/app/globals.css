@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+@theme {
+  --color-lagon-50: #ecfdf9;
+  --color-lagon-100: #d0f7ee;
+  --color-lagon-200: #a4ecdd;
+  --color-lagon-300: #6ddac8;
+  --color-lagon-400: #36c0ae;
+  --color-lagon-500: #14a394;
+  --color-lagon-600: #0b8379;
+  --color-lagon-700: #0d6962;
+  --color-lagon-800: #10534f;
+  --color-lagon-900: #114542;
+
+  --color-flamboyant-50: #fff3ef;
+  --color-flamboyant-100: #ffe2d8;
+  --color-flamboyant-400: #ff8a6b;
+  --color-flamboyant-500: #f9643f;
+  --color-flamboyant-600: #e44a24;
+  --color-flamboyant-700: #bd3818;
+
+  --color-sable-50: #fffbf3;
+  --color-sable-100: #fdf3e0;
+  --color-sable-200: #f8e4bd;
+
+  --color-encre: #12263a;
+
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: var(--color-sable-50);
+  color: var(--color-encre);
+  -webkit-tap-highlight-color: transparent;
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition disabled:cursor-not-allowed disabled:opacity-50;
+}
+@utility btn-primary {
+  @apply btn bg-lagon-600 text-white shadow-sm hover:bg-lagon-700;
+}
+@utility btn-accent {
+  @apply btn bg-flamboyant-500 text-white shadow-sm hover:bg-flamboyant-600;
+}
+@utility btn-outline {
+  @apply btn border border-slate-300 bg-white text-encre hover:border-lagon-500 hover:text-lagon-700;
+}
+@utility btn-ghost {
+  @apply btn text-slate-600 hover:bg-slate-100;
+}
+@utility btn-danger {
+  @apply btn border border-red-200 bg-white text-red-600 hover:bg-red-50;
+}
+@utility input {
+  @apply w-full rounded-xl border border-slate-300 bg-white px-3.5 py-2.5 text-sm text-encre outline-none transition placeholder:text-slate-400 focus:border-lagon-500 focus:ring-2 focus:ring-lagon-100;
+}
+@utility label {
+  @apply mb-1.5 block text-sm font-medium text-slate-700;
+}
+@utility card {
+  @apply rounded-2xl border border-slate-200/80 bg-white shadow-[0_1px_2px_rgba(18,38,58,0.04)];
+}
+@utility chip {
+  @apply inline-flex items-center gap-1 rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700;
+}
+@utility container-app {
+  @apply mx-auto w-full max-w-6xl px-4 sm:px-6;
+}
+@utility heading {
+  @apply font-display font-semibold tracking-tight text-encre;
+}
+
+/* Leaflet : on évite que la carte passe au-dessus des menus */
+.leaflet-container {
+  z-index: 0;
+  font-family: inherit;
+}
+.price-marker {
+  background: white;
+  border: 2px solid var(--color-lagon-600);
+  border-radius: 999px;
+  padding: 2px 8px;
+  font-weight: 700;
+  font-size: 12px;
+  color: var(--color-encre);
+  white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  transform: translate(-50%, -50%);
+  display: inline-block;
+}
+.price-marker.is-active {
+  background: var(--color-lagon-600);
+  color: white;
+}
