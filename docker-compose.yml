@@ -1,0 +1,33 @@
+# Lancement local ou sur un serveur : docker compose up -d
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: zouti
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-zouti}
+      POSTGRES_DB: zouti
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U zouti"]
+      interval: 5s
+      retries: 10
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      DATABASE_URL: postgres://zouti:${POSTGRES_PASSWORD:-zouti}@db:5432/zouti
+      APP_URL: ${APP_URL:-http://localhost:3000}
+
+volumes:
+  pgdata:
