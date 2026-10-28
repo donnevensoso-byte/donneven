@@ -8,6 +8,14 @@ Guadeloupe (971), la Martinique (972), la Guyane (973), Saint-Barthélemy (977) 
 Application web **mobile-first et installable sur téléphone (PWA)** : barre de navigation façon appli,
 ajout à l'écran d'accueil, prise de photos depuis l'appareil pour les états des lieux.
 
+## Aperçu
+
+| Accueil | Fiche véhicule | Réservation |
+| --- | --- | --- |
+| ![Accueil](docs/captures/01-mobile-accueil.png) | ![Fiche véhicule](docs/captures/03-mobile-fiche-vehicule.png) | ![Réservation](docs/captures/05-mobile-ma-reservation.png) |
+
+Toutes les captures sont dans [`docs/captures`](docs/captures).
+
 ## Fonctionnalités
 
 ### Locataires
