@@ -23,7 +23,7 @@ Changer la date d'une réservation,réservation,should,yes,no,aujourd'hui : annu
 Déclarer un litige depuis la transaction,confiance,should,yes,partial,signalement au support uniquement
 Déclaration de sinistre avec photos,confiance,should,yes,partial,photos d'état des lieux en place ; pas d'assurance ni de dossier de sinistre
 "Catalogue de types d'outils normalisés (500 outils, 80 catégories)",annonces,should,yes,no,Zouti : titre libre + 13 catégories
-Pages SEO par ville et par catégorie,acquisition,should,yes,partial,"URL filtrées /recherche?commune=… dans le sitemap, pas de pages dédiées"
+Pages SEO par ville et par catégorie,acquisition,should,yes,yes,"/location-outils, /location-outils/{commune|catégorie} et /{catégorie}/{commune} : vraies annonces, liens voisins, canonique, noindex si vide, plan du site"
 Applications iOS et Android,plateformes,should,yes,partial,PWA installable ; apps natives à faire
 Chat d'assistance 7 j/7,support,could,yes,no,contact par e-mail ; question d'équipe plus que de code
 Plusieurs images par annonce,annonces,could,yes,yes,6 photos

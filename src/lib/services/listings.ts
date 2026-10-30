@@ -496,3 +496,13 @@ export async function countActiveListings(): Promise<number> {
     .where(and(eq(listings.status, "active"), isNull(users.bannedAt)));
   return row?.n ?? 0;
 }
+
+/** Nombre d'annonces en ligne par commune et catégorie (pages locales, plan du site). */
+export async function listingCounts(): Promise<{ commune: string; category: string; count: number }[]> {
+  return db
+    .select({ commune: listings.commune, category: listings.category, count: sql<number>`count(*)::int` })
+    .from(listings)
+    .innerJoin(users, eq(users.id, listings.ownerId))
+    .where(and(eq(listings.status, "active"), isNull(users.bannedAt)))
+    .groupBy(listings.commune, listings.category);
+}

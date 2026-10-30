@@ -182,3 +182,23 @@ test("F01-N3 date de début passée refusée par le serveur", async ({ page, con
   await page.getByRole("button", { name: "Demander à réserver" }).click();
   await expect(page.getByText(/déjà passée/)).toBeVisible();
 });
+
+test("F01-E14 pages locales : commune, catégorie, combinaison, et 404 sur un lieu inconnu", async ({ page }) => {
+  const owner = await createUser("Loueuse Kourou", "kourou");
+  const marker = `Locale${Date.now()}`;
+  await createTestListing(owner.id, { title: `Taille-haie ${marker}`, category: "jardin", commune: "kourou" });
+  await page.goto("/location-outils");
+  await page.getByRole("link", { name: /^Kourou \(/ }).click();
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Location d'outils à Kourou");
+  await expect(page.getByTestId("listing-card").filter({ hasText: marker })).toBeVisible();
+  await expectAccessible(page);
+  await page.getByRole("link", { name: /Jardin & débroussaillage \(/ }).click();
+  await expect(page).toHaveURL(/\/location-outils\/jardin\/kourou$/);
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Location jardin & débroussaillage à Kourou");
+  await expect(page.locator('link[rel="canonical"]')).toHaveAttribute("href", /\/location-outils\/jardin\/kourou$/);
+  const res = await page.goto("/location-outils/atlantide");
+  expect(res?.status()).toBe(404);
+  allowNotFound(page);
+  const sitemap = await (await page.request.get("/sitemap.xml")).text();
+  expect(sitemap).toContain("/location-outils/jardin/kourou");
+});
