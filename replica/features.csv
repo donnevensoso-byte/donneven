@@ -1,4 +1,36 @@
 feature,area,priority,original,clone,notes
+Inscription et connexion par e-mail,compte,must,yes,yes,S06 ; session 60 j (plainte « reconnexion » réglée)
+"Déposer une annonce gratuite avec photos, prix/jour et caution",annonces,must,yes,yes,S07 ; 6 photos compressées
+Recherche par outil et par lieu,recherche,must,yes,yes,S02 ; mot-clé + 22 communes + carte
+"Fiche annonce avec prix, caution, disponibilités et profil du loueur",annonces,must,yes,yes,S04
+Demande de réservation avec dates et prix total affiché,réservation,must,yes,yes,S05 ; tarif semaine en plus
+"Le loueur accepte ou refuse, expiration automatique sans réponse",réservation,must,yes,yes,F03 ; 48 h chez Zouti contre 24 h chez Bricolib
+Coordonnées partagées après acceptation,réservation,must,yes,yes,F01 ; + bouton WhatsApp
+Messagerie entre loueur et locataire,messagerie,must,yes,yes,S09
+Paiement par carte dans l'app (empreinte puis débit à l'acceptation),paiement,must,yes,partial,"Stripe Checkout à l'acceptation, désactivé par défaut et non testé avec de vraies clés ; pas d'empreinte"
+Versement au loueur après la remise,paiement,must,yes,partial,Stripe Connect (non testé) ; en main propre par défaut
+Confirmation de remise par code du locataire,réservation,must,yes,partial,"Zouti : le loueur clique « J'ai remis le matériel », sans code"
+Avis après location,avis,must,yes,yes,"S12 ; mutuels, 30 jours"
+Annuler une réservation avec remboursement,réservation,must,yes,yes,F04 ; gratuit jusqu'à la veille
+Contrat de location,réservation,must,yes,yes,contrat imprimable + état des lieux
+Garantie casse & vol incluse (assurance Tulip),confiance,must,yes,skip,partenariat d'assurance de Bricolib : contrat à négocier par Zouti avec son propre assureur
+Taux de réactivité du loueur qui influence le classement,recherche,should,yes,partial,"taux de réponse affiché sur le profil, pas utilisé dans le tri"
+Mettre ses annonces en pause / mode vacances,annonces,should,yes,yes,pause + dates bloquées
+Vérification d'identité des loueurs,confiance,should,yes,no,Bricolib via Lemonway/Onfido (source de plaintes) ; Zouti : badges e-mail/téléphone seulement
+Porte-monnaie et retrait vers IBAN,paiement,should,yes,partial,Stripe Express gère les versements ; pas de porte-monnaie interne
+Formule « annulation flexible » payante,paiement,could,yes,no,modèle de frais Bricolib ; sans objet tant que Zouti ne prend pas de frais
+Changer la date d'une réservation,réservation,should,yes,no,aujourd'hui : annuler puis refaire une demande
+Déclarer un litige depuis la transaction,confiance,should,yes,partial,signalement au support uniquement
+Déclaration de sinistre avec photos,confiance,should,yes,no,lié à l'assurance ; voir correctif état des lieux photo
+"Catalogue de types d'outils normalisés (500 outils, 80 catégories)",annonces,should,yes,no,Zouti : titre libre + 13 catégories
+Pages SEO par ville et par catégorie,acquisition,should,yes,partial,"URL filtrées /recherche?commune=… dans le sitemap, pas de pages dédiées"
+Applications iOS et Android,plateformes,should,yes,partial,PWA installable ; apps natives à faire
+Chat d'assistance 7 j/7,support,could,yes,no,contact par e-mail ; question d'équipe plus que de code
+Plusieurs images par annonce,annonces,could,yes,yes,6 photos
+Comptes professionnels / auto-entrepreneurs,compte,could,yes,no,
+Blog de conseils,acquisition,could,yes,no,
+Réseau de 152K membres et 83K outils,réseau,must,yes,skip,le réseau appartient à Bricolib ; Zouti construit le sien en Guyane
+"Marque, logos presse et textes de Bricolib",marque,could,yes,skip,ne se clone pas
 Question gratuite au propriétaire avant toute demande,messagerie,must,no,yes,correctif replica-entrepreneur : contact payant (8 avis 2 sources)
 Aucune commission sur les locations réglées en main propre,paiement,must,no,yes,correctif replica-entrepreneur : frais (11 avis 1 source)
 Annulation gratuite jusqu'à la veille,réservation,must,no,yes,correctif replica-entrepreneur : annulation (11 avis 2 sources)
