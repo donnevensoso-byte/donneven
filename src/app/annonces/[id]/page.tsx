@@ -133,6 +133,13 @@ export default async function ListingPage({ params, searchParams }: Props) {
             <h2 className="text-lg font-semibold">Détails</h2>
             <dl className="mt-3 grid grid-cols-2 gap-3 text-sm sm:grid-cols-4">
               <div className="card p-3">
+                <dt className="text-muted">Tarif</dt>
+                <dd className="font-semibold">
+                  {formatEuros(listing.dayPrice)} / jour
+                  {listing.weekPrice && <span className="block font-normal text-muted">{formatEuros(listing.weekPrice)} / semaine</span>}
+                </dd>
+              </div>
+              <div className="card p-3">
                 <dt className="text-muted">État</dt>
                 <dd className="font-semibold">{conditionLabel(listing.condition)}</dd>
               </div>
