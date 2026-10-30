@@ -57,6 +57,8 @@ export default async function BookingPage({ params, searchParams }: Props) {
   const isOwner = role === "owner";
   const online = booking.paymentMethod === "online";
   const paid = !online || booking.paymentStatus === "paid";
+  // Paiement en ligne : la demande n'est envoyée qu'une fois l'empreinte bancaire posée.
+  const awaitingHold = online && booking.status === "pending" && booking.paymentStatus === "none";
   const today = todayInGuyane();
   const total = booking.rentalAmount + booking.serviceFee;
   const step = stepIndex(booking.status, paid);
@@ -120,19 +122,40 @@ export default async function BookingPage({ params, searchParams }: Props) {
           <section className="card space-y-4 p-5">
             <h2 className="font-semibold">Que faire maintenant ?</h2>
 
-            {booking.status === "pending" && isOwner && (
+            {booking.status === "pending" && awaitingHold && isOwner && (
+              <p className="text-sm text-muted">
+                {firstName(other.name)} doit encore valider son empreinte bancaire. Vous serez prévenu dès que la demande vous est envoyée.
+              </p>
+            )}
+            {booking.status === "pending" && awaitingHold && !isOwner && (
+              <>
+                <p className="text-sm">
+                  Dernière étape : validez l&apos;empreinte bancaire de <strong>{formatEuros(total)}</strong> pour envoyer votre demande.
+                  Vous ne serez débité que si {firstName(other.name)} accepte ; sinon l&apos;empreinte est libérée.
+                </p>
+                <PayButton bookingId={booking.id} amount={formatEuros(total)} />
+                <CancelForm bookingId={booking.id} label="Abandonner la demande" />
+              </>
+            )}
+            {booking.status === "pending" && !awaitingHold && isOwner && (
               <>
                 <p className="text-sm text-muted">
                   {firstName(other.name)} souhaite louer votre matériel. Répondez avant le {formatDateTime(booking.expiresAt)}, sinon la demande expirera.
                   {" "}Une question ? <Link href={`/messages/${conversationId}`} className="font-medium text-brand-600 underline">Écrivez-lui</Link>.
                 </p>
+                {online && (
+                  <p className="text-sm text-muted">
+                    💳 L&apos;empreinte bancaire de {formatEuros(total)} est validée : le locataire est débité dès que vous acceptez.
+                  </p>
+                )}
                 <RespondForm bookingId={booking.id} />
               </>
             )}
-            {booking.status === "pending" && !isOwner && (
+            {booking.status === "pending" && !awaitingHold && !isOwner && (
               <>
                 <p className="text-sm text-muted">
                   En attente de la réponse de {firstName(other.name)} (au plus tard le {formatDateTime(booking.expiresAt)}).
+                  {online && " Votre empreinte bancaire est posée : vous ne serez débité que si la demande est acceptée."}
                 </p>
                 <CancelForm bookingId={booking.id} label="Annuler ma demande" />
               </>
@@ -319,7 +342,9 @@ export default async function BookingPage({ params, searchParams }: Props) {
                 <dt>Paiement</dt>
                 <dd>
                   {online
-                    ? booking.paymentStatus === "paid"
+                    ? booking.paymentStatus === "authorized"
+                      ? "Empreinte posée"
+                      : booking.paymentStatus === "paid"
                       ? "Payé en ligne ✓"
                       : booking.paymentStatus === "refunded"
                         ? "Remboursé"

@@ -149,7 +149,7 @@ export function ReturnButton({ bookingId }: { bookingId: string }) {
 }
 
 export function PayButton({ bookingId, amount }: { bookingId: string; amount: string }) {
-  return <OneClick action={() => payBookingAction(bookingId)} label={`💳 Payer ${amount}`} pendingLabel="Redirection vers le paiement…" />;
+  return <OneClick action={() => payBookingAction(bookingId)} label={`💳 Valider l'empreinte de ${amount}`} pendingLabel="Redirection vers le paiement sécurisé…" />;
 }
 
 export function ReviewForm({ bookingId, targetName }: { bookingId: string; targetName: string }) {

@@ -7,7 +7,7 @@ Demande de réservation avec dates et prix total affiché,réservation,must,yes,
 "Le loueur accepte ou refuse, expiration automatique sans réponse",réservation,must,yes,yes,F03 ; 48 h chez Zouti contre 24 h chez Bricolib
 Coordonnées partagées après acceptation,réservation,must,yes,yes,F01 ; + bouton WhatsApp
 Messagerie entre loueur et locataire,messagerie,must,yes,yes,S09
-Paiement par carte dans l'app (empreinte puis débit à l'acceptation),paiement,must,yes,partial,"Stripe Checkout à l'acceptation, désactivé par défaut et non testé avec de vraies clés ; pas d'empreinte"
+Paiement par carte dans l'app (empreinte puis débit à l'acceptation),paiement,must,yes,yes,"S05/S08 : empreinte à la demande (capture manuelle), débit à l'acceptation, libérée au refus/expiration/annulation ; testé avec passerelle simulée, pas encore avec de vraies clés Stripe"
 Versement au loueur après la remise,paiement,must,yes,partial,Stripe Connect (non testé) ; en main propre par défaut
 Confirmation de remise par code du locataire,réservation,must,yes,yes,"S08 : code à 4 chiffres tiré à l'acceptation, saisi par le loueur, 5 essais / 15 min"
 Avis après location,avis,must,yes,yes,"S12 ; mutuels, 30 jours"

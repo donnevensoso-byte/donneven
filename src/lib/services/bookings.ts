@@ -17,6 +17,7 @@ import { computePrice } from "../pricing";
 import { rateLimit } from "../rate-limit";
 import { firstName } from "../text";
 import { getOrCreateConversation, postSystemMessage, sendMessage } from "./messages";
+import { paymentGateway } from "./payment-gateway";
 import { notify } from "./notifications";
 
 type Tx = Parameters<Parameters<DB["transaction"]>[0]>[0];
@@ -34,6 +35,7 @@ export const STATUS_LABELS: Record<Booking["status"], string> = {
 };
 
 export function bookingStatusLabel(b: Pick<Booking, "status" | "paymentMethod" | "paymentStatus">): string {
+  if (b.status === "pending" && b.paymentMethod === "online" && b.paymentStatus === "none") return "Empreinte bancaire à valider";
   if (b.status === "accepted" && b.paymentMethod === "online" && b.paymentStatus !== "paid") return "Acceptée – paiement en attente";
   return STATUS_LABELS[b.status];
 }
@@ -157,14 +159,70 @@ export async function requestBooking(renterId: string, req: BookingRequest): Pro
   // Le propriétaire est déjà notifié de la demande : pas de seconde notification.
   if (message) await sendMessage(renterId, conversationId, message.slice(0, 2000), { silent: true });
 
-  const [renter] = await db.select({ name: users.name }).from(users).where(eq(users.id, renterId)).limit(1);
-  await notify(listing.ownerId, {
+  // En paiement en ligne, le propriétaire n'est prévenu qu'une fois l'empreinte bancaire posée.
+  if (!online) await notifyOwnerOfRequest(id);
+  return id;
+}
+
+async function notifyOwnerOfRequest(bookingId: string) {
+  const [row] = await db
+    .select({ booking: bookings, title: listings.title, renterName: users.name })
+    .from(bookings)
+    .innerJoin(listings, eq(listings.id, bookings.listingId))
+    .innerJoin(users, eq(users.id, bookings.renterId))
+    .where(eq(bookings.id, bookingId))
+    .limit(1);
+  if (!row) return;
+  await notify(row.booking.ownerId, {
     title: "Nouvelle demande de réservation",
-    body: `${firstName(renter?.name ?? "Un membre")} souhaite louer « ${listing.title} » ${formatDateRange(req.startDate, req.endDate)}. Répondez sous 48 h.`,
-    link: `/reservations/${id}`,
+    body: `${firstName(row.renterName)} souhaite louer « ${row.title} » ${formatDateRange(row.booking.startDate, row.booking.endDate)}. Répondez sous 48 h.`,
+    link: `/reservations/${bookingId}`,
     email: true,
   });
-  return id;
+}
+
+/** Demande en paiement en ligne dont l'empreinte bancaire n'est pas encore posée. */
+export async function needsAuthorization(bookingId: string): Promise<boolean> {
+  const [b] = await db
+    .select({ status: bookings.status, paymentMethod: bookings.paymentMethod, paymentStatus: bookings.paymentStatus })
+    .from(bookings)
+    .where(eq(bookings.id, bookingId))
+    .limit(1);
+  return b?.status === "pending" && b.paymentMethod === "online" && b.paymentStatus === "none";
+}
+
+/** L'empreinte bancaire du locataire est posée : la demande part chez le propriétaire. Idempotent. */
+export async function markBookingAuthorized(bookingId: string, paymentIntentId: string): Promise<boolean> {
+  const [updated] = await db
+    .update(bookings)
+    .set({ paymentStatus: "authorized", stripePaymentIntentId: paymentIntentId, updatedAt: new Date() })
+    .where(
+      and(
+        eq(bookings.id, bookingId),
+        eq(bookings.status, "pending"),
+        eq(bookings.paymentMethod, "online"),
+        eq(bookings.paymentStatus, "none"),
+      ),
+    )
+    .returning();
+  if (!updated) return false;
+  await postSystemMessage(
+    await conversationFor(updated),
+    `💳 Empreinte bancaire de ${formatEuros(updated.rentalAmount + updated.serviceFee)} validée. Le locataire ne sera débité que si la demande est acceptée.`,
+  );
+  await notifyOwnerOfRequest(bookingId);
+  return true;
+}
+
+/** Libère une empreinte sans bloquer le parcours si Stripe est indisponible (elle expire seule après 7 jours). */
+async function releaseAuthorization(b: Pick<Booking, "id" | "paymentStatus" | "stripePaymentIntentId">) {
+  if (b.paymentStatus !== "authorized" || !b.stripePaymentIntentId) return;
+  try {
+    await paymentGateway().release(b.stripePaymentIntentId);
+    await db.update(bookings).set({ paymentStatus: "none", updatedAt: new Date() }).where(eq(bookings.id, b.id));
+  } catch (err) {
+    console.error("Libération de l'empreinte impossible", b.id, err);
+  }
 }
 
 async function loadBooking(q: DB | Tx, bookingId: string) {
@@ -190,6 +248,8 @@ export async function respondToBooking(
 ): Promise<void> {
   await expireStaleBookings();
   const autoDeclined: Booking[] = [];
+  // Empreinte débitée dans la transaction : remboursée si la suite échoue.
+  let capturedIntent: string | null = null;
   const { booking, listingTitle } = await db.transaction(async (tx) => {
     const { booking, listingTitle } = await loadBooking(tx, bookingId);
     if (booking.ownerId !== ownerId) throw new UserError("Réservation introuvable.");
@@ -201,7 +261,7 @@ export async function respondToBooking(
     if (decision === "decline") {
       await tx
         .update(bookings)
-        .set({ status: "declined", respondedAt: now, cancelReason: reason?.slice(0, 500) || null })
+        .set({ status: "declined", respondedAt: now, updatedAt: now, cancelReason: reason?.slice(0, 500) || null })
         .where(eq(bookings.id, bookingId));
       return { booking: fresh, listingTitle };
     }
@@ -209,14 +269,27 @@ export async function respondToBooking(
       throw new UserError("Ces dates sont déjà réservées ou bloquées.");
     }
     const online = fresh.paymentMethod === "online";
-    const payDeadline = new Date(Math.min(now.getTime() + 24 * 3_600_000, endOfDayInGuyane(fresh.startDate).getTime()));
+    if (online) {
+      if (fresh.paymentStatus !== "authorized" || !fresh.stripePaymentIntentId) {
+        throw new UserError("Le locataire n'a pas encore validé son empreinte bancaire.");
+      }
+      // Débit de l'empreinte avant de confirmer : en cas d'échec, rien n'est accepté.
+      try {
+        await paymentGateway().capture(fresh.stripePaymentIntentId);
+        capturedIntent = fresh.stripePaymentIntentId;
+      } catch (err) {
+        console.error("Capture refusée", fresh.id, err);
+        throw new UserError("Le paiement du locataire n'a pas pu être débité. Proposez-lui de refaire une demande.");
+      }
+    }
     await tx
       .update(bookings)
       .set({
         status: "accepted",
         respondedAt: now,
+        updatedAt: now,
         handoverCode: newHandoverCode(),
-        ...(online ? { paymentStatus: "pending" as const, expiresAt: payDeadline } : {}),
+        ...(online ? { paymentStatus: "paid" as const, paidAt: now } : {}),
       })
       .where(eq(bookings.id, bookingId));
     const overlapping = await tx
@@ -233,7 +306,13 @@ export async function respondToBooking(
       .returning();
     autoDeclined.push(...overlapping);
     return { booking: fresh, listingTitle };
+  }).catch(async (err) => {
+    if (capturedIntent) await paymentGateway().refund(capturedIntent).catch((e) => console.error("Remboursement impossible", e));
+    throw err;
   });
+
+  if (decision === "decline") await releaseAuthorization(booking);
+  for (const other of autoDeclined) await releaseAuthorization(other);
 
   const conversationId = await conversationFor(booking);
   if (decision === "accept") {
@@ -241,11 +320,11 @@ export async function respondToBooking(
     await postSystemMessage(
       conversationId,
       online
-        ? "✅ Demande acceptée. Le locataire doit maintenant régler la location en ligne pour la confirmer."
+        ? "✅ Réservation confirmée et payée en ligne. Convenez ensemble du lieu et de l'heure de remise."
         : "✅ Réservation confirmée ! Convenez ensemble du lieu et de l'heure de remise. Le paiement et la caution se règlent en main propre.",
     );
     await notify(booking.renterId, {
-      title: online ? "Demande acceptée – finalisez le paiement" : "Réservation confirmée 🎉",
+      title: "Réservation confirmée 🎉",
       body: `Votre demande pour « ${listingTitle} » ${formatDateRange(booking.startDate, booking.endDate)} a été acceptée.`,
       link: `/reservations/${booking.id}`,
       email: true,
@@ -287,9 +366,11 @@ export async function cancelBooking(userId: string, bookingId: string, reason?: 
 
   let paymentStatus = booking.paymentStatus;
   if (booking.paymentStatus === "paid" && booking.stripePaymentIntentId) {
-    const { refundPayment } = await import("./payments");
-    await refundPayment(booking.stripePaymentIntentId);
+    await paymentGateway().refund(booking.stripePaymentIntentId);
     paymentStatus = "refunded";
+  } else if (booking.paymentStatus === "authorized" && booking.stripePaymentIntentId) {
+    await paymentGateway().release(booking.stripePaymentIntentId);
+    paymentStatus = "none";
   }
   const [updated] = await db
     .update(bookings)
@@ -422,6 +503,7 @@ export async function expireStaleBookings(): Promise<number> {
     )
     .returning();
   for (const b of expired) {
+    await releaseAuthorization(b);
     try {
       await postSystemMessage(await conversationFor(b), "⌛ Demande expirée faute de réponse ou de paiement dans les délais.");
       await notify(b.renterId, {
@@ -462,7 +544,15 @@ export async function pendingRequestCount(ownerId: string): Promise<number> {
   const [row] = await db
     .select({ n: sql<number>`count(*)::int` })
     .from(bookings)
-    .where(and(eq(bookings.ownerId, ownerId), eq(bookings.status, "pending"), sql`${bookings.expiresAt} > now()`));
+    .where(
+      and(
+        eq(bookings.ownerId, ownerId),
+        eq(bookings.status, "pending"),
+        sql`${bookings.expiresAt} > now()`,
+        // Les demandes en ligne sans empreinte ne sont pas encore envoyées au propriétaire.
+        sql`not (${bookings.paymentMethod} = 'online' and ${bookings.paymentStatus} = 'none')`,
+      ),
+    );
   return row?.n ?? 0;
 }
 

@@ -1,21 +1,13 @@
 // Paiement en ligne facultatif via Stripe Connect (comptes Express).
-// Le locataire paie la location + les frais de service ; Stripe reverse la
-// location au propriétaire et la plateforme conserve les frais de service.
+// Empreinte bancaire à la demande, débit quand le propriétaire accepte ;
+// Stripe reverse la location au propriétaire, la plateforme garde les frais de service.
 import { eq } from "drizzle-orm";
-import Stripe from "stripe";
 import { APP_NAME, appUrl, stripeEnabled } from "../config";
 import { db } from "../db";
-import { bookings, listings, users } from "../db/schema";
+import { bookings, listings, stripeEvents, users } from "../db/schema";
 import { UserError } from "../errors";
-import { markBookingPaid } from "./bookings";
-
-let client: Stripe | null = null;
-
-export function getStripe(): Stripe {
-  if (!stripeEnabled()) throw new UserError("Le paiement en ligne n'est pas activé.");
-  client ??= new Stripe(process.env.STRIPE_SECRET_KEY!, { appInfo: { name: APP_NAME } });
-  return client;
-}
+import { markBookingAuthorized, markBookingPaid } from "./bookings";
+import { getStripe, paymentGateway, type CheckoutLine, type CheckoutState } from "./payment-gateway";
 
 /** Lien d'inscription Stripe pour qu'un propriétaire reçoive ses paiements. */
 export async function createOnboardingLink(userId: string): Promise<string> {
@@ -66,9 +58,11 @@ export async function createDashboardLink(userId: string): Promise<string> {
   return link.url;
 }
 
-/** Crée la page de paiement Stripe pour une réservation acceptée. */
-export async function createCheckout(renterId: string, bookingId: string): Promise<string> {
-  const stripe = getStripe();
+/**
+ * Page de paiement Stripe qui pose une empreinte bancaire sur la carte du locataire
+ * juste après sa demande. Le débit n'a lieu que si le propriétaire accepte.
+ */
+export async function createAuthorizationCheckout(renterId: string, bookingId: string): Promise<string> {
   const [row] = await db
     .select({ booking: bookings, title: listings.title, ownerAccount: users.stripeAccountId })
     .from(bookings)
@@ -78,69 +72,56 @@ export async function createCheckout(renterId: string, bookingId: string): Promi
     .limit(1);
   if (!row || row.booking.renterId !== renterId) throw new UserError("Réservation introuvable.");
   const { booking } = row;
-  if (booking.status !== "accepted" || booking.paymentMethod !== "online") throw new UserError("Aucun paiement en attente.");
-  if (booking.paymentStatus === "paid") throw new UserError("Cette réservation est déjà payée.");
+  if (booking.status !== "pending" || booking.paymentMethod !== "online" || booking.paymentStatus !== "none") {
+    throw new UserError("Aucune empreinte bancaire à valider pour cette réservation.");
+  }
   if (!row.ownerAccount) throw new UserError("Le propriétaire ne peut pas encore recevoir de paiement.");
   const [renter] = await db.select({ email: users.email }).from(users).where(eq(users.id, renterId)).limit(1);
 
-  const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = [
-    {
-      quantity: 1,
-      price_data: {
-        currency: "eur",
-        unit_amount: booking.rentalAmount,
-        product_data: { name: `Location : ${row.title}`, description: `${booking.days} jour(s), du ${booking.startDate} au ${booking.endDate}` },
-      },
-    },
+  const lines: CheckoutLine[] = [
+    { name: `Location : ${row.title}`, description: `${booking.days} jour(s), du ${booking.startDate} au ${booking.endDate}`, amount: booking.rentalAmount },
   ];
-  if (booking.serviceFee > 0) {
-    lineItems.push({
-      quantity: 1,
-      price_data: { currency: "eur", unit_amount: booking.serviceFee, product_data: { name: `Frais de service ${APP_NAME}` } },
-    });
-  }
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    locale: "fr",
-    customer_email: renter?.email,
-    line_items: lineItems,
-    payment_intent_data: {
-      application_fee_amount: booking.serviceFee,
-      transfer_data: { destination: row.ownerAccount },
-      metadata: { bookingId: booking.id },
-      description: `${APP_NAME} – réservation ${booking.id}`,
-    },
-    metadata: { bookingId: booking.id },
-    expires_at: Math.floor(Date.now() / 1000) + 60 * 60,
-    success_url: `${appUrl()}/reservations/${booking.id}?paiement={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${appUrl()}/reservations/${booking.id}`,
+  if (booking.serviceFee > 0) lines.push({ name: `Frais de service ${APP_NAME}`, amount: booking.serviceFee });
+  const session = await paymentGateway().createAuthorization({
+    bookingId: booking.id,
+    customerEmail: renter?.email,
+    lines,
+    applicationFee: booking.serviceFee,
+    destinationAccount: row.ownerAccount,
+    successUrl: `${appUrl()}/reservations/${booking.id}?paiement={CHECKOUT_SESSION_ID}`,
+    cancelUrl: `${appUrl()}/reservations/${booking.id}`,
   });
   await db.update(bookings).set({ stripeCheckoutSessionId: session.id }).where(eq(bookings.id, booking.id));
-  if (!session.url) throw new UserError("Impossible d'ouvrir la page de paiement.");
   return session.url;
 }
 
-/** Vérifie une session de paiement au retour du locataire (filet de sécurité du webhook). */
+/** Vérifie une session au retour du locataire (filet de sécurité si le webhook tarde). */
 export async function syncCheckoutSession(sessionId: string): Promise<void> {
-  const session = await getStripe().checkout.sessions.retrieve(sessionId);
-  await applyCheckoutSession(session);
+  await applyCheckout(await paymentGateway().getCheckout(sessionId));
 }
 
-async function applyCheckoutSession(session: Stripe.Checkout.Session) {
-  const bookingId = session.metadata?.bookingId;
-  if (!bookingId || session.payment_status !== "paid") return;
-  const paymentIntent = typeof session.payment_intent === "string" ? session.payment_intent : session.payment_intent?.id ?? null;
-  await markBookingPaid(bookingId, paymentIntent);
+async function applyCheckout(checkout: CheckoutState) {
+  if (!checkout.bookingId || !checkout.paymentIntentId) return;
+  if (checkout.state === "authorized") await markBookingAuthorized(checkout.bookingId, checkout.paymentIntentId);
+  // Réservations créées avant l'empreinte (paiement après acceptation).
+  if (checkout.state === "paid") await markBookingPaid(checkout.bookingId, checkout.paymentIntentId);
 }
 
-export async function handleStripeWebhook(rawBody: string, signature: string | null): Promise<void> {
-  const secret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!secret || !signature) throw new UserError("Webhook non configuré.");
-  const event = getStripe().webhooks.constructEvent(rawBody, signature, secret);
+/** Événement Stripe minimal, tel que traité ici (testable sans Stripe). */
+export type StripeEventLike = {
+  id: string;
+  type: string;
+  data: { object: { id: string; charges_enabled?: boolean; payouts_enabled?: boolean } };
+};
+
+/** Traite un événement une seule fois : Stripe peut renvoyer le même événement. */
+export async function processStripeEvent(event: StripeEventLike): Promise<boolean> {
+  const [fresh] = await db.insert(stripeEvents).values({ id: event.id, type: event.type }).onConflictDoNothing().returning();
+  if (!fresh) return false;
   switch (event.type) {
     case "checkout.session.completed":
     case "checkout.session.async_payment_succeeded":
-      await applyCheckoutSession(event.data.object);
+      await syncCheckoutSession(event.data.object.id);
       break;
     case "account.updated": {
       const account = event.data.object;
@@ -149,12 +130,12 @@ export async function handleStripeWebhook(rawBody: string, signature: string | n
       break;
     }
   }
+  return true;
 }
 
-export async function refundPayment(paymentIntentId: string): Promise<void> {
-  await getStripe().refunds.create({
-    payment_intent: paymentIntentId,
-    reverse_transfer: true,
-    refund_application_fee: true,
-  });
+export async function handleStripeWebhook(rawBody: string, signature: string | null): Promise<void> {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!secret || !signature) throw new UserError("Webhook non configuré.");
+  const event = getStripe().webhooks.constructEvent(rawBody, signature, secret);
+  await processStripeEvent(event as unknown as StripeEventLike);
 }

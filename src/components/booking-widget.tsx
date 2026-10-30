@@ -138,7 +138,9 @@ export function BookingWidget(props: Props) {
         </Link>
       )}
       <p className="text-center text-xs text-muted">
-        Vous ne payez rien maintenant. Le propriétaire a 48 h pour accepter.
+        {props.online
+          ? "Empreinte bancaire à la demande : vous n'êtes débité que si le propriétaire accepte (sous 48 h)."
+          : "Vous ne payez rien maintenant. Le propriétaire a 48 h pour accepter."}
       </p>
 
       {props.unavailable.length > 0 && (

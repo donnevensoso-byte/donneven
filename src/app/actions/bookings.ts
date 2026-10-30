@@ -8,6 +8,7 @@ import {
   cancelBooking,
   confirmHandover,
   confirmReturn,
+  needsAuthorization,
   requestBooking,
   respondToBooking,
 } from "@/lib/services/bookings";
@@ -29,6 +30,18 @@ export async function requestBookingAction(listingId: string, _prev: ActionState
     });
   } catch (err) {
     return toActionError(err);
+  }
+  // Paiement en ligne : la demande ne part qu'après l'empreinte bancaire.
+  if (await needsAuthorization(bookingId)) {
+    let url: string;
+    try {
+      const { createAuthorizationCheckout } = await import("@/lib/services/payments");
+      url = await createAuthorizationCheckout(user.id, bookingId);
+    } catch (err) {
+      console.error(err);
+      redirect(`/reservations/${bookingId}`);
+    }
+    redirect(url);
   }
   redirect(`/reservations/${bookingId}?envoyee=1`);
 }
@@ -94,8 +107,8 @@ export async function payBookingAction(bookingId: string): Promise<ActionState> 
   const user = await requireUser(`/reservations/${bookingId}`);
   let url: string;
   try {
-    const { createCheckout } = await import("@/lib/services/payments");
-    url = await createCheckout(user.id, bookingId);
+    const { createAuthorizationCheckout } = await import("@/lib/services/payments");
+    url = await createAuthorizationCheckout(user.id, bookingId);
   } catch (err) {
     return toActionError(err);
   }
