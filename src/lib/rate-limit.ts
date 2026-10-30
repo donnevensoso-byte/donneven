@@ -14,3 +14,17 @@ export function rateLimit(key: string, limit: number, windowMs: number): boolean
   bucket.count++;
   return bucket.count <= limit;
 }
+
+/**
+ * Adresse du client pour les limites anti-abus. Chaque proxy ajoute l'adresse qu'il voit
+ * à la fin de X-Forwarded-For : seules les dernières entrées sont fiables, le début est
+ * écrit par le client. TRUSTED_PROXIES = nombre de proxys devant l'application (1 par défaut).
+ */
+export function clientIp(headers: Headers, trustedProxies = Number(process.env.TRUSTED_PROXIES ?? 1)): string {
+  const chain = (headers.get("x-forwarded-for") ?? "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  if (chain.length > 0) return chain[Math.max(0, chain.length - Math.max(1, trustedProxies))];
+  return headers.get("x-real-ip")?.trim() || "local";
+}

@@ -22,14 +22,13 @@ import { sendEmail } from "@/lib/email";
 import type { ActionState } from "@/lib/errors";
 import { COMMUNES } from "@/lib/guyane";
 import { newId } from "@/lib/ids";
-import { rateLimit } from "@/lib/rate-limit";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 import { safeRedirectPath } from "@/lib/text";
 
 const communeSlugs = COMMUNES.map((c) => c.slug) as [string, ...string[]];
 
 async function clientKey(): Promise<string> {
-  const h = await headers();
-  return (h.get("x-forwarded-for") ?? "").split(",")[0].trim() || h.get("x-real-ip") || "local";
+  return clientIp(await headers());
 }
 
 

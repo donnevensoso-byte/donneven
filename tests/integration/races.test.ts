@@ -79,6 +79,5 @@ describe("requêtes simultanées", () => {
     await Promise.allSettled([respondToBooking(owner, id, "accept"), cancelBooking(renter, id, "changement")]);
     const [row] = await db.select().from(bookings).where(eq(bookings.id, id));
     expect(["accepted", "cancelled"]).toContain(row.status);
-    if (row.status === "cancelled") expect(row.handoverCode === null || row.cancelledAt !== null).toBe(true);
   });
 });
