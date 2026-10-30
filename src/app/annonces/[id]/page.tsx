@@ -160,6 +160,12 @@ export default async function ListingPage({ params, searchParams }: Props) {
                 <dt className="text-muted">Durée minimale</dt>
                 <dd className="font-semibold">{listing.minDays} jour{listing.minDays > 1 ? "s" : ""}</dd>
               </div>
+              {listing.minNoticeDays > 0 && (
+                <div className="card p-3">
+                  <dt className="text-muted">Réserver</dt>
+                  <dd className="font-semibold">{listing.minNoticeDays} jour{listing.minNoticeDays > 1 ? "s" : ""} à l&apos;avance</dd>
+                </div>
+              )}
             </dl>
           </section>
 
@@ -203,6 +209,7 @@ export default async function ListingPage({ params, searchParams }: Props) {
                 weekPrice={listing.weekPrice}
                 deposit={listing.deposit}
                 minDays={listing.minDays}
+                minNoticeDays={listing.minNoticeDays}
                 unavailable={unavailable}
                 today={todayInGuyane()}
                 maxDays={MAX_RENTAL_DAYS}

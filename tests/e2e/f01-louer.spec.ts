@@ -142,7 +142,7 @@ test("F01-E9 au clavier seulement : choisir les dates et envoyer", async ({ page
   await page.getByLabel("Début").focus();
   await fillDates(page, day(3), day(4));
   const button = page.getByRole("button", { name: "Demander à réserver" });
-  for (let i = 0; i < 6 && !(await button.evaluate((el) => el === document.activeElement)); i++) await page.keyboard.press("Tab");
+  for (let i = 0; i < 15 && !(await button.evaluate((el) => el === document.activeElement)); i++) await page.keyboard.press("Tab");
   await expect(button).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(page.getByText("Demande envoyée")).toBeVisible();
@@ -201,4 +201,27 @@ test("F01-E14 pages locales : commune, catégorie, combinaison, et 404 sur un li
   allowNotFound(page);
   const sitemap = await (await page.request.get("/sitemap.xml")).text();
   expect(sitemap).toContain("/location-outils/jardin/kourou");
+});
+
+test("F01-E15 délai de prévenance, heures souhaitées et rayon de recherche", async ({ page, context }) => {
+  const owner = await createUser("Loueur Prévenance");
+  const renter = await createUser("Locataire Horaires");
+  const marker = `Horaire${Date.now()}`;
+  const listingId = await createTestListing(owner.id, { title: `Échafaudage ${marker}`, minNoticeDays: "3", commune: "remire-montjoly" });
+  await signIn(context, renter);
+  await page.goto(`/annonces/${listingId}`);
+  await expect(page.getByText(/prévenu 3 jours à l'avance/)).toBeVisible();
+  await expect(page.getByLabel("Début")).toHaveAttribute("min", day(3));
+  await fillDates(page, day(3), day(4));
+  await page.getByLabel(/Heure de remise/).fill("07:30");
+  await page.getByLabel(/Heure de retour/).fill("17:45");
+  await page.getByRole("button", { name: "Demander à réserver" }).click();
+  await expect(page.getByText("Demande envoyée")).toBeVisible();
+  await expect(page.getByText("remise 07:30 · retour 17:45")).toBeVisible();
+
+  await page.goto(`/recherche?q=${marker}&commune=cayenne`);
+  await expect(page.getByTestId("listing-card")).toHaveCount(0);
+  await page.goto(`/recherche?q=${marker}&commune=cayenne&rayon=20`);
+  await expect(page.getByTestId("listing-card")).toHaveCount(1);
+  await expect(page.getByLabel("Autour de la commune")).toHaveValue("20");
 });

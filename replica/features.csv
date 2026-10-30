@@ -37,8 +37,8 @@ Annulation gratuite jusqu'à la veille,réservation,must,no,yes,correctif replic
 État des lieux en photos à la remise et au retour,réservation,must,no,yes,"S08 + contrat : photos datées des deux parties, 8 par personne et par étape, tracées dans la conversation ; fix 1"
 Relance du loueur et annonces alternatives si pas de réponse,réservation,must,no,yes,"fix 2 : rappel au loueur 12 h avant l'expiration (/api/cron + secours au fil des visites), délai de réponse habituel affiché, annonces libres aux mêmes dates proposées après refus ou expiration"
 Règles d'annulation affichées avant la demande,réservation,should,no,yes,"fix 3 : dans le module de réservation avec la date limite exacte, rappelées sur la réservation"
-Filtre par rayon en km,recherche,could,no,no,fix 4 : 1 avis (mince)
-Heure de remise et de retour,réservation,could,no,no,fix 5 : 1 avis (mince)
-Délai minimum de réservation par annonce,annonces,could,no,no,fix 6 : 1 avis (mince)
+Filtre par rayon en km,recherche,could,no,yes,"fix 4 : « 5/10/20/50 km autour » de la commune choisie, dans la recherche"
+Heure de remise et de retour,réservation,could,no,yes,"fix 5 : heures souhaitées sur la demande, reprises sur la réservation et le contrat"
+Délai minimum de réservation par annonce,annonces,could,no,yes,"fix 6 : « réservation au plus tard X jours avant » par annonce, imposé par le serveur et le calendrier"
 Caution par empreinte bancaire,paiement,could,no,no,fix 7 : 1 avis + litiges
 Notifications push,notifications,could,no,no,fix 8 : 1 avis (mince) ; avec l'app mobile

@@ -352,6 +352,16 @@ export default async function BookingPage({ params, searchParams }: Props) {
           <div className="card p-5 text-sm">
             <h2 className="font-semibold">Récapitulatif</h2>
             <dl className="mt-3 space-y-1.5">
+              {(booking.pickupTime || booking.returnTime) && (
+                <div className="flex justify-between text-muted">
+                  <dt>Horaires souhaités</dt>
+                  <dd>
+                    {booking.pickupTime ? `remise ${booking.pickupTime.slice(0, 5)}` : ""}
+                    {booking.pickupTime && booking.returnTime ? " · " : ""}
+                    {booking.returnTime ? `retour ${booking.returnTime.slice(0, 5)}` : ""}
+                  </dd>
+                </div>
+              )}
               <div className="flex justify-between">
                 <dt>Location ({booking.days} j)</dt>
                 <dd>{formatEuros(booking.rentalAmount)}</dd>

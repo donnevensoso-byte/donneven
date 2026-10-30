@@ -70,6 +70,7 @@ export const listingFormSchema = z
     weekPrice: euros({ min: 1, max: 5000 }),
     deposit: euros({ min: 0, max: 5000 }).transform((v) => v ?? 0),
     minDays: z.coerce.number().int().min(1).max(30).default(1),
+    minNoticeDays: z.coerce.number().int().min(0).max(14).default(0),
     commune: z.enum(communeSlugs, { message: "Choisissez votre commune" }),
     neighborhood: optionalText(80),
     lat: coordinate,
@@ -144,6 +145,7 @@ export async function createListing(ownerId: string, input: ListingInput, photos
       weekPrice: input.weekPrice,
       deposit: input.deposit,
       minDays: input.minDays,
+      minNoticeDays: input.minNoticeDays,
       commune: input.commune,
       neighborhood: input.neighborhood,
       lat: location.lat,
@@ -202,6 +204,7 @@ export async function updateListing(
         weekPrice: input.weekPrice,
         deposit: input.deposit,
         minDays: input.minDays,
+        minNoticeDays: input.minNoticeDays,
         commune: input.commune,
         neighborhood: input.neighborhood,
         lat: location.lat,
@@ -254,6 +257,8 @@ export type SearchFilters = {
   end?: string;
   sort?: "recommended" | "recent" | "price_asc" | "price_desc" | "distance";
   near?: { lat: number; lng: number };
+  /** Avec une commune : élargit la recherche à ce rayon autour de son centre. */
+  radiusKm?: number;
   delivery?: boolean;
   ownerId?: string;
   page?: number;
@@ -339,7 +344,9 @@ export async function searchListings(filters: SearchFilters): Promise<{ items: L
     }
   }
   if (filters.category) conditions.push(eq(listings.category, filters.category));
-  if (filters.commune) conditions.push(eq(listings.commune, filters.commune));
+  const radiusCenter = filters.radiusKm && filters.commune ? getCommune(filters.commune) : undefined;
+  if (radiusCenter) conditions.push(sql`${distanceExpr(radiusCenter)} <= ${filters.radiusKm}`);
+  else if (filters.commune) conditions.push(eq(listings.commune, filters.commune));
   if (filters.maxPrice) conditions.push(sql`${listings.dayPrice} <= ${filters.maxPrice}`);
   if (filters.delivery) conditions.push(eq(listings.delivery, true));
   if (filters.ownerId) conditions.push(eq(listings.ownerId, filters.ownerId));

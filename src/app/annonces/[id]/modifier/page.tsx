@@ -51,6 +51,7 @@ export default async function EditListingPage({ params }: { params: Promise<{ id
           weekPrice: toEuros(listing.weekPrice),
           deposit: toEuros(listing.deposit),
           minDays: listing.minDays,
+          minNoticeDays: listing.minNoticeDays,
           commune: listing.commune,
           neighborhood: listing.neighborhood,
           lat: listing.lat,

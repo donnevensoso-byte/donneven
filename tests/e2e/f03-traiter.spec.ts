@@ -115,8 +115,9 @@ test("F03-E6 refus : le locataire voit des annonces libres aux mêmes dates ; d�
   const owner = await createUser("Loueur Refus Plan B");
   const other = await createUser("Autre Loueur Plan B");
   const renter = await createUser("Locataire Plan B");
-  const listingId = await createTestListing(owner.id, { title: "Perceuse refusée" });
-  await createTestListing(other.id, { title: "Perceuse de secours disponible" });
+  // Catégorie peu utilisée par les autres specs : le plan B n'en montre que 4.
+  const listingId = await createTestListing(owner.id, { title: "Perceuse refusée", category: "fleuve" });
+  await createTestListing(other.id, { title: "Perceuse de secours disponible", category: "fleuve" });
   const id = await requestBooking(renter.id, { listingId, startDate: day(6), endDate: day(7) });
   await respondToBooking(owner.id, id, "decline", "Prêtée à mon frère");
   await signIn(context, renter);

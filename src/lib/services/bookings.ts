@@ -73,10 +73,24 @@ async function isPeriodFree(
   return !blocked;
 }
 
-export type BookingRequest = { listingId: string; startDate: string; endDate: string; message?: string };
+export type BookingRequest = {
+  listingId: string;
+  startDate: string;
+  endDate: string;
+  message?: string;
+  /** Heures souhaitées (HH:MM), facultatives. */
+  pickupTime?: string;
+  returnTime?: string;
+};
+
+function parseTime(value: string | undefined, label: string): string | null {
+  if (!value?.trim()) return null;
+  if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(value.trim())) throw new UserError(`Heure de ${label} invalide.`);
+  return value.trim();
+}
 
 export function quoteBooking(
-  listing: { dayPrice: number; weekPrice: number | null; minDays: number },
+  listing: { dayPrice: number; weekPrice: number | null; minDays: number; minNoticeDays: number },
   startDate: string,
   endDate: string,
   online: boolean,
@@ -85,6 +99,9 @@ export function quoteBooking(
   if (!isIsoDate(startDate) || !isIsoDate(endDate)) throw new UserError("Choisissez vos dates de location.");
   if (startDate > endDate) throw new UserError("La date de fin doit être après la date de début.");
   if (startDate < today) throw new UserError("La date de début est déjà passée.");
+  if (startDate < addDays(today, listing.minNoticeDays)) {
+    throw new UserError(`Ce propriétaire demande à être prévenu au moins ${listing.minNoticeDays} jour${listing.minNoticeDays > 1 ? "s" : ""} à l'avance.`);
+  }
   if (startDate > addDays(today, MAX_ADVANCE_DAYS)) throw new UserError("Réservation possible jusqu'à 6 mois à l'avance.");
   const days = rentalDays(startDate, endDate);
   if (days > MAX_RENTAL_DAYS) throw new UserError(`Location limitée à ${MAX_RENTAL_DAYS} jours.`);
@@ -111,6 +128,8 @@ export async function requestBooking(renterId: string, req: BookingRequest): Pro
 
   const online = stripeEnabled() && row.ownerOnboarded;
   const price = quoteBooking(listing, req.startDate, req.endDate, online);
+  const pickupTime = parseTime(req.pickupTime, "remise");
+  const returnTime = parseTime(req.returnTime, "retour");
 
   if (!(await isPeriodFree(db, listing.id, req.startDate, req.endDate))) {
     throw new UserError("Le matériel n'est pas disponible à ces dates.");
@@ -150,6 +169,8 @@ export async function requestBooking(renterId: string, req: BookingRequest): Pro
       deposit: listing.deposit,
       paymentMethod: online ? "online" : "onsite",
       expiresAt: ttl < startDeadline ? ttl : startDeadline,
+      pickupTime,
+      returnTime,
     })
     .catch((err) => {
       // Deux onglets au même instant : la base tranche (contrainte d'exclusion).

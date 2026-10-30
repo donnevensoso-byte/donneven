@@ -97,7 +97,8 @@ export default async function ContractPage({ params }: { params: Promise<{ id: s
           <p>
             Du <strong>{formatDate(booking.startDate, { weekday: "long", year: "numeric" })}</strong> au{" "}
             <strong>{formatDate(booking.endDate, { weekday: "long", year: "numeric" })}</strong> inclus, soit {booking.days} jour{booking.days > 1 ? "s" : ""}.
-            Heure de remise : ……… h ……… · Heure de retour : ……… h ………
+            Heure de remise : {booking.pickupTime ? booking.pickupTime.slice(0, 5).replace(":", " h ") : "……… h ………"} · Heure de retour :{" "}
+            {booking.returnTime ? booking.returnTime.slice(0, 5).replace(":", " h ") : "……… h ………"}
           </p>
         </section>
 

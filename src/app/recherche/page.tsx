@@ -13,6 +13,7 @@ type Params = {
   q?: string;
   categorie?: string;
   commune?: string;
+  rayon?: string;
   prixmax?: string;
   du?: string;
   au?: string;
@@ -28,6 +29,8 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   const where = p.commune ? communeName(p.commune) : "Guyane";
   return { title: `${what} à louer – ${where}` };
 }
+
+const RADII = [5, 10, 20, 50];
 
 const SORTS = [
   { value: "recommended", label: "Recommandées" },
@@ -46,6 +49,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     q: p.q?.slice(0, 100),
     category: getCategory(p.categorie)?.slug,
     commune: getCommune(p.commune)?.slug,
+    radiusKm: RADII.includes(Number(p.rayon)) ? Number(p.rayon) : undefined,
     maxPrice: parseEuros(p.prixmax) ?? undefined,
     start: p.du && isIsoDate(p.du) ? p.du : undefined,
     end: p.au && isIsoDate(p.au) ? p.au : p.du && isIsoDate(p.du) ? p.du : undefined,
@@ -64,7 +68,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
     const qs = params.toString();
     return `/recherche${qs ? `?${qs}` : ""}`;
   };
-  const activeFilters = [p.categorie, p.commune, p.prixmax, p.du, p.livraison].filter(Boolean).length;
+  const activeFilters = [p.categorie, p.commune, p.rayon, p.prixmax, p.du, p.livraison].filter(Boolean).length;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
@@ -94,6 +98,15 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               <select className="input" id="commune" name="commune" defaultValue={p.commune ?? ""}>
                 <option value="">Toute la Guyane</option>
                 <CommuneOptions />
+              </select>
+            </div>
+            <div>
+              <label className="label" htmlFor="rayon">Autour de la commune</label>
+              <select className="input" id="rayon" name="rayon" defaultValue={p.rayon ?? ""}>
+                <option value="">Cette commune seulement</option>
+                {RADII.map((r) => (
+                  <option key={r} value={r}>{r} km autour</option>
+                ))}
               </select>
             </div>
             <div>

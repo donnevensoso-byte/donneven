@@ -15,6 +15,7 @@ type Props = {
   weekPrice: number | null;
   deposit: number;
   minDays: number;
+  minNoticeDays: number;
   unavailable: { start: string; end: string }[];
   today: string;
   maxDays: number;
@@ -27,6 +28,7 @@ export function BookingWidget(props: Props) {
   const form = useActionForm(requestBookingAction.bind(null, props.listingId));
   const { state } = form;
   const [start, setStart] = useState("");
+  const firstDay = addDays(props.today, props.minNoticeDays);
   const [end, setEnd] = useState("");
 
   const quote = useMemo(() => {
@@ -61,7 +63,7 @@ export function BookingWidget(props: Props) {
             type="date"
             id="start"
             name="start"
-            min={props.today}
+            min={firstDay}
             max={addDays(props.today, 180)}
             value={start}
             onChange={(e) => {
@@ -74,6 +76,22 @@ export function BookingWidget(props: Props) {
         <div>
           <label className="label" htmlFor="end">Fin (incluse)</label>
           <input className="input px-2.5" type="date" id="end" name="end" min={start || props.today} value={end} onChange={(e) => setEnd(e.target.value)} required />
+        </div>
+      </div>
+
+      {props.minNoticeDays > 0 && (
+        <p className="text-xs text-muted">
+          Ce propriétaire demande à être prévenu {props.minNoticeDays} jour{props.minNoticeDays > 1 ? "s" : ""} à l&apos;avance.
+        </p>
+      )}
+      <div className="grid grid-cols-2 gap-2">
+        <div>
+          <label className="label" htmlFor="pickupTime">Heure de remise <span className="font-normal text-muted">(option)</span></label>
+          <input className="input px-2.5" type="time" id="pickupTime" name="pickupTime" step={900} />
+        </div>
+        <div>
+          <label className="label" htmlFor="returnTime">Heure de retour <span className="font-normal text-muted">(option)</span></label>
+          <input className="input px-2.5" type="time" id="returnTime" name="returnTime" step={900} />
         </div>
       </div>
 

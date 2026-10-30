@@ -28,6 +28,8 @@ export async function requestBookingAction(listingId: string, _prev: ActionState
       startDate: String(formData.get("start") ?? ""),
       endDate: String(formData.get("end") ?? ""),
       message: String(formData.get("message") ?? ""),
+      pickupTime: String(formData.get("pickupTime") ?? ""),
+      returnTime: String(formData.get("returnTime") ?? ""),
     });
   } catch (err) {
     return toActionError(err);

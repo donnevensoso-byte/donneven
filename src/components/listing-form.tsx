@@ -17,6 +17,7 @@ export type ListingFormDefaults = {
   weekPrice?: string;
   deposit?: string;
   minDays?: number;
+  minNoticeDays?: number;
   commune?: string;
   neighborhood?: string | null;
   lat?: number;
@@ -142,13 +143,24 @@ export function ListingForm({
           </div>
         </div>
         <p className="hint">La caution est remise en main propre (chèque ou espèces) et rendue au retour du matériel en bon état.</p>
-        <div className="sm:w-1/3">
-          <label className="label" htmlFor="minDays">Durée minimale</label>
-          <select className="input" id="minDays" name="minDays" defaultValue={String(defaults.minDays ?? 1)}>
-            {[1, 2, 3, 7].map((d) => (
-              <option key={d} value={d}>{d} jour{d > 1 ? "s" : ""}</option>
-            ))}
-          </select>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div>
+            <label className="label" htmlFor="minDays">Durée minimale</label>
+            <select className="input" id="minDays" name="minDays" defaultValue={String(defaults.minDays ?? 1)}>
+              {[1, 2, 3, 7].map((d) => (
+                <option key={d} value={d}>{d} jour{d > 1 ? "s" : ""}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="label" htmlFor="minNoticeDays">Réservation au plus tard</label>
+            <select className="input" id="minNoticeDays" name="minNoticeDays" defaultValue={String(defaults.minNoticeDays ?? 0)}>
+              <option value="0">Le jour même</option>
+              {[1, 2, 3, 4, 7].map((d) => (
+                <option key={d} value={d}>{d} jour{d > 1 ? "s" : ""} avant</option>
+              ))}
+            </select>
+          </div>
         </div>
       </Section>
 
