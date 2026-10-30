@@ -90,7 +90,14 @@ export function MessageThread({
   let lastDay = "";
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <div className="flex-1 space-y-2 overflow-y-auto px-1 py-4" aria-live="polite" data-testid="thread">
+      <div
+        className="flex-1 space-y-2 overflow-y-auto rounded-lg px-1 py-4 focus-visible:outline-2 focus-visible:outline-accent"
+        role="log"
+        aria-live="polite"
+        aria-label="Messages de la conversation"
+        tabIndex={0}
+        data-testid="thread"
+      >
         {messages.length === 0 && (
           <p className="py-10 text-center text-sm text-muted">
             Posez votre question à {otherFirstName} : disponibilité, état du matériel, lieu de retrait…
@@ -111,7 +118,7 @@ export function MessageThread({
                 <div className={`flex ${mine ? "justify-end" : "justify-start"}`}>
                   <div className={`max-w-[80%] rounded-2xl px-3.5 py-2 text-[15px] ${mine ? "rounded-br-md bg-brand-600 text-white" : "rounded-bl-md border border-line bg-white"}`}>
                     <p className="whitespace-pre-line break-words">{m.body}</p>
-                    <p className={`mt-0.5 text-right text-[10px] ${mine ? "text-white/70" : "text-muted"}`}>{timeFmt.format(date)}</p>
+                    <p className={`mt-0.5 text-right text-[10px] ${mine ? "text-white/90" : "text-muted"}`}>{timeFmt.format(date)}</p>
                   </div>
                 </div>
               )}

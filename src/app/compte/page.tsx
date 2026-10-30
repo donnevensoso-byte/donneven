@@ -58,7 +58,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
           <h1 className="text-xl font-bold">Bonjour {user.name.split(" ")[0]} 👋</h1>
           <p className="text-sm text-muted">
             {communeName(user.commune)} · {rating.count > 0 ? `${rating.average?.toFixed(1).replace(".", ",")} ★ (${rating.count} avis)` : "pas encore d'avis"} ·{" "}
-            <Link href={`/profil/${user.id}`} className="text-brand-600 hover:underline">voir mon profil public</Link>
+            <Link href={`/profil/${user.id}`} className="text-brand-600 underline hover:no-underline">voir mon profil public</Link>
           </p>
         </div>
         <div className="flex gap-6 text-center">

@@ -90,7 +90,8 @@ export default async function BookingPage({ params, searchParams }: Props) {
       <div className="mt-4 grid gap-6 md:grid-cols-[1fr_320px]">
         <div className="space-y-5">
           <div className="card flex gap-4 p-4">
-            <Link href={`/annonces/${listing.id}`} className="size-24 shrink-0 overflow-hidden rounded-xl bg-line">
+            {/* Doublon du lien du titre : retiré du clavier et des lecteurs d'écran. */}
+            <Link href={`/annonces/${listing.id}`} aria-hidden tabIndex={-1} className="size-24 shrink-0 overflow-hidden rounded-xl bg-line">
               {listingImageId && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={imageUrl(listingImageId, "thumb")} alt="" className="size-full object-cover" />
