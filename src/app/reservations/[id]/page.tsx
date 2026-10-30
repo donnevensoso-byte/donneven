@@ -10,13 +10,15 @@ import {
   ReviewForm,
 } from "@/components/booking-controls";
 import { DisputeForm } from "@/components/dispute-form";
+import { ListingGrid } from "@/components/listing-card";
 import { BookingPhotosForm } from "@/components/booking-photos";
 import { Alert, Avatar, Badge, imageUrl } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
+import { cancellationPolicy } from "@/lib/cancellation";
 import { addDays, formatDate, formatDateRange, formatDateTime, todayInGuyane } from "@/lib/dates";
 import { communeName } from "@/lib/guyane";
 import { formatEuros } from "@/lib/money";
-import { bookingStatusLabel, getBookingForUser } from "@/lib/services/bookings";
+import { alternativesFor, bookingStatusLabel, getBookingForUser } from "@/lib/services/bookings";
 import { openDisputeFor } from "@/lib/services/moderation";
 import { listBookingPhotos, MAX_PHOTOS_PER_STAGE, openPhotoStages, STAGE_LABELS } from "@/lib/services/booking-photos";
 import { canReview } from "@/lib/services/reviews";
@@ -71,6 +73,8 @@ export default async function BookingPage({ params, searchParams }: Props) {
   const photos = await listBookingPhotos(booking.id);
   const photoStages = openPhotoStages(booking);
   const dispute = await openDisputeFor(booking.id);
+  // Plan B pour le locataire quand le propriétaire refuse ou ne répond pas.
+  const alternatives = !isOwner && ["declined", "expired"].includes(booking.status) ? await alternativesFor(booking.id) : [];
   const statusTone =
     booking.status === "pending" || (booking.status === "accepted" && !paid)
       ? "yellow"
@@ -161,6 +165,7 @@ export default async function BookingPage({ params, searchParams }: Props) {
                   En attente de la réponse de {firstName(other.name)} (au plus tard le {formatDateTime(booking.expiresAt)}).
                   {online && " Votre empreinte bancaire est posée : vous ne serez débité que si la demande est acceptée."}
                 </p>
+                <p className="text-xs text-muted">{cancellationPolicy(booking.startDate, online)}</p>
                 <CancelForm bookingId={booking.id} label="Annuler ma demande" />
               </>
             )}
@@ -201,6 +206,7 @@ export default async function BookingPage({ params, searchParams }: Props) {
                 {isOwner && today < addDays(booking.startDate, -1) && (
                   <p className="text-xs text-muted">Le jour de la remise, demandez au locataire son code à 4 chiffres pour confirmer.</p>
                 )}
+                {!isOwner && today < booking.startDate && <p className="text-xs text-muted">{cancellationPolicy(booking.startDate, online)}</p>}
                 {(isOwner || today < booking.startDate) && <CancelForm bookingId={booking.id} />}
               </>
             )}
@@ -253,6 +259,16 @@ export default async function BookingPage({ params, searchParams }: Props) {
               </p>
             )}
           </section>
+
+          {alternatives.length > 0 && (
+            <section className="card space-y-4 p-5" aria-labelledby="plan-b">
+              <div>
+                <h2 id="plan-b" className="font-semibold">Disponibles aux mêmes dates</h2>
+                <p className="text-sm text-muted">Annonces de la même catégorie, libres {formatDateRange(booking.startDate, booking.endDate)}, les plus proches d&apos;abord.</p>
+              </div>
+              <ListingGrid listings={alternatives} />
+            </section>
+          )}
 
           {(photos.length > 0 || photoStages.length > 0) && (
             <section className="card space-y-4 p-5" aria-labelledby="etat-des-lieux">

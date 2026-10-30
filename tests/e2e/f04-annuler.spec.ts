@@ -69,3 +69,16 @@ test("F04-E2 retour arrière après annulation : pas de double annulation", asyn
   await page.reload();
   await expect(page.getByRole("button", { name: /Annuler (la réservation|ma demande)/ })).toHaveCount(0);
 });
+
+test("F04-E5 règles d'annulation visibles avant la demande, avec la date limite", async ({ page, context }) => {
+  const owner = await createUser("Loueur Règles");
+  const renter = await createUser("Locataire Règles");
+  const listingId = await createTestListing(owner.id);
+  await signIn(context, renter);
+  await page.goto(`/annonces/${listingId}`);
+  await expect(page.getByTestId("cancellation-policy")).toContainText("jusqu'à la veille du début");
+  await page.getByLabel("Début").fill(day(5));
+  await page.getByLabel("Fin (incluse)").fill(day(6));
+  const lastFreeDay = new Intl.DateTimeFormat("fr-FR", { weekday: "long", day: "numeric", month: "long", timeZone: "UTC" }).format(new Date(`${day(4)}T12:00:00Z`));
+  await expect(page.getByTestId("cancellation-policy")).toContainText(`jusqu'au ${lastFreeDay} inclus`);
+});

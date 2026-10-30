@@ -14,7 +14,8 @@ import { formatEuros } from "@/lib/money";
 import { isFavorite } from "@/lib/services/favorites";
 import { getListingDetail, incrementViews, listingsByOwner } from "@/lib/services/listings";
 import { ratingSummary, reviewsForListing } from "@/lib/services/reviews";
-import { publicName, truncate } from "@/lib/text";
+import { publicName, responseTimeLabel, truncate } from "@/lib/text";
+import { getPublicProfile } from "@/lib/services/users";
 
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ publiee?: string; modifiee?: string }> };
 
@@ -40,13 +41,15 @@ export default async function ListingPage({ params, searchParams }: Props) {
   const { listing, owner, photos, unavailable, isOwner } = detail;
   const category = getCategory(listing.category);
 
-  const [reviews, ownerRating, favorite, otherListings] = await Promise.all([
+  const [reviews, ownerRating, favorite, otherListings, ownerProfile] = await Promise.all([
     reviewsForListing(listing.id),
     ratingSummary(owner.id),
     user ? isFavorite(user.id, listing.id) : false,
     listingsByOwner(owner.id),
+    getPublicProfile(owner.id),
     isOwner ? Promise.resolve() : incrementViews(listing.id),
   ]);
+  const responseTime = responseTimeLabel(ownerProfile?.stats.typicalResponseHours);
   const listingRating = reviews.length ? reviews.reduce((s, r) => s + r.rating, 0) / reviews.length : null;
   const online = stripeEnabled() && owner.stripeOnboarded;
 
@@ -216,6 +219,7 @@ export default async function ListingPage({ params, searchParams }: Props) {
                 <p className="font-semibold">{publicName(owner.name)}</p>
                 <p className="text-sm text-muted">{communeName(owner.commune)} · membre depuis {formatMonthYear(owner.createdAt)}</p>
                 <Stars value={ownerRating.average} count={ownerRating.count} />
+                {responseTime && <p className="mt-1 text-sm text-muted">⚡ {responseTime}</p>}
               </div>
             </Link>
             {!isOwner && (

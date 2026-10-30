@@ -1,5 +1,5 @@
 import { randomInt } from "node:crypto";
-import { and, desc, eq, inArray, isNull, lt, ne, or, sql } from "drizzle-orm";
+import { and, desc, eq, gt, inArray, isNull, lt, lte, ne, or, sql } from "drizzle-orm";
 import {
   MAX_ADVANCE_DAYS,
   MAX_RENTAL_DAYS,
@@ -214,14 +214,82 @@ export async function payOutBooking(bookingId: string): Promise<boolean> {
   return true;
 }
 
-let lastPayoutRetry = 0;
+let lastMaintenance = 0;
 
-/** Relance les versements restés en échec (appelé au fil de l'eau, au plus toutes les 5 minutes). */
-export async function retryPendingPayouts({ throttle = false } = {}): Promise<number> {
-  if (throttle) {
-    if (Date.now() - lastPayoutRetry < 5 * 60_000) return 0;
-    lastPayoutRetry = Date.now();
+/**
+ * Tâches de fond : rappels aux propriétaires et versements en échec. Lancées par la route
+ * /api/cron (toutes les 15 min) et, en secours, au fil des visites (au plus toutes les 5 min).
+ */
+async function runMaintenance() {
+  if (Date.now() - lastMaintenance < 5 * 60_000) return;
+  lastMaintenance = Date.now();
+  await sendRequestReminders().catch((err) => console.error("sendRequestReminders", err));
+  await retryPendingPayouts().catch((err) => console.error("retryPendingPayouts", err));
+}
+
+export async function runScheduledJobs() {
+  const expired = await expireStaleBookings();
+  const reminders = await sendRequestReminders();
+  const payouts = await retryPendingPayouts();
+  return { expired, reminders, payouts };
+}
+
+const REMINDER_BEFORE_EXPIRY_HOURS = 12;
+
+/** Rappel unique au propriétaire quand une demande expire dans moins de 12 h. */
+export async function sendRequestReminders(): Promise<number> {
+  const now = new Date();
+  const due = await db
+    .update(bookings)
+    .set({ reminderSentAt: now })
+    .where(
+      and(
+        eq(bookings.status, "pending"),
+        isNull(bookings.reminderSentAt),
+        gt(bookings.expiresAt, now),
+        lte(bookings.expiresAt, new Date(now.getTime() + REMINDER_BEFORE_EXPIRY_HOURS * 3_600_000)),
+        // En ligne, la demande n'existe pour le propriétaire qu'une fois l'empreinte posée.
+        or(eq(bookings.paymentMethod, "onsite"), eq(bookings.paymentStatus, "authorized")),
+      ),
+    )
+    .returning();
+  for (const b of due) {
+    const [listing] = await db.select({ title: listings.title }).from(listings).where(eq(listings.id, b.listingId)).limit(1);
+    await notify(b.ownerId, {
+      title: "Rappel : une demande attend votre réponse",
+      body: `La demande pour « ${listing?.title ?? "votre annonce"} » ${formatDateRange(b.startDate, b.endDate)} expire bientôt. Acceptez ou refusez : le locataire pourra chercher ailleurs.`,
+      link: `/reservations/${b.id}`,
+      email: true,
+    });
   }
+  return due.length;
+}
+
+/** Annonces libres aux mêmes dates, même catégorie, les plus proches d'abord (refus ou expiration). */
+export async function alternativesFor(bookingId: string) {
+  const [row] = await db
+    .select({ booking: bookings, category: listings.category, lat: listings.lat, lng: listings.lng })
+    .from(bookings)
+    .innerJoin(listings, eq(listings.id, bookings.listingId))
+    .where(eq(bookings.id, bookingId))
+    .limit(1);
+  if (!row) return [];
+  const start = row.booking.startDate < todayInGuyane() ? todayInGuyane() : row.booking.startDate;
+  if (start > row.booking.endDate) return [];
+  const { searchListings } = await import("./listings");
+  const { items } = await searchListings({
+    category: row.category,
+    start,
+    end: row.booking.endDate,
+    near: { lat: row.lat, lng: row.lng },
+    sort: "distance",
+    pageSize: 5,
+  });
+  return items.filter((l) => l.id !== row.booking.listingId).slice(0, 4);
+}
+
+/** Relance les versements restés en échec. */
+export async function retryPendingPayouts(): Promise<number> {
   const due = await db
     .select({ id: bookings.id })
     .from(bookings)
@@ -587,7 +655,7 @@ export async function expireStaleBookings(): Promise<number> {
       ),
     )
     .returning();
-  await retryPendingPayouts({ throttle: true });
+  await runMaintenance();
   for (const b of expired) {
     await releaseAuthorization(b);
     try {

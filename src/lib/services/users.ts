@@ -66,6 +66,9 @@ export async function getPublicProfile(userId: string) {
         // Taux de réponse aux demandes reçues (acceptées ou refusées avant expiration)
         answered: sql<number>`(select count(*)::int from ${bookings} b where b.owner_id = ${userId} and b.responded_at is not null)`,
         received: sql<number>`(select count(*)::int from ${bookings} b where b.owner_id = ${userId} and b.status <> 'pending' and not (b.status = 'cancelled' and b.responded_at is null))`,
+        // Délai de réponse habituel (médiane des 10 dernières réponses), en heures
+        typicalResponseHours: sql<number | null>`(select round(percentile_cont(0.5) within group (order by extract(epoch from r.responded_at - r.created_at) / 3600))::int
+          from (select b.responded_at, b.created_at from ${bookings} b where b.owner_id = ${userId} and b.responded_at is not null order by b.responded_at desc limit 10) r)`,
       })
       .from(sql`(select 1) as one`),
   ]);

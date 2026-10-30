@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { requestBookingAction } from "@/app/actions/bookings";
+import { cancellationPolicy } from "@/lib/cancellation";
 import { addDays, formatDate, periodsOverlap, rentalDays } from "@/lib/dates";
 import { formatEuros } from "@/lib/money";
 import { computePrice } from "@/lib/pricing";
@@ -114,6 +115,11 @@ export function BookingWidget(props: Props) {
           )}
         </dl>
       )}
+
+      <p className="rounded-xl border border-line p-3 text-xs text-muted" data-testid="cancellation-policy">
+        <span className="font-semibold text-ink">Annulation · </span>
+        {cancellationPolicy(start && !conflict ? start : null, props.online)}
+      </p>
 
       <div>
         <label className="label" htmlFor="message">Message au propriétaire</label>

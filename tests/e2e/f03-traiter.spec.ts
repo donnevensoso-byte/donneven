@@ -110,3 +110,21 @@ test("F03-N1 le locataire n'a ni bouton accepter ni saisie de code", async ({ pa
   await expect(page.getByLabel("Code de remise du locataire")).toHaveCount(0);
   await expect(page.getByTestId("handover-code")).toBeVisible();
 });
+
+test("F03-E6 refus : le locataire voit des annonces libres aux mêmes dates ; délai de réponse affiché", async ({ page, context }) => {
+  const owner = await createUser("Loueur Refus Plan B");
+  const other = await createUser("Autre Loueur Plan B");
+  const renter = await createUser("Locataire Plan B");
+  const listingId = await createTestListing(owner.id, { title: "Perceuse refusée" });
+  await createTestListing(other.id, { title: "Perceuse de secours disponible" });
+  const id = await requestBooking(renter.id, { listingId, startDate: day(6), endDate: day(7) });
+  await respondToBooking(owner.id, id, "decline", "Prêtée à mon frère");
+  await signIn(context, renter);
+  await page.goto(`/reservations/${id}`);
+  await expect(page.getByRole("heading", { name: "Disponibles aux mêmes dates" })).toBeVisible();
+  await expect(page.getByTestId("listing-card").filter({ hasText: "Perceuse de secours disponible" })).toBeVisible();
+  await expect(page.getByTestId("listing-card").filter({ hasText: "Perceuse refusée" })).toHaveCount(0);
+  await expectAccessible(page);
+  await page.goto(`/annonces/${listingId}`);
+  await expect(page.getByText(/Répond en général en moins de 1 h/)).toBeVisible();
+});

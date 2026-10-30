@@ -41,3 +41,10 @@ export function safeRedirectPath(value: unknown, fallback = "/compte"): string {
   const path = typeof value === "string" ? value : "";
   return path.startsWith("/") && !path.startsWith("//") && !path.startsWith("/\\") ? path : fallback;
 }
+
+/** « Répond en général en moins de 3 h » à partir de la médiane des délais de réponse. */
+export function responseTimeLabel(hours: number | null | undefined): string | null {
+  if (hours == null) return null;
+  const bucket = [1, 3, 6, 12, 24].find((h) => hours < h);
+  return bucket ? `Répond en général en moins de ${bucket} h` : "Répond en général sous 48 h";
+}

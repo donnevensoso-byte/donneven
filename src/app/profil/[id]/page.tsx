@@ -9,7 +9,7 @@ import { communeName } from "@/lib/guyane";
 import { listingsByOwner } from "@/lib/services/listings";
 import { reviewsForUser } from "@/lib/services/reviews";
 import { getPublicProfile } from "@/lib/services/users";
-import { publicName } from "@/lib/text";
+import { publicName, responseTimeLabel } from "@/lib/text";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -52,6 +52,12 @@ export default async function PublicProfilePage({ params }: Props) {
             <div>
               <dt className="text-xs text-muted">Taux de réponse</dt>
               <dd className="text-lg font-bold">{profile.stats.responseRate} %</dd>
+            </div>
+          )}
+          {profile.stats.typicalResponseHours != null && (
+            <div>
+              <dt className="text-xs text-muted">Délai de réponse</dt>
+              <dd className="text-lg font-bold">{responseTimeLabel(profile.stats.typicalResponseHours)?.replace("Répond en général en ", "").replace("Répond en général ", "")}</dd>
             </div>
           )}
         </dl>
