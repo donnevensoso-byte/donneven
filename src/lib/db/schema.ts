@@ -192,6 +192,9 @@ export const bookings = pgTable(
     createdAt: createdAt(),
     respondedAt: timestamp("responded_at", { withTimezone: true }),
     paidAt: timestamp("paid_at", { withTimezone: true }),
+    // Versement au propriétaire, fait à la remise (code du locataire).
+    payoutTransferId: text("payout_transfer_id"),
+    paidOutAt: timestamp("paid_out_at", { withTimezone: true }),
     handedOverAt: timestamp("handed_over_at", { withTimezone: true }),
     returnedAt: timestamp("returned_at", { withTimezone: true }),
     // Code à 4 chiffres que le locataire montre à la remise ; le propriétaire le saisit.

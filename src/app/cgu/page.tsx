@@ -49,7 +49,7 @@ export default function TermsPage() {
       <ul>
         <li>Le Propriétaire fixe librement le prix et le montant de la caution.</li>
         <li>Paiement en main propre : la location et la caution sont réglées directement entre les membres lors de la remise ; Zouti ne perçoit aucune somme ni commission.</li>
-        <li>Paiement en ligne (lorsqu&apos;il est proposé) : le Locataire paie par carte via le prestataire de paiement Stripe ; des frais de service, affichés avant la demande, rémunèrent Zouti. Le montant de la location est reversé au Propriétaire. En cas d&apos;annulation conforme à l&apos;article 4, le paiement est intégralement remboursé.</li>
+        <li>Paiement en ligne (lorsqu&apos;il est proposé) : le Locataire paie par carte via le prestataire de paiement Stripe ; des frais de service, affichés avant la demande, rémunèrent Zouti. Le montant de la location est reversé au Propriétaire après la remise du matériel, confirmée par le code du Locataire. En cas d&apos;annulation conforme à l&apos;article 4, le paiement est intégralement remboursé.</li>
       </ul>
 
       <h2>6. Responsabilités</h2>

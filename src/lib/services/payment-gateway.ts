@@ -10,8 +10,6 @@ export type AuthorizationParams = {
   bookingId: string;
   customerEmail?: string;
   lines: CheckoutLine[];
-  applicationFee: number;
-  destinationAccount: string;
   successUrl: string;
   cancelUrl: string;
 };
@@ -31,9 +29,13 @@ export interface PaymentGateway {
   capture(paymentIntentId: string): Promise<void>;
   /** Libère l'empreinte sans débit (refus, expiration, annulation avant acceptation). */
   release(paymentIntentId: string): Promise<void>;
-  /** Rembourse un paiement débité, frais de service compris. */
+  /** Rembourse un paiement débité, frais de service compris (toujours avant tout versement). */
   refund(paymentIntentId: string): Promise<void>;
+  /** Verse la location au propriétaire depuis le paiement débité. Rejouable sans double versement. */
+  transfer(params: TransferParams): Promise<string>;
 }
+
+export type TransferParams = { paymentIntentId: string; destinationAccount: string; amount: number; bookingId: string };
 
 let client: Stripe | null = null;
 
@@ -57,10 +59,11 @@ const stripeGateway: PaymentGateway = {
           product_data: { name: line.name, ...(line.description ? { description: line.description } : {}) },
         },
       })),
+      // Charges et virements séparés : l'argent reste chez Zouti jusqu'à la remise,
+      // puis la location part chez le propriétaire (transfer) ; les frais restent à Zouti.
       payment_intent_data: {
         capture_method: "manual",
-        application_fee_amount: p.applicationFee,
-        transfer_data: { destination: p.destinationAccount },
+        transfer_group: p.bookingId,
         metadata: { bookingId: p.bookingId },
         description: `${APP_NAME} – réservation ${p.bookingId}`,
       },
@@ -100,7 +103,26 @@ const stripeGateway: PaymentGateway = {
   },
 
   async refund(paymentIntentId) {
-    await getStripe().refunds.create({ payment_intent: paymentIntentId, reverse_transfer: true, refund_application_fee: true });
+    await getStripe().refunds.create({ payment_intent: paymentIntentId });
+  },
+
+  async transfer(p) {
+    const stripe = getStripe();
+    const intent = await stripe.paymentIntents.retrieve(p.paymentIntentId);
+    const charge = typeof intent.latest_charge === "string" ? intent.latest_charge : intent.latest_charge?.id;
+    if (!charge) throw new Error(`Aucun débit pour ${p.paymentIntentId}`);
+    const transfer = await stripe.transfers.create(
+      {
+        amount: p.amount,
+        currency: "eur",
+        destination: p.destinationAccount,
+        transfer_group: p.bookingId,
+        source_transaction: charge,
+        metadata: { bookingId: p.bookingId },
+      },
+      { idempotencyKey: `payout-${p.bookingId}` },
+    );
+    return transfer.id;
   },
 };
 

@@ -7,25 +7,29 @@ import { addDays, todayInGuyane } from "@/lib/dates";
 import { newId } from "@/lib/ids";
 import {
   cancelBooking,
+  confirmHandover,
+  confirmReturn,
   expireStaleBookings,
   needsAuthorization,
   pendingRequestCount,
   requestBooking,
   respondToBooking,
+  retryPendingPayouts,
 } from "@/lib/services/bookings";
 import { createListing, listingFormSchema } from "@/lib/services/listings";
 import { setPaymentGateway, type CheckoutState, type PaymentGateway } from "@/lib/services/payment-gateway";
-import { createAuthorizationCheckout, processStripeEvent, syncCheckoutSession } from "@/lib/services/payments";
+import { createAuthorizationCheckout, ownerPayouts, processStripeEvent, syncCheckoutSession } from "@/lib/services/payments";
 
 // Stripe simulé : enregistre les appels et l'état des empreintes.
 class FakeGateway implements PaymentGateway {
   calls: string[] = [];
   sessions = new Map<string, CheckoutState>();
   failCapture = false;
-  async createAuthorization(p: { bookingId: string; applicationFee: number; lines: { amount: number }[] }) {
+  failTransfer = false;
+  async createAuthorization(p: { bookingId: string; lines: { amount: number }[] }) {
     const id = `cs_${p.bookingId}`;
     this.sessions.set(id, { bookingId: p.bookingId, paymentIntentId: `pi_${p.bookingId}`, state: "open" });
-    this.calls.push(`authorize:${p.bookingId}:${p.lines.reduce((s, l) => s + l.amount, 0)}:${p.applicationFee}`);
+    this.calls.push(`authorize:${p.bookingId}:${p.lines.reduce((s, l) => s + l.amount, 0)}`);
     return { id, url: `https://checkout.test/${id}` };
   }
   async getCheckout(id: string) {
@@ -40,6 +44,11 @@ class FakeGateway implements PaymentGateway {
   }
   async refund(pi: string) {
     this.calls.push(`refund:${pi}`);
+  }
+  async transfer(p: { paymentIntentId: string; destinationAccount: string; amount: number; bookingId: string }) {
+    if (this.failTransfer) throw new Error("balance_insufficient");
+    this.calls.push(`transfer:${p.paymentIntentId}:${p.destinationAccount}:${p.amount}`);
+    return `tr_${p.bookingId}`;
   }
   /** Le locataire valide l'empreinte sur la page de paiement. */
   authorize(bookingId: string) {
@@ -110,7 +119,7 @@ describe("paiement en ligne avec empreinte bancaire", () => {
     await expect(respondToBooking(owner, id, "accept")).rejects.toThrow(/empreinte/);
 
     await createAuthorizationCheckout(renter, id);
-    expect(gateway.calls).toEqual([`authorize:${id}:8800:800`]);
+    expect(gateway.calls).toEqual([`authorize:${id}:8800`]);
     await syncCheckoutSession(`cs_${id}`); // page de paiement abandonnée
     expect(await needsAuthorization(id)).toBe(true);
     gateway.authorize(id);
@@ -158,6 +167,46 @@ describe("paiement en ligne avec empreinte bancaire", () => {
     expect(gateway.calls).toContain(`release:pi_${loser}`);
     const [l] = await db.select().from(bookings).where(eq(bookings.id, loser));
     expect(l).toMatchObject({ status: "declined", paymentStatus: "none" });
+  });
+
+  it("versement au propriétaire à la remise, pas avant ; frais de service gardés par Zouti", async () => {
+    const owner = await makeUser("Loueur versé", true);
+    const renter = await makeUser("Locataire payeur");
+    const listingId = await makeListing(owner);
+    const id = await authorizedRequest(renter, listingId, 0, 1);
+    await respondToBooking(owner, id, "accept");
+    expect(gateway.calls.some((c) => c.startsWith("transfer:"))).toBe(false);
+    expect((await ownerPayouts(owner)).map((p) => p.state)).toEqual(["awaiting_handover"]);
+
+    const [{ handoverCode }] = await db.select().from(bookings).where(eq(bookings.id, id));
+    await confirmHandover(owner, id, handoverCode!);
+    expect(gateway.calls).toContain(`transfer:pi_${id}:acct_${owner}:8000`);
+    const [b] = await db.select().from(bookings).where(eq(bookings.id, id));
+    expect(b.payoutTransferId).toBe(`tr_${id}`);
+    expect(b.paidOutAt).toBeInstanceOf(Date);
+    expect(await ownerPayouts(owner)).toMatchObject([{ state: "paid_out", amount: 8000 }]);
+
+    await confirmReturn(owner, id);
+    expect(gateway.calls.filter((c) => c.startsWith("transfer:"))).toHaveLength(1);
+  });
+
+  it("versement en échec : la remise est confirmée quand même, nouvel essai plus tard", async () => {
+    const owner = await makeUser("Loueur en attente", true);
+    const renter = await makeUser("Locataire patient");
+    const listingId = await makeListing(owner);
+    const id = await authorizedRequest(renter, listingId, 0, 1);
+    await respondToBooking(owner, id, "accept");
+    const [{ handoverCode }] = await db.select().from(bookings).where(eq(bookings.id, id));
+    gateway.failTransfer = true;
+    await confirmHandover(owner, id, handoverCode!);
+    let [b] = await db.select().from(bookings).where(eq(bookings.id, id));
+    expect(b).toMatchObject({ status: "ongoing", paidOutAt: null });
+    expect((await ownerPayouts(owner))[0].state).toBe("pending");
+
+    gateway.failTransfer = false;
+    await retryPendingPayouts();
+    [b] = await db.select().from(bookings).where(eq(bookings.id, id));
+    expect(b.payoutTransferId).toBe(`tr_${id}`);
   });
 
   it("si le débit échoue, la demande reste en attente", async () => {

@@ -1,5 +1,5 @@
 import { randomInt } from "node:crypto";
-import { and, desc, eq, inArray, lt, ne, or, sql } from "drizzle-orm";
+import { and, desc, eq, inArray, isNull, lt, ne, or, sql } from "drizzle-orm";
 import {
   MAX_ADVANCE_DAYS,
   MAX_RENTAL_DAYS,
@@ -168,6 +168,75 @@ export async function requestBooking(renterId: string, req: BookingRequest): Pro
   // En paiement en ligne, le propriétaire n'est prévenu qu'une fois l'empreinte bancaire posée.
   if (!online) await notifyOwnerOfRequest(id);
   return id;
+}
+
+/**
+ * Verse la location au propriétaire (paiement en ligne), une fois le matériel remis.
+ * Un échec n'empêche pas la remise : le versement est retenté plus tard.
+ */
+export async function payOutBooking(bookingId: string): Promise<boolean> {
+  const [row] = await db
+    .select({ booking: bookings, account: users.stripeAccountId, title: listings.title })
+    .from(bookings)
+    .innerJoin(users, eq(users.id, bookings.ownerId))
+    .innerJoin(listings, eq(listings.id, bookings.listingId))
+    .where(eq(bookings.id, bookingId))
+    .limit(1);
+  const booking = row?.booking;
+  if (!booking || !row.account || !booking.stripePaymentIntentId || booking.paidOutAt) return false;
+  if (booking.paymentMethod !== "online" || booking.paymentStatus !== "paid") return false;
+  if (booking.status !== "ongoing" && booking.status !== "completed") return false;
+  let transferId: string;
+  try {
+    transferId = await paymentGateway().transfer({
+      paymentIntentId: booking.stripePaymentIntentId,
+      destinationAccount: row.account,
+      amount: booking.rentalAmount,
+      bookingId: booking.id,
+    });
+  } catch (err) {
+    console.error("Versement impossible", booking.id, err);
+    return false;
+  }
+  const now = new Date();
+  const [saved] = await db
+    .update(bookings)
+    .set({ payoutTransferId: transferId, paidOutAt: now, updatedAt: now })
+    .where(and(eq(bookings.id, booking.id), isNull(bookings.paidOutAt)))
+    .returning({ id: bookings.id });
+  if (saved) {
+    await notify(booking.ownerId, {
+      title: "Versement envoyé 💸",
+      body: `${formatEuros(booking.rentalAmount)} pour « ${row.title} » partent sur votre compte bancaire (quelques jours ouvrés).`,
+      link: "/compte/paiements",
+    });
+  }
+  return true;
+}
+
+let lastPayoutRetry = 0;
+
+/** Relance les versements restés en échec (appelé au fil de l'eau, au plus toutes les 5 minutes). */
+export async function retryPendingPayouts({ throttle = false } = {}): Promise<number> {
+  if (throttle) {
+    if (Date.now() - lastPayoutRetry < 5 * 60_000) return 0;
+    lastPayoutRetry = Date.now();
+  }
+  const due = await db
+    .select({ id: bookings.id })
+    .from(bookings)
+    .where(
+      and(
+        eq(bookings.paymentMethod, "online"),
+        eq(bookings.paymentStatus, "paid"),
+        isNull(bookings.paidOutAt),
+        inArray(bookings.status, ["ongoing", "completed"]),
+      ),
+    )
+    .limit(20);
+  let done = 0;
+  for (const { id } of due) if (await payOutBooking(id)) done++;
+  return done;
 }
 
 /** Violation d'une contrainte d'exclusion sur les réservations, traduite en message. */
@@ -444,6 +513,7 @@ export async function confirmHandover(ownerId: string, bookingId: string, code: 
     .returning({ id: bookings.id });
   if (!updated) throw new UserError("La réservation a changé entre-temps. Rechargez la page.");
   await postSystemMessage(await conversationFor(booking), "🤝 Remise confirmée avec le code du locataire. Bonne location !");
+  await payOutBooking(bookingId);
   await notify(booking.renterId, {
     title: "Location en cours",
     body: `La remise de « ${listingTitle} » est confirmée. Retour prévu le ${booking.endDate.split("-").reverse().join("/")}.`,
@@ -517,6 +587,7 @@ export async function expireStaleBookings(): Promise<number> {
       ),
     )
     .returning();
+  await retryPendingPayouts({ throttle: true });
   for (const b of expired) {
     await releaseAuthorization(b);
     try {

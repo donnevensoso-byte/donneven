@@ -1,7 +1,7 @@
 // Paiement en ligne facultatif via Stripe Connect (comptes Express).
 // Empreinte bancaire à la demande, débit quand le propriétaire accepte ;
 // Stripe reverse la location au propriétaire, la plateforme garde les frais de service.
-import { eq } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import { APP_NAME, appUrl, stripeEnabled } from "../config";
 import { db } from "../db";
 import { bookings, listings, stripeEvents, users } from "../db/schema";
@@ -86,13 +86,29 @@ export async function createAuthorizationCheckout(renterId: string, bookingId: s
     bookingId: booking.id,
     customerEmail: renter?.email,
     lines,
-    applicationFee: booking.serviceFee,
-    destinationAccount: row.ownerAccount,
     successUrl: `${appUrl()}/reservations/${booking.id}?paiement={CHECKOUT_SESSION_ID}`,
     cancelUrl: `${appUrl()}/reservations/${booking.id}`,
   });
   await db.update(bookings).set({ stripeCheckoutSessionId: session.id }).where(eq(bookings.id, booking.id));
   return session.url;
+}
+
+export type PayoutState = "awaiting_handover" | "pending" | "paid_out" | "refunded";
+
+/** Locations payées en ligne d'un propriétaire, avec l'état de leur versement. */
+export async function ownerPayouts(ownerId: string) {
+  const rows = await db
+    .select({ booking: bookings, title: listings.title })
+    .from(bookings)
+    .innerJoin(listings, eq(listings.id, bookings.listingId))
+    .where(and(eq(bookings.ownerId, ownerId), eq(bookings.paymentMethod, "online"), inArray(bookings.paymentStatus, ["paid", "refunded"])))
+    .orderBy(desc(bookings.startDate))
+    .limit(100);
+  return rows.map(({ booking, title }) => {
+    const state: PayoutState =
+      booking.paymentStatus === "refunded" ? "refunded" : booking.paidOutAt ? "paid_out" : booking.status === "accepted" ? "awaiting_handover" : "pending";
+    return { bookingId: booking.id, title, startDate: booking.startDate, endDate: booking.endDate, amount: booking.rentalAmount, paidOutAt: booking.paidOutAt, state };
+  });
 }
 
 /** Vérifie une session au retour du locataire (filet de sécurité si le webhook tarde). */

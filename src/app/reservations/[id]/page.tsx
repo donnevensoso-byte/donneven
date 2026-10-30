@@ -355,7 +355,10 @@ export default async function BookingPage({ params, searchParams }: Props) {
               </div>
             </dl>
             {isOwner && booking.serviceFee > 0 && (
-              <p className="mt-3 text-xs text-muted">Vous recevez {formatEuros(booking.rentalAmount)} (hors frais de service).</p>
+              <p className="mt-3 text-xs text-muted">
+                Vous recevez {formatEuros(booking.rentalAmount)} (hors frais de service)
+                {booking.paidOutAt ? `, versés le ${formatDateTime(booking.paidOutAt)}.` : booking.paymentStatus === "paid" ? ", versés dès la remise confirmée." : "."}
+              </p>
             )}
           </div>
           <p className="text-xs text-muted">Réservation n° {booking.id} · créée le {formatDateTime(booking.createdAt)}</p>
