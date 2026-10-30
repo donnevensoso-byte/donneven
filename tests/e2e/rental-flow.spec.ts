@@ -115,7 +115,7 @@ test("parcours complet d'une location entre particuliers", async ({ page, browse
   await expect(page.getByTestId("thread")).toContainText("Rendez-vous demain 17 h");
   await page.goto(`${bookingUrl}/contrat`);
   await expect(page.getByRole("heading", { name: /Contrat de location/ })).toBeVisible();
-  await expect(page.getByText(owner.name)).toBeVisible();
+  await expect(page.getByText(owner.name, { exact: true })).toBeVisible();
   await page.goto(bookingUrl);
   await expect(page.getByText(/vous a laissé 5 ★/)).toBeVisible();
   await page.locator("label[title='4 étoiles']").click();

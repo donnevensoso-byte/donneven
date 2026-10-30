@@ -3,6 +3,8 @@
 Build testé : 67d7d9c. Navigateur : Chromium (Playwright), profil Pixel 7 (412 px), fr-FR, America/Cayenne.
 Seuls les bugs reproduits sont listés ; les doutes sont en bas, dans « À vérifier ».
 
+Bilan : 8 bugs (S1 : 0, S2 : 1, S3 : 6, S4 : 1). 7 corrigés, 1 ouvert (S4).
+
 ### BUG-003: la limite anti-abus par adresse IP se contourne avec un en-tête falsifié
 
 - Severity: S2
@@ -17,7 +19,7 @@ Expected: la 11e inscription de l'heure est refusée (« Trop de tentatives »).
 Actual: les 11 passent. `clientKey()` lit la première adresse de l'en-tête, celle que le client écrit lui-même ; derrière un proxy, l'adresse fiable est la dernière ajoutée.
 Evidence: `tests/e2e/f02-publier.spec.ts` › F02-E5 (11 succès sur 11).
 Suspected cause: `src/app/actions/auth.ts`, `clientKey()`.
-Status: open
+Status: fixed in 1bf3d0c (`clientIp()` lit X-Forwarded-For depuis la fin, `TRUSTED_PROXIES` = 1 par défaut ; test unitaire + F02-E5)
 
 ### BUG-006: deux onglets qui envoient la même demande au même instant créent deux réservations
 
@@ -34,7 +36,7 @@ Expected: une seule demande ; la seconde reçoit « Vous avez déjà une demande
 Actual: deux demandes en attente identiques (reproduit 1 fois sur 2 passages). Le loueur voit deux demandes ; en accepter une refuse l'autre, donc pas de double location, mais le locataire reçoit un refus incompréhensible.
 Evidence: `tests/e2e/f01-louer.spec.ts` › F01-E3 (« Expected length: 1, Received length: 2 »).
 Suspected cause: le contrôle « demande déjà en attente » est une lecture puis une écriture, sans verrou ni contrainte en base.
-Status: open
+Status: fixed in 71eec25 (contrainte d'exclusion `bookings_one_pending_per_renter`, migration 0003 ; F01-E3 vert 3 fois de suite, F01-E12/E13 en intégration)
 
 ### BUG-001: la vignette de l'annonce sur la page réservation est un lien sans nom
 
@@ -49,7 +51,7 @@ Steps
 Expected: chaque lien a un nom accessible.
 Actual: axe « link-name (serious) » sur `.size-24` : le lien vers l'annonce ne contient qu'une image à `alt=""`. Un lecteur d'écran annonce « lien » sans destination.
 Evidence: scan axe dans les 4 tests cités.
-Status: open
+Status: fixed in 5fd1941 (vignette retirée du clavier et des lecteurs d'écran : le titre juste à côté mène au même endroit)
 
 ### BUG-002: le loueur ne voit pas son prix sur sa propre annonce
 
@@ -66,7 +68,7 @@ Expected: le prix par jour (et semaine) apparaît, pour vérifier ce qu'on vient
 Actual: le prix n'est affiché que dans le module de réservation, masqué pour le propriétaire. Seule la caution apparaît.
 Evidence: `tests/e2e/f02-publier.spec.ts` › F02-H1, instantané de page dans `test-results/`.
 Workaround: ouvrir « Modifier ».
-Status: open
+Status: fixed in 0ea7d07 (« Tarif » ajouté aux détails de l'annonce, visible de tous)
 
 ### BUG-004: le lien « voir mon profil public » ne se distingue que par la couleur
 
@@ -81,7 +83,7 @@ Steps
 Expected: un lien dans un texte est souligné (ou repérable autrement que par la couleur).
 Actual: axe « link-in-text-block (serious) » : souligné seulement au survol.
 Evidence: `tests/e2e/f06-f07-paiements-litiges.spec.ts` › F06-E1.
-Status: open
+Status: fixed in 5fd1941
 
 ### BUG-007: messagerie : heure illisible sur ses propres messages, fil non atteignable au clavier
 
@@ -96,7 +98,23 @@ Steps
 Expected: contraste AA sur l'heure ; la zone qui défile est atteignable au clavier.
 Actual: axe « color-contrast (serious) » sur l'heure en `text-white/70` sur la bulle verte ; « scrollable-region-focusable (serious) » sur le fil (`overflow-y-auto` sans `tabindex`).
 Evidence: `tests/e2e/f01-louer.spec.ts` › F01-E6.
-Status: open
+Status: fixed in 5fd1941 (heure en `text-white/90`, fil en `role="log"` avec `tabIndex=0` et contour au focus)
+
+### BUG-008: les remarques de l'état des lieux n'apparaissent pas dans le contrat
+
+- Severity: S3
+- Flow / case: F05 / F05-H1
+- Screen: contrat de location (imprimable)
+- Build: 5fd1941  Browser / device: Chromium, Pixel 7
+
+Steps
+1. Pendant la location, ajouter des photos au retour avec la remarque « Fissure sur le carter… ».
+2. Ouvrir le contrat.
+
+Expected: les photos et la remarque figurent dans l'état des lieux du contrat.
+Actual: seules les vignettes datées y sont ; la remarque, qui décrit le dégât, manque sur le document imprimé.
+Evidence: `tests/e2e/f05-etat-des-lieux.spec.ts` › F05-H1 (« Fissure sur le carter » introuvable sur `/contrat`).
+Status: fixed in 33a12f7 (remarques listées sous les vignettes, une fois par envoi)
 
 ### BUG-005: le sélecteur de photos d'état des lieux ignore les photos déjà envoyées
 
@@ -112,10 +130,10 @@ Steps
 Expected: le sélecteur indique qu'il ne reste plus de place pour cette étape.
 Actual: la photo est préparée puis refusée par le serveur (« 8 photos maximum par personne à la remise »). Rien n'est perdu.
 Evidence: `tests/e2e/f05-etat-des-lieux.spec.ts` › F05-E2.
-Status: open
+Status: open (S4, pas bloquant : le serveur refuse proprement)
 
 ## À vérifier (non reproduit)
 
-- Courses en base hors interface : 3 demandes identiques en parallèle au niveau du service n'ont donné qu'une réservation (`tests/integration/races.test.ts`), mais BUG-006 montre que la fenêtre existe. Le correctif doit couvrir les deux.
+- `TRUSTED_PROXIES` doit correspondre à l'hébergement réel (1 derrière un seul proxy : Render, Railway, nginx…). Si l'application est exposée sans proxy, l'en-tête reste entièrement écrit par le client : à vérifier au déploiement (`/replica-deploy`).
 - Empreinte bancaire et remboursements avec un vrai compte Stripe test : jamais exécutés (Stripe injoignable d'ici). Voir la passe manuelle de `test-plan.md`.
 - E-mails réels (SMTP) : non testés.

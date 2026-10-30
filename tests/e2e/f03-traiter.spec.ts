@@ -38,8 +38,8 @@ test("F03-E1 deux demandes sur les mêmes dates : accepter l'une refuse l'autre"
   await signIn(context, owner);
   await page.goto(`/reservations/${idA}`);
   await page.getByRole("button", { name: /Accepter la demande/ }).click();
-  // « Confirmée » est aussi une étape de la frise : on attend la disparition du bouton.
-  await expect(page.getByRole("button", { name: /Accepter la demande/ })).toHaveCount(0);
+  // « Confirmée » est aussi une étape de la frise : on attend un texte propre à l'état accepté.
+  await expect(page.getByText(/demandez au locataire son code/)).toBeVisible();
   const [rowB] = await db.select({ status: bookings.status }).from(bookings).where(eq(bookings.id, idB));
   expect(rowB.status).toBe("declined");
   await page.goto(`/reservations/${idB}`);
@@ -56,8 +56,8 @@ test("F03-E2 deux onglets : accepter puis refuser depuis un onglet périmé", as
   await stale.page.goto(`/reservations/${id}`);
   await page.goto(`/reservations/${id}`);
   await page.getByRole("button", { name: /Accepter la demande/ }).click();
-  // « Confirmée » est aussi une étape de la frise : on attend la disparition du bouton.
-  await expect(page.getByRole("button", { name: /Accepter la demande/ })).toHaveCount(0);
+  // « Confirmée » est aussi une étape de la frise : on attend un texte propre à l'état accepté.
+  await expect(page.getByText(/demandez au locataire son code/)).toBeVisible();
   await stale.page.getByRole("button", { name: "Refuser" }).click();
   await stale.page.getByRole("button", { name: "Confirmer le refus" }).click();
   await expect(stale.page.getByText(/déjà été traitée/)).toBeVisible();
