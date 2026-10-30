@@ -14,16 +14,29 @@ export const metadata: Metadata = { title: "Contrat de location", robots: { inde
 
 function PhotoStrip({ photos }: { photos: BookingPhoto[] }) {
   if (photos.length === 0) return null;
+  // Une remarque est jointe à chaque photo d'un même envoi : on ne l'écrit qu'une fois.
+  const notes = [...new Map(photos.filter((p) => p.note).map((p) => [`${p.authorId}|${p.note}`, p])).values()];
   return (
-    <ul className="mt-2 grid grid-cols-4 gap-1">
-      {photos.map((p) => (
-        <li key={p.imageId}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={imageUrl(p.imageId, "thumb")} alt="" className="aspect-square w-full rounded object-cover" />
-          <p className="text-[9px] leading-tight text-muted">{formatDateTime(p.createdAt)}</p>
-        </li>
-      ))}
-    </ul>
+    <>
+      <ul className="mt-2 grid grid-cols-4 gap-1">
+        {photos.map((p) => (
+          <li key={p.imageId}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={imageUrl(p.imageId, "thumb")} alt="" className="aspect-square w-full rounded object-cover" />
+            <p className="text-[9px] leading-tight text-muted">{formatDateTime(p.createdAt)}</p>
+          </li>
+        ))}
+      </ul>
+      {notes.length > 0 && (
+        <ul className="mt-2 space-y-1 text-xs text-ink">
+          {notes.map((p) => (
+            <li key={p.imageId}>
+              « {p.note} » <span className="text-muted">– {p.authorName ?? "un membre"}, {formatDateTime(p.createdAt)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+    </>
   );
 }
 
