@@ -2,6 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 const PORT = 3100;
 const DATABASE_URL = process.env.E2E_DATABASE_URL ?? "postgres://postgres:postgres@localhost:5432/zouti_e2e";
+// Les specs préparent leurs données directement dans la même base que le serveur.
+process.env.DATABASE_URL = DATABASE_URL;
 
 export default defineConfig({
   testDir: "tests/e2e",
