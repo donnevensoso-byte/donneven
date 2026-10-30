@@ -106,14 +106,34 @@ function OneClick({
   );
 }
 
-export function HandoverButton({ bookingId }: { bookingId: string }) {
+/** Le propriétaire saisit le code que le locataire lui montre au moment de la remise. */
+export function HandoverForm({ bookingId, onsite }: { bookingId: string; onsite: boolean }) {
+  const form = useActionForm(handoverAction.bind(null, bookingId));
+  if (form.state?.ok) return <Alert tone="success">{form.state.message}</Alert>;
   return (
-    <OneClick
-      action={() => handoverAction(bookingId)}
-      label="🤝 J'ai remis le matériel"
-      pendingLabel="Enregistrement…"
-      confirmText="Confirmez-vous avoir remis le matériel au locataire (et reçu le paiement et la caution si réglés sur place) ?"
-    />
+    <ActionForm form={form} className="space-y-3 rounded-xl border border-line p-4">
+      <div>
+        <label className="label" htmlFor="handover-code">Code de remise du locataire</label>
+        <input
+          className="input max-w-40 text-center text-2xl font-bold tracking-[0.4em]"
+          id="handover-code"
+          name="code"
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          pattern="[0-9]{4}"
+          maxLength={4}
+          placeholder="0000"
+          aria-invalid={form.state?.error ? true : undefined}
+          aria-describedby="handover-hint"
+        />
+        <p className="hint" id="handover-hint">
+          Le locataire le trouve sur sa réservation. Saisissez-le une fois le matériel vérifié ensemble
+          {onsite ? ", la location et la caution réglées" : ""}.
+        </p>
+      </div>
+      <FormMessage state={form.state} />
+      <SubmitButton className="btn-primary w-full py-3" pendingLabel="Vérification…">🤝 Confirmer la remise</SubmitButton>
+    </ActionForm>
   );
 }
 

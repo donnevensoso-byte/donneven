@@ -1,3 +1,4 @@
+import { randomInt } from "node:crypto";
 import { and, desc, eq, inArray, lt, ne, or, sql } from "drizzle-orm";
 import {
   MAX_ADVANCE_DAYS,
@@ -214,6 +215,7 @@ export async function respondToBooking(
       .set({
         status: "accepted",
         respondedAt: now,
+        handoverCode: newHandoverCode(),
         ...(online ? { paymentStatus: "pending" as const, expiresAt: payDeadline } : {}),
       })
       .where(eq(bookings.id, bookingId));
@@ -311,8 +313,16 @@ export async function cancelBooking(userId: string, bookingId: string, reason?: 
   });
 }
 
-/** Le propriétaire confirme avoir remis le matériel au locataire. */
-export async function confirmHandover(ownerId: string, bookingId: string): Promise<void> {
+/** Code à 4 chiffres que le locataire montre au propriétaire au moment de la remise. */
+export function newHandoverCode(): string {
+  return String(randomInt(0, 10_000)).padStart(4, "0");
+}
+
+/**
+ * Le propriétaire confirme la remise en saisissant le code du locataire :
+ * la remise n'est validée que si le locataire était bien présent.
+ */
+export async function confirmHandover(ownerId: string, bookingId: string, code: string): Promise<void> {
   const { booking, listingTitle } = await loadBooking(db, bookingId);
   if (booking.ownerId !== ownerId) throw new UserError("Réservation introuvable.");
   if (booking.status !== "accepted") throw new UserError("Cette réservation n'est pas en attente de remise.");
@@ -322,11 +332,25 @@ export async function confirmHandover(ownerId: string, bookingId: string): Promi
   if (todayInGuyane() < addDays(booking.startDate, -1)) {
     throw new UserError("Vous pourrez confirmer la remise à partir de la veille du début de location.");
   }
-  await db.update(bookings).set({ status: "ongoing", handedOverAt: new Date() }).where(eq(bookings.id, bookingId));
-  await postSystemMessage(await conversationFor(booking), "🤝 Matériel remis au locataire. Bonne location !");
+  // Réservations acceptées avant l'ajout du code : pas de code à vérifier.
+  if (booking.handoverCode) {
+    if (!rateLimit(`handover:${bookingId}`, 5, 15 * 60_000)) {
+      throw new UserError("Trop d'essais. Réessayez dans 15 minutes.");
+    }
+    if (code.trim() !== booking.handoverCode) {
+      throw new UserError("Code incorrect. Demandez au locataire le code affiché sur sa réservation.");
+    }
+  }
+  const [updated] = await db
+    .update(bookings)
+    .set({ status: "ongoing", handedOverAt: new Date(), updatedAt: new Date() })
+    .where(and(eq(bookings.id, bookingId), eq(bookings.status, "accepted")))
+    .returning({ id: bookings.id });
+  if (!updated) throw new UserError("La réservation a changé entre-temps. Rechargez la page.");
+  await postSystemMessage(await conversationFor(booking), "🤝 Remise confirmée avec le code du locataire. Bonne location !");
   await notify(booking.renterId, {
     title: "Location en cours",
-    body: `Le propriétaire a confirmé la remise de « ${listingTitle} ». Retour prévu le ${booking.endDate.split("-").reverse().join("/")}.`,
+    body: `La remise de « ${listingTitle} » est confirmée. Retour prévu le ${booking.endDate.split("-").reverse().join("/")}.`,
     link: `/reservations/${booking.id}`,
   });
 }
@@ -335,9 +359,8 @@ export async function confirmHandover(ownerId: string, bookingId: string): Promi
 export async function confirmReturn(ownerId: string, bookingId: string): Promise<void> {
   const { booking, listingTitle } = await loadBooking(db, bookingId);
   if (booking.ownerId !== ownerId) throw new UserError("Réservation introuvable.");
-  const startedWithoutHandover = booking.status === "accepted" && todayInGuyane() >= booking.startDate;
-  if (booking.status !== "ongoing" && !startedWithoutHandover) {
-    throw new UserError("Cette location n'est pas en cours.");
+  if (booking.status !== "ongoing") {
+    throw new UserError("Confirmez d'abord la remise avec le code du locataire.");
   }
   if (booking.paymentMethod === "online" && booking.paymentStatus !== "paid") {
     throw new UserError("Le locataire n'a pas encore payé la location.");

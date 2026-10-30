@@ -86,10 +86,18 @@ describe("cycle de réservation", () => {
     expect(view?.role).toBe("renter");
     expect(await getBookingForUser(await makeUser("Intrus"), bookingId)).toBeNull();
 
+    // Un code de remise à 4 chiffres est tiré à l'acceptation
+    [b] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
+    expect(b.handoverCode).toMatch(/^\d{4}$/);
     // Trop tôt pour la remise (début dans 2 jours)
-    await expect(confirmHandover(owner, bookingId)).rejects.toThrow(/veille/);
+    await expect(confirmHandover(owner, bookingId, b.handoverCode!)).rejects.toThrow(/veille/);
     await db.update(bookings).set({ startDate: today, endDate: addDays(today, 8) }).where(eq(bookings.id, bookingId));
-    await confirmHandover(owner, bookingId);
+    // Le retour exige une remise confirmée par code
+    await expect(confirmReturn(owner, bookingId)).rejects.toThrow(/remise/);
+    const wrong = b.handoverCode === "0000" ? "1111" : "0000";
+    await expect(confirmHandover(owner, bookingId, wrong)).rejects.toThrow(/incorrect/);
+    await expect(confirmHandover(renter, bookingId, b.handoverCode!)).rejects.toThrow(/introuvable/);
+    await confirmHandover(owner, bookingId, b.handoverCode!);
     await confirmReturn(owner, bookingId);
     [b] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
     expect(b.status).toBe("completed");
@@ -147,6 +155,31 @@ describe("cycle de réservation", () => {
     expect(free.total).toBe(1);
 
     await expect(requestBooking(c, { listingId, startDate: addDays(today, 7), endDate: addDays(today, 9) })).rejects.toThrow(/disponible/);
+  });
+
+  it("limite les essais de code de remise", async () => {
+    const owner = await makeUser("Owner code");
+    const renter = await makeUser("Renter code");
+    const listingId = await makeListing(owner);
+    const bookingId = await requestBooking(renter, { listingId, startDate: today, endDate: today });
+    await respondToBooking(owner, bookingId, "accept");
+    const [b] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
+    const wrong = b.handoverCode === "0000" ? "1111" : "0000";
+    for (let i = 0; i < 5; i++) await expect(confirmHandover(owner, bookingId, wrong)).rejects.toThrow(/incorrect/);
+    await expect(confirmHandover(owner, bookingId, b.handoverCode!)).rejects.toThrow(/Trop d'essais/);
+  });
+
+  it("la base refuse deux réservations confirmées qui se chevauchent", async () => {
+    const owner = await makeUser("Owner overlap");
+    const renter = await makeUser("Renter overlap");
+    const listingId = await makeListing(owner);
+    const first = await requestBooking(renter, { listingId, startDate: addDays(today, 3), endDate: addDays(today, 5) });
+    await respondToBooking(owner, first, "accept");
+    const other = await requestBooking(renter, { listingId, startDate: addDays(today, 20), endDate: addDays(today, 21) });
+    // Même en contournant le service, la contrainte d'exclusion bloque le chevauchement.
+    await expect(
+      db.update(bookings).set({ status: "accepted", startDate: addDays(today, 5), endDate: addDays(today, 6) }).where(eq(bookings.id, other)),
+    ).rejects.toThrow();
   });
 
   it("annulations et expiration des demandes", async () => {

@@ -68,9 +68,10 @@ export async function cancelBookingAction(bookingId: string, _prev: ActionState 
   return run(bookingId, () => cancelBooking(user.id, bookingId, String(formData.get("reason") ?? "")), "Réservation annulée.");
 }
 
-export async function handoverAction(bookingId: string): Promise<ActionState> {
+export async function handoverAction(bookingId: string, _prev: ActionState | undefined, formData: FormData): Promise<ActionState> {
   const user = await requireUser(`/reservations/${bookingId}`);
-  return run(bookingId, () => confirmHandover(user.id, bookingId), "Remise confirmée.");
+  const code = String(formData.get("code") ?? "");
+  return run(bookingId, () => confirmHandover(user.id, bookingId, code), "Remise confirmée.");
 }
 
 export async function returnAction(bookingId: string): Promise<ActionState> {

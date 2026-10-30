@@ -30,7 +30,7 @@ async function login(page: Page, user: typeof owner) {
   await expect(page).toHaveURL(/\/compte$/);
 }
 
-test("parcours complet d'une location entre particuliers", async ({ page }) => {
+test("parcours complet d'une location entre particuliers", async ({ page, browser }) => {
   page.on("dialog", (dialog) => dialog.accept());
   const start = addDays(todayInGuyane(), 1);
   const end = addDays(todayInGuyane(), 3);
@@ -71,7 +71,7 @@ test("parcours complet d'une location entre particuliers", async ({ page }) => {
   await page.getByTestId("booking-row").first().click();
   await expect(page).toHaveURL(bookingUrl);
   await page.getByRole("button", { name: /Accepter la demande/ }).click();
-  await expect(page.getByRole("button", { name: /J'ai remis le matériel/ })).toBeVisible();
+  await expect(page.getByLabel("Code de remise du locataire")).toBeVisible();
   await page.goto("/messages");
   await page.getByTestId("conversation-row").first().click();
   await expect(page.getByTestId("thread")).toContainText("nettoyer ma terrasse");
@@ -79,10 +79,22 @@ test("parcours complet d'une location entre particuliers", async ({ page }) => {
   await page.getByRole("button", { name: "Envoyer" }).click();
   await expect(page.getByTestId("thread")).toContainText("Rendez-vous demain 17 h");
 
-  // 4. Remise puis retour du matériel, avis de la propriétaire
+  // 4. Le locataire montre son code de remise, la propriétaire le saisit
+  const renterContext = await browser.newContext({ baseURL: test.info().project.use.baseURL, locale: "fr-FR", timezoneId: "America/Cayenne" });
+  const renterPage = await renterContext.newPage();
+  await login(renterPage, renter);
+  await renterPage.goto(bookingUrl);
+  const code = (await renterPage.getByTestId("handover-code").locator("p").nth(1).textContent())?.trim() ?? "";
+  expect(code).toMatch(/^\d{4}$/);
+  await renterContext.close();
+
   await page.goto(bookingUrl);
   await expect(page.getByText("Confirmée", { exact: true }).first()).toBeVisible();
-  await page.getByRole("button", { name: /J'ai remis le matériel/ }).click();
+  await page.getByLabel("Code de remise du locataire").fill(code === "0000" ? "1111" : "0000");
+  await page.getByRole("button", { name: /Confirmer la remise/ }).click();
+  await expect(page.getByText(/Code incorrect/)).toBeVisible();
+  await page.getByLabel("Code de remise du locataire").fill(code);
+  await page.getByRole("button", { name: /Confirmer la remise/ }).click();
   await expect(page.getByText("En cours", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: /Le matériel m'a été rendu/ }).click();
   await expect(page.getByText("Terminée", { exact: true })).toBeVisible();

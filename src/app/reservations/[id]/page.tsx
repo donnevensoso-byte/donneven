@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   CancelForm,
-  HandoverButton,
+  HandoverForm,
   PayButton,
   RespondForm,
   ReturnButton,
@@ -157,9 +157,18 @@ export default async function BookingPage({ params, searchParams }: Props) {
                   <Link href={`/messages/${conversationId}`} className="btn-secondary">💬 Messagerie</Link>
                   <Link href={`/reservations/${booking.id}/contrat`} className="btn-secondary">📄 Contrat de location</Link>
                 </div>
-                {isOwner && today >= addDays(booking.startDate, -1) && <HandoverButton bookingId={booking.id} />}
-                {isOwner && today >= booking.startDate && (
-                  <p className="text-xs text-muted">La location a commencé ? Confirmez la remise ci-dessus, puis le retour une fois le matériel rendu.</p>
+                {!isOwner && booking.handoverCode && (
+                  <div className="rounded-xl bg-sun-100 p-4 text-center" data-testid="handover-code">
+                    <p className="text-sm font-medium">Votre code de remise</p>
+                    <p className="mt-1 text-4xl font-extrabold tracking-[0.3em]" aria-label={`Code ${booking.handoverCode.split("").join(" ")}`}>
+                      {booking.handoverCode}
+                    </p>
+                    <p className="mt-1 text-xs text-muted">Montrez-le à {firstName(other.name)} quand vous récupérez le matériel, pas avant.</p>
+                  </div>
+                )}
+                {isOwner && today >= addDays(booking.startDate, -1) && <HandoverForm bookingId={booking.id} onsite={!online} />}
+                {isOwner && today < addDays(booking.startDate, -1) && (
+                  <p className="text-xs text-muted">Le jour de la remise, demandez au locataire son code à 4 chiffres pour confirmer.</p>
                 )}
                 {(isOwner || today < booking.startDate) && <CancelForm bookingId={booking.id} />}
               </>

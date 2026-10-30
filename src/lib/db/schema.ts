@@ -10,6 +10,7 @@ import {
   primaryKey,
   smallint,
   text,
+  time,
   timestamp,
   uniqueIndex,
 } from "drizzle-orm/pg-core";
@@ -39,6 +40,7 @@ export const users = pgTable(
     stripeAccountId: text("stripe_account_id"),
     stripeOnboarded: boolean("stripe_onboarded").notNull().default(false),
     createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [uniqueIndex("users_email_idx").on(sql`lower(${t.email})`)],
 );
@@ -94,6 +96,8 @@ export const listings = pgTable(
     weekPrice: integer("week_price"), // centimes, facultatif (tarif dégressif)
     deposit: integer("deposit").notNull().default(0), // centimes
     minDays: smallint("min_days").notNull().default(1),
+    // Délai minimum entre la demande et le début de la location (en jours).
+    minNoticeDays: smallint("min_notice_days").notNull().default(0),
     commune: text("commune").notNull(),
     neighborhood: text("neighborhood"),
     lat: doublePrecision("lat").notNull(),
@@ -177,7 +181,7 @@ export const bookings = pgTable(
     deposit: integer("deposit").notNull().default(0),
     status: text("status", { enum: BOOKING_STATUSES }).notNull().default("pending"),
     paymentMethod: text("payment_method", { enum: ["onsite", "online"] }).notNull().default("onsite"),
-    paymentStatus: text("payment_status", { enum: ["none", "pending", "paid", "refunded"] })
+    paymentStatus: text("payment_status", { enum: ["none", "authorized", "pending", "paid", "refunded"] })
       .notNull()
       .default("none"),
     stripeCheckoutSessionId: text("stripe_checkout_session_id"),
@@ -190,13 +194,49 @@ export const bookings = pgTable(
     paidAt: timestamp("paid_at", { withTimezone: true }),
     handedOverAt: timestamp("handed_over_at", { withTimezone: true }),
     returnedAt: timestamp("returned_at", { withTimezone: true }),
+    // Code à 4 chiffres que le locataire montre à la remise ; le propriétaire le saisit.
+    handoverCode: text("handover_code"),
+    // Relance envoyée au propriétaire avant l'expiration d'une demande.
+    reminderSentAt: timestamp("reminder_sent_at", { withTimezone: true }),
+    pickupTime: time("pickup_time"),
+    returnTime: time("return_time"),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
     index("bookings_listing_idx").on(t.listingId, t.status),
     index("bookings_renter_idx").on(t.renterId),
     index("bookings_owner_idx").on(t.ownerId),
+    index("bookings_pending_expiry_idx").on(t.expiresAt).where(sql`${t.status} = 'pending'`),
   ],
 );
+
+export const PHOTO_STAGES = ["handover", "return"] as const;
+export type PhotoStage = (typeof PHOTO_STAGES)[number];
+
+/** État des lieux : photos datées prises à la remise et au retour du matériel. */
+export const bookingPhotos = pgTable(
+  "booking_photos",
+  {
+    bookingId: text("booking_id")
+      .notNull()
+      .references(() => bookings.id, { onDelete: "cascade" }),
+    imageId: text("image_id")
+      .notNull()
+      .references(() => images.id, { onDelete: "cascade" }),
+    authorId: text("author_id").references(() => users.id, { onDelete: "set null" }),
+    stage: text("stage", { enum: PHOTO_STAGES }).notNull(),
+    note: text("note"),
+    createdAt: createdAt(),
+  },
+  (t) => [primaryKey({ columns: [t.bookingId, t.imageId] }), index("booking_photos_booking_idx").on(t.bookingId, t.stage)],
+);
+
+/** Événements Stripe déjà traités (les webhooks peuvent arriver plusieurs fois). */
+export const stripeEvents = pgTable("stripe_events", {
+  id: text("id").primaryKey(),
+  type: text("type").notNull(),
+  createdAt: createdAt(),
+});
 
 export const conversations = pgTable(
   "conversations",
@@ -215,6 +255,7 @@ export const conversations = pgTable(
     renterLastReadAt: timestamp("renter_last_read_at", { withTimezone: true }),
     ownerLastReadAt: timestamp("owner_last_read_at", { withTimezone: true }),
     createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
   },
   (t) => [
     uniqueIndex("conversations_pair_idx").on(t.listingId, t.renterId),
