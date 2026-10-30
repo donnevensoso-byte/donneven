@@ -14,7 +14,7 @@ Avis après location,avis,must,yes,yes,"S12 ; mutuels, 30 jours"
 Annuler une réservation avec remboursement,réservation,must,yes,yes,F04 ; gratuit jusqu'à la veille
 Contrat de location,réservation,must,yes,yes,contrat imprimable + état des lieux
 Garantie casse & vol incluse (assurance Tulip),confiance,must,yes,skip,partenariat d'assurance de Bricolib : contrat à négocier par Zouti avec son propre assureur
-Taux de réactivité du loueur qui influence le classement,recherche,should,yes,partial,"taux de réponse affiché sur le profil, pas utilisé dans le tri"
+Taux de réactivité du loueur qui influence le classement,recherche,should,yes,yes,"tri « Recommandées » par défaut : réponses sur les 10 dernières demandes, 5 paliers ; taux affiché sur le profil ; expliqué dans la FAQ"
 Mettre ses annonces en pause / mode vacances,annonces,should,yes,yes,pause + dates bloquées
 Vérification d'identité des loueurs,confiance,should,yes,no,Bricolib via Lemonway/Onfido (source de plaintes) ; Zouti : badges e-mail/téléphone seulement
 Porte-monnaie et retrait vers IBAN,paiement,should,yes,partial,Stripe Express gère les versements ; pas de porte-monnaie interne

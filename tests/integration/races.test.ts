@@ -100,3 +100,43 @@ describe("requêtes simultanées", () => {
     expect(["accepted", "cancelled"]).toContain(row.status);
   });
 });
+
+describe("classement par réactivité", () => {
+  it("à la une, les annonces des loueurs qui répondent passent devant celles des loueurs qui laissent expirer", async () => {
+    const { searchListings } = await import("@/lib/services/listings");
+    const { expireStaleBookings } = await import("@/lib/services/bookings");
+    const quick = await makeUser("Loueur réactif");
+    const slow = await makeUser("Loueur absent");
+    const renter = await makeUser("Locataire");
+    const marker = `reac${Date.now()}`;
+    const img = await sharp({ create: { width: 8, height: 8, channels: 3, background: "#888" } }).png().toBuffer();
+    const make = (owner: string) =>
+      createListing(
+        owner,
+        listingFormSchema.parse({
+          title: `Bétonnière ${marker}`,
+          description: "Bétonnière 140 L, électrique, avec rallonge de 25 m.",
+          category: "bricolage",
+          condition: "bon",
+          dayPrice: "25",
+          deposit: "100",
+          minDays: "1",
+          commune: "cayenne",
+        }),
+        [img],
+      );
+    const quickListing = await make(quick);
+    const slowListing = await make(slow); // plus récente : en tête du tri « récent »
+    for (let i = 0; i < 3; i++) {
+      const a = await requestBooking(renter, { listingId: quickListing, startDate: day(10 + i * 3), endDate: day(10 + i * 3) });
+      await respondToBooking(quick, a, "decline");
+      const b = await requestBooking(renter, { listingId: slowListing, startDate: day(10 + i * 3), endDate: day(10 + i * 3) });
+      await db.update(bookings).set({ expiresAt: new Date(Date.now() - 1000) }).where(eq(bookings.id, b));
+    }
+    await expireStaleBookings();
+    const recent = await searchListings({ q: marker, sort: "recent" });
+    expect(recent.items.map((l) => l.id)).toEqual([slowListing, quickListing]);
+    const recommended = await searchListings({ q: marker, sort: "recommended" });
+    expect(recommended.items.map((l) => l.id)).toEqual([quickListing, slowListing]);
+  });
+});

@@ -252,7 +252,7 @@ export type SearchFilters = {
   maxPrice?: number; // centimes
   start?: string;
   end?: string;
-  sort?: "recent" | "price_asc" | "price_desc" | "distance";
+  sort?: "recommended" | "recent" | "price_asc" | "price_desc" | "distance";
   near?: { lat: number; lng: number };
   delivery?: boolean;
   ownerId?: string;
@@ -311,6 +311,19 @@ function distanceExpr(near: { lat: number; lng: number }) {
     + sin(radians(${near.lat})) * sin(radians(${listings.lat})) ))))`;
 }
 
+/**
+ * Réactivité du loueur : part de ses 10 dernières demandes traitées auxquelles il a répondu
+ * (acceptée ou refusée) plutôt que de les laisser expirer. Un nouveau loueur part à 0,8.
+ * Arrondie en 5 paliers pour qu'une réponse de plus ne bouleverse pas le classement.
+ */
+const ownerReactivity = sql<number>`round(coalesce((
+    select avg(case when r.responded_at is not null then 1.0 else 0 end) from (
+      select b.responded_at from ${bookings} b
+      where b.owner_id = ${listings.ownerId} and b.status <> 'pending'
+        and not (b.status = 'cancelled' and b.responded_at is null)
+      order by b.created_at desc limit 10) r
+  ), 0.8) * 4)`;
+
 function unavailableDuring(start: string, end: string): SQL {
   return sql`(exists (select 1 from ${bookings} b where b.listing_id = ${listings.id}
       and b.status in ('accepted', 'ongoing') and b.start_date <= ${end} and b.end_date >= ${start})
@@ -347,7 +360,9 @@ export async function searchListings(filters: SearchFilters): Promise<{ items: L
         ? [desc(listings.dayPrice), desc(listings.createdAt)]
         : filters.sort === "distance" && near
           ? [asc(distance), desc(listings.createdAt)]
-          : [desc(listings.createdAt)];
+          : filters.sort === "recent"
+            ? [desc(listings.createdAt)]
+            : [desc(ownerReactivity), desc(listings.createdAt)];
 
   const [items, [{ total }]] = await Promise.all([
     db

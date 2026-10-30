@@ -30,6 +30,7 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 }
 
 const SORTS = [
+  { value: "recommended", label: "Recommandées" },
   { value: "recent", label: "Plus récentes" },
   { value: "distance", label: "Plus proches" },
   { value: "price_asc", label: "Prix croissant" },
@@ -40,7 +41,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
   const p = await searchParams;
   const view = p.vue === "carte" ? "carte" : "liste";
   const page = Math.max(1, Number(p.page) || 1);
-  const sort = SORTS.some((s) => s.value === p.tri) ? (p.tri as SearchFilters["sort"]) : "recent";
+  const sort = SORTS.some((s) => s.value === p.tri) ? (p.tri as SearchFilters["sort"]) : "recommended";
   const filters: SearchFilters = {
     q: p.q?.slice(0, 100),
     category: getCategory(p.categorie)?.slug,
