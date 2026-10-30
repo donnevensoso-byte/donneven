@@ -16,6 +16,7 @@ import {
 } from "@/lib/services/bookings";
 import { addBlockedPeriod, createListing, listingFormSchema, searchListings } from "@/lib/services/listings";
 import { getOrCreateConversation, listConversations, sendMessage, unreadConversationCount } from "@/lib/services/messages";
+import { addBookingPhotos, listBookingPhotos } from "@/lib/services/booking-photos";
 import { createReview, ratingSummary } from "@/lib/services/reviews";
 
 let photo: Buffer;
@@ -155,6 +156,36 @@ describe("cycle de réservation", () => {
     expect(free.total).toBe(1);
 
     await expect(requestBooking(c, { listingId, startDate: addDays(today, 7), endDate: addDays(today, 9) })).rejects.toThrow(/disponible/);
+  });
+
+  it("état des lieux en photos : participants seulement, aux bonnes étapes", async () => {
+    const owner = await makeUser("Owner photos");
+    const renter = await makeUser("Renter photos");
+    const stranger = await makeUser("Intrus photos");
+    const listingId = await makeListing(owner);
+    const bookingId = await requestBooking(renter, { listingId, startDate: today, endDate: addDays(today, 1) });
+    // Pas de photos tant que la demande n'est pas acceptée
+    await expect(addBookingPhotos(renter, bookingId, "handover", [photo])).rejects.toThrow(/remise/);
+    await respondToBooking(owner, bookingId, "accept");
+    await expect(addBookingPhotos(stranger, bookingId, "handover", [photo])).rejects.toThrow(/introuvable/);
+    await expect(addBookingPhotos(owner, bookingId, "return", [photo])).rejects.toThrow(/retour/);
+    expect(await addBookingPhotos(owner, bookingId, "handover", [photo, photo], "Rayure existante")).toBe(2);
+    await addBookingPhotos(renter, bookingId, "handover", [photo]);
+    await expect(addBookingPhotos(renter, bookingId, "handover", Array(8).fill(photo))).rejects.toThrow(/maximum/);
+
+    const [b] = await db.select().from(bookings).where(eq(bookings.id, bookingId));
+    await confirmHandover(owner, bookingId, b.handoverCode!);
+    await addBookingPhotos(renter, bookingId, "return", [photo]);
+    await confirmReturn(owner, bookingId);
+    await addBookingPhotos(owner, bookingId, "return", [photo]);
+
+    const photos = await listBookingPhotos(bookingId);
+    expect(photos.map((p) => p.stage)).toEqual(["handover", "handover", "handover", "return", "return"]);
+    expect(photos[0]).toMatchObject({ authorId: owner, note: "Rayure existante", authorName: "Owner photos" });
+    // Chaque ajout est tracé dans la conversation
+    const conversationId = await getOrCreateConversation(listingId, renter);
+    const thread = await db.select().from(messages).where(eq(messages.conversationId, conversationId));
+    expect(thread.filter((m) => m.body.startsWith("📸"))).toHaveLength(4);
   });
 
   it("limite les essais de code de remise", async () => {

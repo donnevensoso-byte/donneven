@@ -21,7 +21,7 @@ Porte-monnaie et retrait vers IBAN,paiement,should,yes,partial,Stripe Express g�
 Formule « annulation flexible » payante,paiement,could,yes,no,modèle de frais Bricolib ; sans objet tant que Zouti ne prend pas de frais
 Changer la date d'une réservation,réservation,should,yes,no,aujourd'hui : annuler puis refaire une demande
 Déclarer un litige depuis la transaction,confiance,should,yes,partial,signalement au support uniquement
-Déclaration de sinistre avec photos,confiance,should,yes,no,lié à l'assurance ; voir correctif état des lieux photo
+Déclaration de sinistre avec photos,confiance,should,yes,partial,photos d'état des lieux en place ; pas d'assurance ni de dossier de sinistre
 "Catalogue de types d'outils normalisés (500 outils, 80 catégories)",annonces,should,yes,no,Zouti : titre libre + 13 catégories
 Pages SEO par ville et par catégorie,acquisition,should,yes,partial,"URL filtrées /recherche?commune=… dans le sitemap, pas de pages dédiées"
 Applications iOS et Android,plateformes,should,yes,partial,PWA installable ; apps natives à faire
@@ -34,7 +34,7 @@ Réseau de 152K membres et 83K outils,réseau,must,yes,skip,le réseau appartien
 Question gratuite au propriétaire avant toute demande,messagerie,must,no,yes,correctif replica-entrepreneur : contact payant (8 avis 2 sources)
 Aucune commission sur les locations réglées en main propre,paiement,must,no,yes,correctif replica-entrepreneur : frais (11 avis 1 source)
 Annulation gratuite jusqu'à la veille,réservation,must,no,yes,correctif replica-entrepreneur : annulation (11 avis 2 sources)
-État des lieux en photos à la remise et au retour,réservation,must,no,no,fix 1 : litiges (6 avis 2 sources)
+État des lieux en photos à la remise et au retour,réservation,must,no,yes,"S08 + contrat : photos datées des deux parties, 8 par personne et par étape, tracées dans la conversation ; fix 1"
 Relance du loueur et annonces alternatives si pas de réponse,réservation,must,no,partial,fix 2 : sans réponse (7 avis 2 sources) ; expiration 48 h et taux de réponse déjà faits
 Règles d'annulation affichées avant la demande,réservation,should,no,partial,fix 3 : annulation (11 avis 2 sources)
 Filtre par rayon en km,recherche,could,no,no,fix 4 : 1 avis (mince)

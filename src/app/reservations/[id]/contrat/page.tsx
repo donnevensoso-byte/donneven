@@ -3,12 +3,29 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PrintButton } from "@/components/print-button";
 import { requireUser } from "@/lib/auth";
-import { formatDate } from "@/lib/dates";
+import { imageUrl } from "@/components/ui";
+import { formatDate, formatDateTime } from "@/lib/dates";
 import { communeName, conditionLabel } from "@/lib/guyane";
 import { formatEuros } from "@/lib/money";
+import { listBookingPhotos, type BookingPhoto } from "@/lib/services/booking-photos";
 import { getBookingForUser } from "@/lib/services/bookings";
 
 export const metadata: Metadata = { title: "Contrat de location", robots: { index: false } };
+
+function PhotoStrip({ photos }: { photos: BookingPhoto[] }) {
+  if (photos.length === 0) return null;
+  return (
+    <ul className="mt-2 grid grid-cols-4 gap-1">
+      {photos.map((p) => (
+        <li key={p.imageId}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imageUrl(p.imageId, "thumb")} alt="" className="aspect-square w-full rounded object-cover" />
+          <p className="text-[9px] leading-tight text-muted">{formatDateTime(p.createdAt)}</p>
+        </li>
+      ))}
+    </ul>
+  );
+}
 
 function Party({ title, person }: { title: string; person: { name: string; phone: string | null; email: string; commune?: string } }) {
   return (
@@ -32,6 +49,7 @@ export default async function ContractPage({ params }: { params: Promise<{ id: s
   const owner = role === "owner" ? { ...self, commune: undefined } : other;
   const renter = role === "renter" ? { ...self, commune: undefined } : other;
   const total = booking.rentalAmount + booking.serviceFee;
+  const photos = await listBookingPhotos(booking.id);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-6 print:max-w-none print:p-0">
@@ -104,8 +122,14 @@ export default async function ContractPage({ params }: { params: Promise<{ id: s
             </thead>
             <tbody>
               <tr>
-                <td className="h-28 border border-line p-2 align-top text-muted">État, défauts constatés, niveau de carburant / batterie, photos prises :</td>
-                <td className="h-28 border border-line p-2 align-top text-muted">État, dommages éventuels, montant retenu sur la caution :</td>
+                <td className="h-28 border border-line p-2 align-top text-muted">
+                  État, défauts constatés, niveau de carburant / batterie :
+                  <PhotoStrip photos={photos.filter((p) => p.stage === "handover")} />
+                </td>
+                <td className="h-28 border border-line p-2 align-top text-muted">
+                  État, dommages éventuels, montant retenu sur la caution :
+                  <PhotoStrip photos={photos.filter((p) => p.stage === "return")} />
+                </td>
               </tr>
             </tbody>
           </table>

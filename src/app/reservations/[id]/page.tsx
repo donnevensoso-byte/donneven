@@ -9,12 +9,14 @@ import {
   ReturnButton,
   ReviewForm,
 } from "@/components/booking-controls";
+import { BookingPhotosForm } from "@/components/booking-photos";
 import { Alert, Avatar, Badge, imageUrl } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { addDays, formatDate, formatDateRange, formatDateTime, todayInGuyane } from "@/lib/dates";
 import { communeName } from "@/lib/guyane";
 import { formatEuros } from "@/lib/money";
 import { bookingStatusLabel, getBookingForUser } from "@/lib/services/bookings";
+import { listBookingPhotos, MAX_PHOTOS_PER_STAGE, openPhotoStages, STAGE_LABELS } from "@/lib/services/booking-photos";
 import { canReview } from "@/lib/services/reviews";
 import { firstName, publicName, whatsappNumber } from "@/lib/text";
 
@@ -62,6 +64,8 @@ export default async function BookingPage({ params, searchParams }: Props) {
   const myReview = reviews.find((r) => r.authorId === user.id);
   const theirReview = reviews.find((r) => r.authorId !== user.id);
   const wa = whatsappNumber(other.phone);
+  const photos = await listBookingPhotos(booking.id);
+  const photoStages = openPhotoStages(booking);
   const statusTone =
     booking.status === "pending" || (booking.status === "accepted" && !paid)
       ? "yellow"
@@ -222,6 +226,41 @@ export default async function BookingPage({ params, searchParams }: Props) {
               </p>
             )}
           </section>
+
+          {(photos.length > 0 || photoStages.length > 0) && (
+            <section className="card space-y-4 p-5" aria-labelledby="etat-des-lieux">
+              <div>
+                <h2 id="etat-des-lieux" className="font-semibold">📸 État des lieux en photos</h2>
+                <p className="text-sm text-muted">
+                  Photographiez le matériel ensemble à la remise et au retour : en cas de désaccord, ces photos datées font foi.
+                </p>
+              </div>
+              {(["handover", "return"] as const).map((stage) => {
+                const list = photos.filter((p) => p.stage === stage);
+                if (list.length === 0) return null;
+                return (
+                  <div key={stage}>
+                    <h3 className="text-sm font-semibold first-letter:uppercase">{STAGE_LABELS[stage]} ({list.length})</h3>
+                    <ul className="mt-2 grid grid-cols-3 gap-2 sm:grid-cols-4" data-testid={`photos-${stage}`}>
+                      {list.map((p) => (
+                        <li key={p.imageId}>
+                          <a href={imageUrl(p.imageId)} target="_blank" rel="noreferrer" className="block aspect-square overflow-hidden rounded-lg bg-line">
+                            {/* eslint-disable-next-line @next/next/no-img-element */}
+                            <img src={imageUrl(p.imageId, "thumb")} alt={`Photo ${STAGE_LABELS[stage]} par ${p.authorName ?? "un membre"}`} className="size-full object-cover" />
+                          </a>
+                          <p className="mt-0.5 truncate text-[11px] text-muted">
+                            {p.authorId === user.id ? "Vous" : firstName(p.authorName ?? "Membre")} · {formatDateTime(p.createdAt)}
+                          </p>
+                          {p.note && <p className="truncate text-[11px]">{p.note}</p>}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+              {photoStages.length > 0 && <BookingPhotosForm bookingId={booking.id} stages={photoStages} max={MAX_PHOTOS_PER_STAGE} />}
+            </section>
+          )}
 
           {confirmed && listing.pickupNotes && (
             <section className="card p-5">

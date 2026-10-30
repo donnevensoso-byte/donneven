@@ -90,6 +90,11 @@ test("parcours complet d'une location entre particuliers", async ({ page, browse
 
   await page.goto(bookingUrl);
   await expect(page.getByText("Confirmée", { exact: true }).first()).toBeVisible();
+  // État des lieux en photos avant la remise
+  await page.getByTestId("photo-picker").setInputFiles({ name: "etat.png", mimeType: "image/png", buffer: PNG });
+  await page.getByLabel("Remarque").fill("Petite rayure sur le capot");
+  await page.getByRole("button", { name: /Ajouter à l'état des lieux/ }).click();
+  await expect(page.getByTestId("photos-handover").locator("li")).toHaveCount(1);
   await page.getByLabel("Code de remise du locataire").fill(code === "0000" ? "1111" : "0000");
   await page.getByRole("button", { name: /Confirmer la remise/ }).click();
   await expect(page.getByText(/Code incorrect/)).toBeVisible();

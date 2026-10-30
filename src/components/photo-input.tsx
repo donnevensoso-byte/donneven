@@ -26,7 +26,18 @@ async function downscale(file: File): Promise<File> {
 
 type Existing = { id: string };
 
-export function PhotoInput({ max, existing = [] }: { max: number; existing?: Existing[] }) {
+export function PhotoInput({
+  max,
+  existing = [],
+  cover = true,
+  hint,
+}: {
+  max: number;
+  existing?: Existing[];
+  /** Affiche le badge « Couverture » sur la première photo (annonces). */
+  cover?: boolean;
+  hint?: string;
+}) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
@@ -63,7 +74,7 @@ export function PhotoInput({ max, existing = [] }: { max: number; existing?: Exi
           <li key={img.id} className="relative aspect-square overflow-hidden rounded-xl bg-line">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={imageUrl(img.id, "thumb")} alt="" className="size-full object-cover" />
-            {i === 0 && <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 text-[10px] font-semibold text-white">Couverture</span>}
+            {cover && i === 0 && <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 text-[10px] font-semibold text-white">Couverture</span>}
             <button
               type="button"
               onClick={() => setRemoved((r) => [...r, img.id])}
@@ -78,7 +89,7 @@ export function PhotoInput({ max, existing = [] }: { max: number; existing?: Exi
           <li key={src} className="relative aspect-square overflow-hidden rounded-xl bg-line">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={src} alt="" className="size-full object-cover" />
-            {kept.length === 0 && i === 0 && (
+            {cover && kept.length === 0 && i === 0 && (
               <span className="absolute bottom-1 left-1 rounded bg-black/60 px-1.5 text-[10px] font-semibold text-white">Couverture</span>
             )}
             <button
@@ -109,7 +120,7 @@ export function PhotoInput({ max, existing = [] }: { max: number; existing?: Exi
         <input key={id} type="hidden" name="removeImage" value={id} />
       ))}
       <p className="hint">
-        Jusqu&apos;à {max} photos. La première sert de couverture. Montrez le matériel en entier, à la lumière du jour.
+        {hint ?? `Jusqu'à ${max} photos. La première sert de couverture. Montrez le matériel en entier, à la lumière du jour.`}
       </p>
     </div>
   );

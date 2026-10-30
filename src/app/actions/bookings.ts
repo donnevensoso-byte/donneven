@@ -12,6 +12,8 @@ import {
   respondToBooking,
 } from "@/lib/services/bookings";
 import { getOrCreateConversation } from "@/lib/services/messages";
+import { addBookingPhotos, MAX_PHOTOS_PER_STAGE } from "@/lib/services/booking-photos";
+import { readImageFiles } from "@/lib/services/images";
 import { createReview } from "@/lib/services/reviews";
 
 export async function requestBookingAction(listingId: string, _prev: ActionState | undefined, formData: FormData): Promise<ActionState> {
@@ -98,4 +100,18 @@ export async function payBookingAction(bookingId: string): Promise<ActionState> 
     return toActionError(err);
   }
   redirect(url);
+}
+
+export async function addBookingPhotosAction(bookingId: string, _prev: ActionState | undefined, formData: FormData): Promise<ActionState> {
+  const user = await requireUser(`/reservations/${bookingId}`);
+  const stage = formData.get("stage") === "return" ? "return" : "handover";
+  let added = 0;
+  try {
+    const photos = await readImageFiles(formData.getAll("photos"), MAX_PHOTOS_PER_STAGE);
+    added = await addBookingPhotos(user.id, bookingId, stage, photos, String(formData.get("note") ?? ""));
+  } catch (err) {
+    return toActionError(err);
+  }
+  revalidatePath(`/reservations/${bookingId}`);
+  return { ok: true, message: `${added} photo${added > 1 ? "s" : ""} ajoutée${added > 1 ? "s" : ""} à l'état des lieux.` };
 }

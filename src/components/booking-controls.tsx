@@ -127,7 +127,7 @@ export function HandoverForm({ bookingId, onsite }: { bookingId: string; onsite:
           aria-describedby="handover-hint"
         />
         <p className="hint" id="handover-hint">
-          Le locataire le trouve sur sa réservation. Saisissez-le une fois le matériel vérifié ensemble
+          Le locataire le trouve sur sa réservation. Saisissez-le une fois le matériel vérifié et photographié ensemble
           {onsite ? ", la location et la caution réglées" : ""}.
         </p>
       </div>
