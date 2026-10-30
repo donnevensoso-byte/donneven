@@ -15,6 +15,7 @@ import {
 import { getOrCreateConversation } from "@/lib/services/messages";
 import { addBookingPhotos, MAX_PHOTOS_PER_STAGE } from "@/lib/services/booking-photos";
 import { readImageFiles } from "@/lib/services/images";
+import { openDispute } from "@/lib/services/moderation";
 import { createReview } from "@/lib/services/reviews";
 
 export async function requestBookingAction(listingId: string, _prev: ActionState | undefined, formData: FormData): Promise<ActionState> {
@@ -127,4 +128,15 @@ export async function addBookingPhotosAction(bookingId: string, _prev: ActionSta
   }
   revalidatePath(`/reservations/${bookingId}`);
   return { ok: true, message: `${added} photo${added > 1 ? "s" : ""} ajoutée${added > 1 ? "s" : ""} à l'état des lieux.` };
+}
+
+export async function openDisputeAction(bookingId: string, _prev: ActionState | undefined, formData: FormData): Promise<ActionState> {
+  const user = await requireUser(`/reservations/${bookingId}`);
+  try {
+    await openDispute(user.id, bookingId, String(formData.get("reason") ?? ""), String(formData.get("details") ?? ""));
+  } catch (err) {
+    return toActionError(err);
+  }
+  revalidatePath(`/reservations/${bookingId}`);
+  return { ok: true, message: "Litige transmis à l'équipe Zouti. Nous revenons vers vous par e-mail sous 48 h." };
 }

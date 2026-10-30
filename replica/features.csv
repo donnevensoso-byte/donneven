@@ -20,7 +20,7 @@ Vérification d'identité des loueurs,confiance,should,yes,no,Bricolib via Lemon
 Porte-monnaie et retrait vers IBAN,paiement,should,yes,partial,Stripe Express gère les versements ; pas de porte-monnaie interne
 Formule « annulation flexible » payante,paiement,could,yes,no,modèle de frais Bricolib ; sans objet tant que Zouti ne prend pas de frais
 Changer la date d'une réservation,réservation,should,yes,no,aujourd'hui : annuler puis refaire une demande
-Déclarer un litige depuis la transaction,confiance,should,yes,partial,signalement au support uniquement
+Déclarer un litige depuis la transaction,confiance,should,yes,yes,"S08 « Un problème ? » : motif + récit, l'autre partie prévenue, trace dans la conversation, e-mail à l'équipe ; l'admin ouvre le contrat et les photos"
 Déclaration de sinistre avec photos,confiance,should,yes,partial,photos d'état des lieux en place ; pas d'assurance ni de dossier de sinistre
 "Catalogue de types d'outils normalisés (500 outils, 80 catégories)",annonces,should,yes,no,Zouti : titre libre + 13 catégories
 Pages SEO par ville et par catégorie,acquisition,should,yes,yes,"/location-outils, /location-outils/{commune|catégorie} et /{catégorie}/{commune} : vraies annonces, liens voisins, canonique, noindex si vide, plan du site"

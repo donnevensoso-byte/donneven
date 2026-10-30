@@ -61,6 +61,11 @@ export default async function AdminPage() {
                       <BanUser id={report.userId} banned={targetBanned} />
                     </>
                   )}
+                  {report.bookingId && (
+                    <Link href={`/reservations/${report.bookingId}/contrat`} className="font-medium text-brand-600 underline">
+                      Litige : contrat et photos
+                    </Link>
+                  )}
                   {report.status === "open" && <ResolveReport id={report.id} />}
                 </div>
               </li>

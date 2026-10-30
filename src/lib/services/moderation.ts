@@ -1,4 +1,4 @@
-import { desc, eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { CONTACT_EMAIL } from "../config";
 import { db } from "../db";
 import { bookings, listings, reports, sessions, users } from "../db/schema";
@@ -6,7 +6,10 @@ import { sendEmail } from "../email";
 import { UserError } from "../errors";
 import { newId } from "../ids";
 import { rateLimit } from "../rate-limit";
-import { REPORT_REASONS } from "./moderation-reasons";
+import { formatDateRange } from "../dates";
+import { firstName } from "../text";
+import { getOrCreateConversation, postSystemMessage } from "./messages";
+import { DISPUTE_REASONS, REPORT_REASONS } from "./moderation-reasons";
 import { notify } from "./notifications";
 
 export async function createReport(
@@ -25,6 +28,57 @@ export async function createReport(
     userId: target.userId ?? null,
     reason,
     details: details?.trim().slice(0, 1000) || null,
+  });
+}
+
+/** Litige ouvert sur une réservation, s'il y en a un. */
+export async function openDisputeFor(bookingId: string) {
+  const [report] = await db
+    .select()
+    .from(reports)
+    .where(and(eq(reports.bookingId, bookingId), eq(reports.status, "open")))
+    .orderBy(desc(reports.createdAt))
+    .limit(1);
+  return report ?? null;
+}
+
+/**
+ * Litige déclaré par le locataire ou le propriétaire depuis la réservation : l'équipe est
+ * prévenue, l'autre partie aussi, et la conversation en garde la trace. Les photos d'état
+ * des lieux et les messages servent de pièces.
+ */
+export async function openDispute(userId: string, bookingId: string, reason: string, details?: string) {
+  const [booking] = await db.select().from(bookings).where(eq(bookings.id, bookingId)).limit(1);
+  if (!booking || (booking.renterId !== userId && booking.ownerId !== userId)) throw new UserError("Réservation introuvable.");
+  if (!["accepted", "ongoing", "completed", "cancelled"].includes(booking.status) || (booking.status === "cancelled" && !booking.respondedAt)) {
+    throw new UserError("Un litige se déclare après l'acceptation de la réservation. Avant, annulez simplement la demande.");
+  }
+  if (!DISPUTE_REASONS.includes(reason as (typeof DISPUTE_REASONS)[number])) throw new UserError("Choisissez un motif.");
+  if (await openDisputeFor(bookingId)) throw new UserError("Un litige est déjà ouvert sur cette réservation : l'équipe Zouti revient vers vous.");
+  if (!rateLimit(`report:${userId}`, 10, 3_600_000)) throw new UserError("Trop de signalements. Réessayez plus tard.");
+  const otherId = booking.renterId === userId ? booking.ownerId : booking.renterId;
+  const text = details?.trim().slice(0, 2000) || null;
+  await db.insert(reports).values({ id: newId(), reporterId: userId, userId: otherId, listingId: booking.listingId, bookingId, reason, details: text });
+
+  const [[author], [listing]] = await Promise.all([
+    db.select({ name: users.name, email: users.email }).from(users).where(eq(users.id, userId)).limit(1),
+    db.select({ title: listings.title }).from(listings).where(eq(listings.id, booking.listingId)).limit(1),
+  ]);
+  const who = firstName(author?.name ?? "Un membre");
+  await postSystemMessage(
+    await getOrCreateConversation(booking.listingId, booking.renterId),
+    `⚠️ ${who} a signalé un problème à l'équipe Zouti : ${reason}. Gardez vos échanges ici ; les photos d'état des lieux servent de preuve.`,
+  );
+  await notify(otherId, {
+    title: "Litige ouvert sur une location",
+    body: `${who} a signalé « ${reason} » pour « ${listing?.title ?? "une location"} » ${formatDateRange(booking.startDate, booking.endDate)}. L'équipe Zouti va vous contacter.`,
+    link: `/reservations/${booking.id}`,
+    email: true,
+  });
+  await sendEmail({
+    to: CONTACT_EMAIL,
+    subject: `Litige : ${reason} (réservation ${booking.id})`,
+    text: `${author?.name} (${author?.email}) : ${reason}\n\n${text ?? "(sans précision)"}\n\nRéservation ${booking.id}, « ${listing?.title} » ${formatDateRange(booking.startDate, booking.endDate)}.`,
   });
 }
 

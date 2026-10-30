@@ -347,6 +347,8 @@ export const reports = pgTable("reports", {
     .references(() => users.id, { onDelete: "cascade" }),
   listingId: text("listing_id").references(() => listings.id, { onDelete: "cascade" }),
   userId: text("user_id").references(() => users.id, { onDelete: "cascade" }),
+  // Litige déclaré depuis une réservation (le membre visé est l'autre partie).
+  bookingId: text("booking_id").references(() => bookings.id, { onDelete: "cascade" }),
   reason: text("reason").notNull(),
   details: text("details"),
   status: text("status", { enum: ["open", "resolved"] }).notNull().default("open"),

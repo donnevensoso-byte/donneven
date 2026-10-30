@@ -642,6 +642,12 @@ export async function pendingRequestCount(ownerId: string): Promise<number> {
   return row?.n ?? 0;
 }
 
+/** Lecture d'une réservation par l'équipe (arbitrage d'un litige), vue côté propriétaire. */
+export async function getBookingForAdmin(bookingId: string) {
+  const [row] = await db.select({ ownerId: bookings.ownerId }).from(bookings).where(eq(bookings.id, bookingId)).limit(1);
+  return row ? getBookingForUser(row.ownerId, bookingId) : null;
+}
+
 export async function getBookingForUser(userId: string, bookingId: string) {
   await expireStaleBookings();
   const [row] = await db

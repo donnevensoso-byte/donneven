@@ -9,6 +9,7 @@ import {
   ReturnButton,
   ReviewForm,
 } from "@/components/booking-controls";
+import { DisputeForm } from "@/components/dispute-form";
 import { BookingPhotosForm } from "@/components/booking-photos";
 import { Alert, Avatar, Badge, imageUrl } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
@@ -16,6 +17,7 @@ import { addDays, formatDate, formatDateRange, formatDateTime, todayInGuyane } f
 import { communeName } from "@/lib/guyane";
 import { formatEuros } from "@/lib/money";
 import { bookingStatusLabel, getBookingForUser } from "@/lib/services/bookings";
+import { openDisputeFor } from "@/lib/services/moderation";
 import { listBookingPhotos, MAX_PHOTOS_PER_STAGE, openPhotoStages, STAGE_LABELS } from "@/lib/services/booking-photos";
 import { canReview } from "@/lib/services/reviews";
 import { firstName, publicName, whatsappNumber } from "@/lib/text";
@@ -68,6 +70,7 @@ export default async function BookingPage({ params, searchParams }: Props) {
   const wa = whatsappNumber(other.phone);
   const photos = await listBookingPhotos(booking.id);
   const photoStages = openPhotoStages(booking);
+  const dispute = await openDisputeFor(booking.id);
   const statusTone =
     booking.status === "pending" || (booking.status === "accepted" && !paid)
       ? "yellow"
@@ -290,6 +293,20 @@ export default async function BookingPage({ params, searchParams }: Props) {
             <section className="card p-5">
               <h2 className="font-semibold">Infos de retrait</h2>
               <p className="mt-1 whitespace-pre-line text-sm">{listing.pickupNotes}</p>
+            </section>
+          )}
+
+          {(confirmed || dispute || (booking.status === "cancelled" && booking.respondedAt)) && (
+            <section className="card space-y-3 p-5" aria-labelledby="litige">
+              <h2 id="litige" className="font-semibold">Un problème ?</h2>
+              {dispute ? (
+                <Alert tone="warning">
+                  Litige ouvert le {formatDateTime(dispute.createdAt)} ({dispute.reason}). L&apos;équipe Zouti examine la conversation, les
+                  photos et le contrat, et revient vers vous par e-mail.
+                </Alert>
+              ) : (
+                <DisputeForm bookingId={booking.id} />
+              )}
             </section>
           )}
         </div>

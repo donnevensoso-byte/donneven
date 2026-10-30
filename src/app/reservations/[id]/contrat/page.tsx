@@ -8,7 +8,7 @@ import { formatDate, formatDateTime } from "@/lib/dates";
 import { communeName, conditionLabel } from "@/lib/guyane";
 import { formatEuros } from "@/lib/money";
 import { listBookingPhotos, type BookingPhoto } from "@/lib/services/booking-photos";
-import { getBookingForUser } from "@/lib/services/bookings";
+import { getBookingForAdmin, getBookingForUser } from "@/lib/services/bookings";
 
 export const metadata: Metadata = { title: "Contrat de location", robots: { index: false } };
 
@@ -56,7 +56,8 @@ function Party({ title, person }: { title: string; person: { name: string; phone
 export default async function ContractPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const user = await requireUser(`/reservations/${id}/contrat`);
-  const data = await getBookingForUser(user.id, id);
+  // L'équipe peut lire le contrat pour arbitrer un litige.
+  const data = (await getBookingForUser(user.id, id)) ?? (user.role === "admin" ? await getBookingForAdmin(id) : null);
   if (!data || !["accepted", "ongoing", "completed"].includes(data.booking.status)) notFound();
   const { booking, listing, role, other, self } = data;
   const owner = role === "owner" ? { ...self, commune: undefined } : other;
