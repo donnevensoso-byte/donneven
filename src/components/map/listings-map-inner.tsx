@@ -13,7 +13,7 @@ export type MapListing = { id: string; title: string; lat: number; lng: number; 
 function priceIcon(price: number) {
   return L.divIcon({
     className: "",
-    html: `<span style="display:inline-block;transform:translate(-50%,-50%);white-space:nowrap;background:#fff;border:1px solid #e5e3da;border-radius:999px;padding:2px 8px;font:600 12px/18px 'Inter Variable',system-ui,sans-serif;box-shadow:0 2px 6px rgba(0,0,0,.18)">${formatEuros(price)}</span>`,
+    html: `<span style="display:inline-block;transform:translate(-50%,-50%);white-space:nowrap;background:var(--color-surface);color:var(--color-text);border:1px solid var(--color-border);border-radius:999px;padding:2px 8px;font:600 12px/18px var(--font-sans);box-shadow:var(--shadow-pop)">${formatEuros(price)}</span>`,
     iconSize: [0, 0],
   });
 }

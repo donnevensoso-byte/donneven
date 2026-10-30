@@ -1,0 +1,30 @@
+/* Généré par scripts/design-tokens.mjs depuis replica/design/tokens.json. Ne pas modifier à la main. */
+@theme {
+  --color-bg: #f6f5f0;
+  --color-surface: #ffffff;
+  --color-surface-accent: #e9f6f0;
+  --color-surface-sun: #fdf3cf;
+  --color-border: #e5e3da;
+  --color-border-input: #8a887e;
+  --color-text: #1c1c1a;
+  --color-text-muted: #66655d;
+  --color-accent: #0b6e4f;
+  --color-accent-strong: #08583f;
+  --color-accent-text: #08583f;
+  --color-on-accent: #ffffff;
+  --color-sun: #f4c430;
+  --color-sun-text: #8a6500;
+  --color-on-sun: #1c1c1a;
+  --color-danger: #b3311f;
+  --color-on-danger: #ffffff;
+  --color-success: #0b6e4f;
+  --color-warning: #8a6500;
+  --radius-token-sm: 0.5rem;
+  --radius-token-md: 0.75rem;
+  --radius-token-lg: 1rem;
+  --radius-token-xl: 1.5rem;
+  --radius-token-pill: 9999px;
+  --shadow-card: 0 1px 2px rgb(28 28 26 / .06), 0 4px 16px rgb(28 28 26 / .05);
+  --shadow-pop: 0 12px 32px rgb(28 28 26 / .18);
+  --ease-zouti: cubic-bezier(.4,0,.2,1);
+}

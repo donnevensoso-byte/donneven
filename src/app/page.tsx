@@ -24,7 +24,7 @@ export default async function HomePage() {
           className="absolute inset-0 opacity-25"
           style={{
             backgroundImage:
-              "radial-gradient(circle at 15% 20%, #f4c430 0, transparent 35%), radial-gradient(circle at 85% 80%, #12875f 0, transparent 45%)",
+              "radial-gradient(circle at 15% 20%, var(--color-sun) 0, transparent 35%), radial-gradient(circle at 85% 80%, var(--color-brand-500) 0, transparent 45%)",
           }}
         />
         <div className="relative mx-auto max-w-6xl px-4 py-12 sm:py-20">

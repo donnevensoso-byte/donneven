@@ -1,27 +1,28 @@
 @import "tailwindcss";
+@import "./tokens.css";
 
 @theme {
   --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 
-  --color-brand-50: #e9f6f0;
+  /* Palette de marque. Les nuances utilisées comme rôles pointent vers tokens.css. */
+  --color-brand-50: var(--color-surface-accent);
   --color-brand-100: #c9eadb;
   --color-brand-200: #96d4b9;
   --color-brand-500: #12875f;
-  --color-brand-600: #0b6e4f;
-  --color-brand-700: #08583f;
+  --color-brand-600: var(--color-accent);
+  --color-brand-700: var(--color-accent-strong);
   --color-brand-800: #064330;
-  --color-sun-100: #fdf3cf;
+  --color-sun-100: var(--color-surface-sun);
   --color-sun-300: #f8d76a;
-  --color-sun-400: #f4c430;
-  --color-sun-600: #b98a06;
-  --color-flame-500: #d9412b;
-  --color-sand: #f6f5f0;
-  --color-ink: #1c1c1a;
-  --color-muted: #66655d;
-  --color-line: #e5e3da;
+  --color-sun-400: var(--color-sun);
+  --color-sun-600: var(--color-sun-text);
+  --color-flame-500: var(--color-danger);
+  --color-sand: var(--color-bg);
+  --color-ink: var(--color-text);
+  --color-muted: var(--color-text-muted);
+  --color-line: var(--color-border);
 
-  --radius-card: 1rem;
-  --shadow-card: 0 1px 2px rgb(28 28 26 / 0.06), 0 4px 16px rgb(28 28 26 / 0.05);
+  --radius-card: var(--radius-token-lg);
 }
 
 @layer base {
@@ -68,7 +69,7 @@
 }
 
 @utility input {
-  @apply block w-full rounded-xl border border-line bg-white px-3.5 py-2.5 text-[15px] text-ink placeholder:text-muted/70 focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20 focus:outline-none disabled:bg-sand;
+  @apply block w-full rounded-xl border border-border-input bg-surface px-3.5 py-2.5 text-[15px] text-ink placeholder:text-muted/70 focus:border-brand-600 focus:ring-2 focus:ring-brand-600/20 focus:outline-none disabled:bg-sand aria-invalid:border-danger aria-invalid:ring-danger/20;
 }
 
 @utility label {
