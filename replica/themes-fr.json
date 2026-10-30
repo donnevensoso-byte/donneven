@@ -1,0 +1,34 @@
+{
+  "_about": "Thèmes en français pour la location d'outils entre particuliers (adapté de .claude/skills/replica-entrepreneur/themes.json).",
+  "request_patterns": [
+    "\\bj'aimerais\\b", "\\bil faudrait\\b", "\\bserait[- ]il possible\\b", "\\bpas de possibilité\\b",
+    "\\bimpossible de (choisir|contacter|mettre|planifier)\\b", "\\bprochaine amélioration\\b", "\\bmanque\\b",
+    "\\bpourrait être\\b", "\\bmerci de\\b"
+  ],
+  "themes": [
+    {"id": "frais", "label": "Commission et frais trop élevés", "kind": "complaint",
+     "patterns": ["\\bcommission", "\\bfrais\\b", "\\bmarge\\b", "\\bpharaonique\\b", "\\babus", "\\bcher pour\\b", "\\b\\d+ ?%"]},
+    {"id": "contact-payant", "label": "Impossible de contacter le loueur sans payer d'avance", "kind": "complaint",
+     "patterns": ["pr[ée][- ]?paiement", "payer (d'avance|en avance)", "pay(é|e)r? d'abord", "contacter le loueur", "poser une question", "questions au loueur", "dialoguer avec le loueur", "coordonnées du loueur", "\\bpaye d'abord\\b"]},
+    {"id": "annulation", "label": "Annulation et remboursement", "kind": "complaint",
+     "patterns": ["\\bannul", "\\brembours", "r[ée]cup[ée]rer (mon|l['’])argent", "restitution de la somme"]},
+    {"id": "sans-reponse", "label": "Loueurs qui ne répondent pas ou ne viennent pas", "kind": "complaint",
+     "patterns": ["(n'a|n’a|n'ont|ont) (jamais )?répondu", "absences? de réponse", "pas au rendez-vous", "aucun des loueur", "plus de réponse", "pas le produit", "n'avait pas l'appareil", "perdu (24|deux|2) (heures|jours)", "signe de vie"]},
+    {"id": "litige", "label": "Casse, vol et litiges sans protection", "kind": "complaint",
+     "patterns": ["\\blitige", "\\bassurance\\b", "\\bgarantie\\b", "\\bcaution\\b", "\\bab[iî]m", "\\bvol\\b", "en panne", "parole contre parole", "responsabilit[ée] civile"]},
+    {"id": "connexion", "label": "Connexion et compte", "kind": "complaint",
+     "patterns": ["\\bconnect", "\\bconnexion\\b", "\\bidentifiant\\b", "mot de passe", "\\bMDP\\b", "cr[ée]er (un|mon) (compte|identifiant)"]},
+    {"id": "bugs", "label": "Bugs, site ou appli qui ne marche pas", "kind": "complaint",
+     "patterns": ["\\bbug", "ne fonctionne", "dysfonction", "inutilisable", "mal foutu", "rien ne se passe", "rien ne fonctionne", "impossible de (r[ée]server|faire une recherche|cherche)", "\\bbloqu"]},
+    {"id": "paiement-loueur", "label": "Versements aux loueurs et vérification d'identité", "kind": "complaint",
+     "patterns": ["\\brib\\b", "\\bKYC\\b", "lemonway", "onfido", "30 jours avant de recevoir", "retire l'argent", "carte (bancaire )?bloqu", "cartes CB"]},
+    {"id": "liquidite", "label": "Pas assez de demandes ni de visibilité", "kind": "complaint",
+     "patterns": ["aucun client", "aucune loc", "jamais eu un appel", "pas un seul contact", "peu de location", "visibilit[ée]", "manque à être connaitre", "plateforme déjà morte", "y a un type"]},
+    {"id": "support", "label": "Support absent ou désagréable", "kind": "complaint",
+     "patterns": ["ne répondent pas aux mails", "aucune (assistance|réponse)", "aucun SAV", "jamais reçu aucune réponse", "\\bméprisant", "plus aucune nouvelle", "robot"]},
+    {"id": "service-ok", "label": "Service client réactif (positif)", "kind": "request",
+     "patterns": ["(service|assistance|SAV).{0,30}(réactif|efficace|rapide|top)", "m'a rappelé", "prend(s)? le temps de vous répondre"]},
+    {"id": "fonctions", "label": "Fonctions demandées (recherche, horaires, notifications, dispo)", "kind": "request",
+     "patterns": ["rayon de recherche", "l['’]heure de d[ée]but", "notification", "planifier à l['’]avance", "réservation 4 jours avant", "QR code", "police ridiculement petite", "gestion .{0,40}caution", "mettre ma ville"]}
+  ]
+}

@@ -1,0 +1,12 @@
+feature,area,priority,original,clone,notes
+Question gratuite au propriétaire avant toute demande,messagerie,must,no,yes,correctif replica-entrepreneur : contact payant (8 avis 2 sources)
+Aucune commission sur les locations réglées en main propre,paiement,must,no,yes,correctif replica-entrepreneur : frais (11 avis 1 source)
+Annulation gratuite jusqu'à la veille,réservation,must,no,yes,correctif replica-entrepreneur : annulation (11 avis 2 sources)
+État des lieux en photos à la remise et au retour,réservation,must,no,no,fix 1 : litiges (6 avis 2 sources)
+Relance du loueur et annonces alternatives si pas de réponse,réservation,must,no,partial,fix 2 : sans réponse (7 avis 2 sources) ; expiration 48 h et taux de réponse déjà faits
+Règles d'annulation affichées avant la demande,réservation,should,no,partial,fix 3 : annulation (11 avis 2 sources)
+Filtre par rayon en km,recherche,could,no,no,fix 4 : 1 avis (mince)
+Heure de remise et de retour,réservation,could,no,no,fix 5 : 1 avis (mince)
+Délai minimum de réservation par annonce,annonces,could,no,no,fix 6 : 1 avis (mince)
+Caution par empreinte bancaire,paiement,could,no,no,fix 7 : 1 avis + litiges
+Notifications push,notifications,could,no,no,fix 8 : 1 avis (mince) ; avec l'app mobile
