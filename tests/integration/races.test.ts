@@ -5,6 +5,7 @@ import { afterAll, describe, expect, it } from "vitest";
 import { closeDb, db } from "@/lib/db";
 import { bookings, conversations, users } from "@/lib/db/schema";
 import { addDays, todayInGuyane } from "@/lib/dates";
+import { UserError } from "@/lib/errors";
 import { newId } from "@/lib/ids";
 import { cancelBooking, requestBooking, respondToBooking } from "@/lib/services/bookings";
 import { createListing, listingFormSchema } from "@/lib/services/listings";
@@ -43,6 +44,24 @@ describe("requêtes simultanées", () => {
     await Promise.allSettled([requestBooking(renter, req), requestBooking(renter, req), requestBooking(renter, req)]);
     const rows = await db.select().from(bookings).where(eq(bookings.listingId, listingId));
     expect(rows).toHaveLength(1);
+  });
+
+  it("F01-E12 la base refuse une seconde demande en attente qui chevauche (BUG-006)", async () => {
+    const owner = await makeUser("Loueur");
+    const renter = await makeUser("Locataire");
+    const listingId = await makeListing(owner);
+    const id = await requestBooking(renter, { listingId, startDate: day(3), endDate: day(4) });
+    const [first] = await db.select().from(bookings).where(eq(bookings.id, id));
+    // Ce que ferait un second onglet arrivé entre le contrôle et l'insertion.
+    await expect(db.insert(bookings).values({ ...first, id: newId(), startDate: day(4), endDate: day(5) })).rejects.toThrow();
+  });
+
+  it("F01-E13 la violation de contrainte devient un message clair", async () => {
+    const { bookingConflictError } = await import("@/lib/services/bookings");
+    const err = bookingConflictError(Object.assign(new Error("dup"), { code: "23P01", constraint_name: "bookings_one_pending_per_renter" }));
+    expect(err).toBeInstanceOf(UserError);
+    expect(err?.message).toMatch(/déjà une demande en attente/);
+    expect(bookingConflictError(new Error("autre"))).toBeNull();
   });
 
   it("F01-E11 premier contact simultané : une seule conversation", async () => {

@@ -37,6 +37,15 @@ alter table bookings
     listing_id with =,
     daterange(start_date, end_date, '[]') with &&
   ) where (status in ('accepted','ongoing'));
+-- Ajouté après /replica-test (BUG-006, drizzle/0003) : une seule demande en attente par
+-- locataire et par période sur une annonce, même envoyée depuis deux onglets.
+alter table bookings
+  add constraint bookings_one_pending_per_renter
+  exclude using gist (
+    listing_id with =,
+    renter_id with =,
+    daterange(start_date, end_date, '[]') with &&
+  ) where (status = 'pending');
 
 -- 3. updated_at sur les tables qui changent ----------------------------------------------------
 alter table bookings add column updated_at timestamptz not null default now();

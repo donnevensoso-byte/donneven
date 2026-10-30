@@ -133,22 +133,28 @@ export async function requestBooking(renterId: string, req: BookingRequest): Pro
   const ttl = new Date(now.getTime() + REQUEST_TTL_HOURS * 3_600_000);
   const startDeadline = endOfDayInGuyane(req.startDate);
   const id = newId();
-  await db.insert(bookings).values({
-    id,
-    listingId: listing.id,
-    renterId,
-    ownerId: listing.ownerId,
-    startDate: req.startDate,
-    endDate: req.endDate,
-    days: price.days,
-    dayPrice: listing.dayPrice,
-    weekPrice: listing.weekPrice,
-    rentalAmount: price.rentalAmount,
-    serviceFee: price.serviceFee,
-    deposit: listing.deposit,
-    paymentMethod: online ? "online" : "onsite",
-    expiresAt: ttl < startDeadline ? ttl : startDeadline,
-  });
+  await db
+    .insert(bookings)
+    .values({
+      id,
+      listingId: listing.id,
+      renterId,
+      ownerId: listing.ownerId,
+      startDate: req.startDate,
+      endDate: req.endDate,
+      days: price.days,
+      dayPrice: listing.dayPrice,
+      weekPrice: listing.weekPrice,
+      rentalAmount: price.rentalAmount,
+      serviceFee: price.serviceFee,
+      deposit: listing.deposit,
+      paymentMethod: online ? "online" : "onsite",
+      expiresAt: ttl < startDeadline ? ttl : startDeadline,
+    })
+    .catch((err) => {
+      // Deux onglets au même instant : la base tranche (contrainte d'exclusion).
+      throw bookingConflictError(err) ?? err;
+    });
 
   const conversationId = await getOrCreateConversation(listing.id, renterId);
   await postSystemMessage(
@@ -162,6 +168,15 @@ export async function requestBooking(renterId: string, req: BookingRequest): Pro
   // En paiement en ligne, le propriétaire n'est prévenu qu'une fois l'empreinte bancaire posée.
   if (!online) await notifyOwnerOfRequest(id);
   return id;
+}
+
+/** Violation d'une contrainte d'exclusion sur les réservations, traduite en message. */
+export function bookingConflictError(err: unknown): UserError | null {
+  const pg = (err as { cause?: unknown })?.cause ?? err;
+  const { code, constraint_name } = (pg ?? {}) as { code?: string; constraint_name?: string };
+  if (code !== "23P01") return null;
+  if (constraint_name === "bookings_one_pending_per_renter") return new UserError("Vous avez déjà une demande en attente sur ces dates.");
+  return new UserError("Le matériel n'est pas disponible à ces dates.");
 }
 
 async function notifyOwnerOfRequest(bookingId: string) {
