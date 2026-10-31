@@ -3,7 +3,7 @@ export const APP_TAGLINE = "Louez les outils de vos voisins en Guyane";
 export const APP_DESCRIPTION =
   "Zouti, c'est la location d'outils et de matériel entre particuliers en Guyane : débroussailleuse, nettoyeur haute pression, groupe électrogène, barnum, kayak… Louez près de chez vous ou gagnez de l'argent avec votre matériel.";
 /** Adresse de contact affichée sur le site et destinataire des signalements (à régler en production). */
-export const CONTACT_EMAIL = process.env.CONTACT_EMAIL?.trim() || "contact@zouti.gf";
+export const CONTACT_EMAIL = process.env.CONTACT_EMAIL?.trim() || "contact@zouti97.fr";
 
 export function appUrl(): string {
   return (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");

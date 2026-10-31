@@ -38,13 +38,13 @@ Date : 2026-10-31. Build vérifié : `b4f5a03` (branche `claude/zouti-web-app`).
 - **Hébergement : Render**, avec le Blueprint `render.yaml`.
 - **Statut : micro-entreprise.** Nom suivi de « EI », TVA non applicable (art. 293 B du CGI) par défaut.
 - **E-mails : Brevo.**
-- **Domaine : à acheter chez IONOS.** Pour les `.fr`, IONOS interroge l'AFNIC, le registre officiel. Le 2026-10-31, l'AFNIC répondait que **zouti973.fr** et **zouti-guyane.fr** sont **libres** ; zouti.fr, zouti.com et zouti.app sont pris.
+- **Domaine : `zouti97.fr`, à acheter chez IONOS.** Pour les `.fr`, IONOS interroge l'AFNIC, le registre officiel ; le 2026-10-31, l'AFNIC répondait que `zouti97.fr` est **libre**.
 
 ## 3 bis. Ce qu'il te faut fournir (je ne crée ni n'achète rien à ta place)
 
 1. **Identité de l'éditeur**, pour les mentions légales, les CGU et la confidentialité : nom ou raison sociale, adresse, statut (particulier, micro-entreprise, association…), SIRET le cas échéant, e-mail de contact. Il faut aussi choisir un **médiateur de la consommation**, obligatoire dès qu'on s'adresse à des consommateurs. À faire relire par un juriste.
 2. **Hébergement.** Je conseille Render, avec le Blueprint fourni : environ 7 $ par mois pour le service web, environ 6 $ pour la base et environ 1 $ pour la tâche planifiée (tarifs à vérifier). Crée le compte et connecte le dépôt GitHub : *New → Blueprint →* `donnevensoso-byte/donneven`, branche à fusionner dans `main` d'abord.
-3. **Nom de domaine.** `zouti.fr`, `zouti.com` et `zouti.app` sont pris (`zouti.fr` est à vendre chez un courtier). `zouti973.fr` et `zouti-guyane.fr` étaient **libres le 2026-10-30**. Achète celui que tu préfères chez un registrar (OVH, Gandi…).
+3. **Nom de domaine : `zouti97.fr`**, libre le 2026-10-31. À acheter chez IONOS (sans leur hébergement).
 4. **E-mails.** Crée un compte chez un prestataire européen, par exemple Brevo, et vérifie le domaine d'envoi. Sans ça, pas d'e-mail de vérification, de demande ni de rappel.
 5. **Ton e-mail d'administrateur**, pour `ADMIN_EMAILS`.
 6. **Plus tard, pour le paiement par carte :** un compte Stripe avec Connect, puis la passe manuelle en mode test de `replica/test-plan.md`. Le lancement se fait sans carte, en main propre.
@@ -54,9 +54,9 @@ Date : 2026-10-31. Build vérifié : `b4f5a03` (branche `claude/zouti-web-app`).
 | variable | valeur |
 | --- | --- |
 | `DATABASE_URL` | fournie par Render (Blueprint) ou par ta base |
-| `APP_URL` | `https://<ton-domaine>` (sans `/` final) |
+| `APP_URL` | `https://zouti97.fr` (sans `/` final) |
 | `ADMIN_EMAILS` | ton e-mail |
-| `CONTACT_EMAIL` | l'adresse affichée sur le site, par ex. `bonjour@zouti973.fr` |
+| `CONTACT_EMAIL` | l'adresse affichée sur le site, par ex. `bonjour@zouti97.fr` |
 | `LEGAL_PUBLISHER` | `Prénom Nom EI` |
 | `LEGAL_ADDRESS` | ton adresse professionnelle (ou domiciliation), 973xx commune |
 | `LEGAL_SIRET` | ton numéro SIRET |
@@ -64,7 +64,7 @@ Date : 2026-10-31. Build vérifié : `b4f5a03` (branche `claude/zouti-web-app`).
 | `LEGAL_REGISTRATION` | facultatif, par ex. « Immatriculée au RNE » |
 | `CRON_SECRET` | généré par Render ; sur un VPS : `openssl rand -hex 32` |
 | `TRUSTED_PROXIES` | `1` (un seul proxy devant l'app, à vérifier selon l'hébergeur) |
-| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | donnés par le prestataire e-mail ; `SMTP_FROM` = `Zouti <bonjour@<ton-domaine>>` |
+| `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | donnés par le prestataire e-mail ; `SMTP_FROM` = `Zouti <bonjour@zouti97.fr>` |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | **vides au lancement** |
 | `SERVICE_FEE_PERCENT` | `10` |
 
@@ -84,7 +84,7 @@ Choisis une seule adresse canonique (par exemple sans `www`) et redirige l'autre
 
 ## 6. Surveillance
 
-- **Disponibilité** : UptimeRobot ou Better Stack (gratuit) sur `https://<domaine>/api/health` toutes les 5 minutes, avec alerte par e-mail ou SMS.
+- **Disponibilité** : UptimeRobot ou Better Stack (gratuit) sur `https://zouti97.fr/api/health` toutes les 5 minutes, avec alerte par e-mail ou SMS.
 - **Erreurs** : journaux Render (`console.error` sur les paiements, les versements et `/api/cron`). Sentry est à brancher si le trafic monte ; il n'est pas intégré aujourd'hui.
 - **Audience** : Plausible ou Umami, sans cookie, donc sans bandeau. Pas encore intégré, à ajouter quand le domaine sera choisi.
 - **Sauvegardes** : Render sauvegarde la base chaque jour sur les offres payantes. Sur un VPS, `pg_dump` quotidien. Les photos sont stockées dans la base : surveille sa taille, car l'offre de 256 Mo se remplit avec quelques milliers de photos.

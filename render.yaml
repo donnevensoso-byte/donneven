@@ -15,7 +15,7 @@ services:
           name: zouti-db
           property: connectionString
       - key: APP_URL
-        sync: false # https://votre-domaine (sans / final)
+        sync: false # https://zouti97.fr
       - key: ADMIN_EMAILS
         sync: false
       - key: CRON_SECRET

@@ -26,6 +26,7 @@ Quatre noms de rechange, au cas où un contrôle juridique fermerait la porte :
 | Domaine zouti.fr | **pris**, et **à vendre** chez Dovendi (courtier), enregistré en 2023 | 2026-10-30 |
 | Domaine zouti.com | **pris** (enregistré en 2010, certificat invalide) | 2026-10-30 |
 | Domaine zouti.app | **pris** : « Zouti Technologies », logiciels Mac pour Apple Photos (« Kreyòl for tool ») | 2026-10-30 |
+| Domaine **zouti97.fr** (retenu) | **libre** (RDAP AFNIC : introuvable) | 2026-10-31 |
 | Domaine zouti973.fr | **libre** (RDAP AFNIC : introuvable) | 2026-10-30 |
 | Domaine zouti-guyane.fr | **libre** (RDAP AFNIC : introuvable) | 2026-10-30 |
 | Domaine zouti.gf | **à faire** chez un registrar .gf (pas de RDAP public) | — |
@@ -37,7 +38,7 @@ Quatre noms de rechange, au cas où un contrôle juridique fermerait la porte :
 1. Garder **Zouti** comme nom de service.
 2. Déposer la marque à l'INPI en **classes 35** (mise en relation, place de marché), **39** (location de véhicules et de matériel de transport, pour les kayaks et remorques), **42** (plateforme en ligne) et **37** (location de matériel de chantier). Éviter la classe 9 seule, où « Zouti Magic » existe.
 3. Sur les stores, publier sous un nom composé, par exemple « **Zouti – location d'outils Guyane** », pour ne pas se confondre avec Zouti Photos.
-4. Domaine : enregistrer **zouti973.fr** ou **zouti-guyane.fr** tout de suite (libres et peu chers), puis faire une offre pour **zouti.fr** s'il reste raisonnable.
+4. Domaine : **zouti97.fr**, choisi le 2026-10-31 et libre ce jour-là, à acheter chez IONOS. Il reste possible de faire une offre plus tard pour **zouti.fr**.
 5. **Avant de dépenser pour la marque, faites valider par un conseil en propriété industrielle.** Ces contrôles ne sont qu'un premier tri.
 
 ## 2. Palette

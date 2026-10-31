@@ -44,7 +44,7 @@ export async function sendEmail(mail: Mail): Promise<void> {
   }
   try {
     await getTransporter().sendMail({
-      from: process.env.SMTP_FROM ?? `${APP_NAME} <no-reply@zouti.gf>`,
+      from: process.env.SMTP_FROM ?? `${APP_NAME} <no-reply@zouti97.fr>`,
       to: mail.to,
       subject: `${mail.subject} – ${APP_NAME}`,
       text,
