@@ -3,7 +3,7 @@
 Build testé : 67d7d9c. Navigateur : Chromium (Playwright), profil Pixel 7 (412 px), fr-FR, America/Cayenne.
 Seuls les bugs reproduits sont listés ; les doutes sont en bas, dans « À vérifier ».
 
-Bilan : 8 bugs (S1 : 0, S2 : 1, S3 : 6, S4 : 1). 7 corrigés, 1 ouvert (S4).
+Bilan : 9 bugs (S1 : 0, S2 : 2, S3 : 6, S4 : 1). 8 corrigés, 1 ouvert (S4).
 
 ### BUG-003: la limite anti-abus par adresse IP se contourne avec un en-tête falsifié
 
@@ -116,6 +116,22 @@ Actual: seules les vignettes datées y sont ; la remarque, qui décrit le dégâ
 Evidence: `tests/e2e/f05-etat-des-lieux.spec.ts` › F05-H1 (« Fissure sur le carter » introuvable sur `/contrat`).
 Status: fixed in 33a12f7 (remarques listées sous les vignettes, une fois par envoi)
 
+### BUG-009: supprimer son compte effaçait un litige ouvert et ses preuves
+
+- Severity: S2
+- Flow / case: F07 / trouvé pendant le préflight de /replica-deploy (« la suppression de compte fonctionne »)
+- Screen: compte, suppression
+- Build: 14301fb
+
+Steps
+1. Une location terminée fait l'objet d'un litige ouvert par le propriétaire.
+2. Le locataire supprime son compte.
+
+Expected: la suppression est refusée tant que le litige est ouvert.
+Actual: la suppression passe et, par cascade, efface la réservation, ses photos d'état des lieux et le litige.
+Evidence: `tests/integration/disputes.test.ts` › BUG-009 (rouge avant correction).
+Status: fixed (voir le commit « fix(BUG-009) »)
+
 ### BUG-005: le sélecteur de photos d'état des lieux ignore les photos déjà envoyées
 
 - Severity: S4
@@ -137,3 +153,4 @@ Status: open (S4, pas bloquant : le serveur refuse proprement)
 - `TRUSTED_PROXIES` doit correspondre à l'hébergement réel (1 derrière un seul proxy : Render, Railway, nginx…). Si l'application est exposée sans proxy, l'en-tête reste entièrement écrit par le client : à vérifier au déploiement (`/replica-deploy`).
 - Empreinte bancaire et remboursements avec un vrai compte Stripe test : jamais exécutés (Stripe injoignable d'ici). Voir la passe manuelle de `test-plan.md`.
 - E-mails réels (SMTP) : non testés.
+- Conservation comptable : supprimer un compte efface aussi ses réservations terminées. Si le paiement en ligne est activé, il faudra conserver les traces de transactions (Stripe les garde de son côté) : à valider avec un comptable avant d'activer la carte.

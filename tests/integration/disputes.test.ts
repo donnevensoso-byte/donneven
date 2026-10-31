@@ -74,3 +74,25 @@ describe("litige depuis la réservation", () => {
     await expect(openDispute(renter, id, "N'importe quoi")).rejects.toThrow(/motif/);
   });
 });
+
+describe("suppression de compte", () => {
+  it("BUG-009 : impossible de supprimer son compte pour échapper à un litige ouvert", async () => {
+    const { deleteAccount } = await import("@/lib/services/users");
+    const { confirmReturn } = await import("@/lib/services/bookings");
+    const { owner, renter, id } = await rental();
+    await respondToBooking(owner, id, "accept");
+    const [{ handoverCode }] = await db.select().from(bookings).where(eq(bookings.id, id));
+    await confirmHandover(owner, id, handoverCode!);
+    await confirmReturn(owner, id);
+    await openDispute(owner, id, "Matériel endommagé", "Carter fendu.");
+    await expect(deleteAccount(renter)).rejects.toThrow(/litige/);
+    expect(await db.select().from(reports).where(eq(reports.bookingId, id))).toHaveLength(1);
+  });
+
+  it("sans réservation en cours ni litige, le compte est supprimé", async () => {
+    const { deleteAccount } = await import("@/lib/services/users");
+    const lonely = await makeUser("Membre partant");
+    await deleteAccount(lonely);
+    expect(await db.select().from(users).where(eq(users.id, lonely))).toHaveLength(0);
+  });
+});

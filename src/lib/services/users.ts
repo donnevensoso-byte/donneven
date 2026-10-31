@@ -1,7 +1,7 @@
 import { and, eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { db } from "../db";
-import { bookings, images, listings, users } from "../db/schema";
+import { bookings, images, listings, reports, users } from "../db/schema";
 import { UserError } from "../errors";
 import { COMMUNES } from "../guyane";
 import { saveImage } from "./images";
@@ -102,5 +102,13 @@ export async function deleteAccount(userId: string) {
     )
     .limit(1);
   if (open) throw new UserError("Vous avez des réservations en cours. Terminez-les ou annulez-les avant de supprimer votre compte.");
+  // Supprimer le compte effacerait la réservation, ses photos et le litige : on attend sa clôture.
+  const [dispute] = await db
+    .select({ id: reports.id })
+    .from(reports)
+    .innerJoin(bookings, eq(bookings.id, reports.bookingId))
+    .where(and(eq(reports.status, "open"), sql`(${bookings.renterId} = ${userId} or ${bookings.ownerId} = ${userId})`))
+    .limit(1);
+  if (dispute) throw new UserError("Un litige est ouvert sur une de vos locations : votre compte pourra être supprimé une fois le litige clos par l'équipe Zouti.");
   await db.delete(users).where(eq(users.id, userId));
 }
