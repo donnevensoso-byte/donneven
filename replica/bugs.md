@@ -130,7 +130,7 @@ Steps
 Expected: la suppression est refusée tant que le litige est ouvert.
 Actual: la suppression passe et, par cascade, efface la réservation, ses photos d'état des lieux et le litige.
 Evidence: `tests/integration/disputes.test.ts` › BUG-009 (rouge avant correction).
-Status: fixed (voir le commit « fix(BUG-009) »)
+Status: fixed in b4f5a03
 
 ### BUG-005: le sélecteur de photos d'état des lieux ignore les photos déjà envoyées
 

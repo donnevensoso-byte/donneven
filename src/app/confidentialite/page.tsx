@@ -32,7 +32,8 @@ export default function PrivacyPage() {
       <p>
         Les autres membres voient votre profil public (prénom, initiale du nom, commune, photo, présentation, avis). Votre téléphone et votre nom
         complet ne sont communiqués qu&apos;à l&apos;autre partie d&apos;une réservation confirmée. Nos sous-traitants : hébergement{" "}
-        <ToFill>hébergeur et localisation des serveurs</ToFill>, envoi d&apos;e-mails <ToFill>prestataire e-mail</ToFill>, paiement Stripe. Vos
+        <ToFill>hébergeur et localisation des serveurs</ToFill>, envoi d&apos;e-mails <ToFill>prestataire e-mail</ToFill>, paiement Stripe (si le paiement en ligne est activé), fonds de carte{" "}
+        <ToFill>fournisseur de tuiles de carte</ToFill> (votre navigateur lui transmet son adresse IP pour afficher la carte). Vos
         données ne sont jamais vendues.
       </p>
 

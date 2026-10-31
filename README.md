@@ -56,21 +56,25 @@ Comptes de démo après `db:seed` : `marie@demo.zouti.gf` / `zouti-demo` (et kev
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | non | Envoi des e-mails. **Sans SMTP**, les e-mails sont écrits dans les logs et les comptes sont considérés comme vérifiés. **Avec SMTP**, la vérification d'e-mail est exigée pour publier et réserver. |
 | `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `SERVICE_FEE_PERCENT` | non | Paiement en ligne. Sans ces clés, tout se règle en main propre, sans commission. |
 | `NEXT_PUBLIC_MAP_TILE_URL`, `NEXT_PUBLIC_MAP_ATTRIBUTION` | non | Fournisseur de fonds de carte (OSM par défaut, à remplacer en cas de fort trafic) |
+| `CRON_SECRET` | conseillé | Secret de `GET /api/cron` (expirations, rappels aux propriétaires, versements en échec), à appeler toutes les 15 min |
+| `TRUSTED_PROXIES` | non | Nombre de proxys devant l'app, pour lire la vraie IP des visiteurs (limites anti-abus) ; 1 par défaut |
 | `SKIP_MIGRATIONS` | non | `1` pour ne pas migrer au démarrage |
 
 ## Mettre en ligne
 
 L'application a seulement besoin d'un hébergement Node.js (ou Docker) et d'une base PostgreSQL. Pour le RGPD, choisissez des serveurs dans l'Union européenne.
 
-**Option simple – Render / Railway / Scalingo** (≈ 10–25 €/mois)
+**Option conseillée – Render (Blueprint fourni)** : `render.yaml` crée le service web Docker, la base PostgreSQL et la tâche planifiée `/api/cron`, en région Francfort. Dans Render : *New → Blueprint →* ce dépôt, puis renseignez les valeurs demandées. Le détail pas à pas est dans `replica/deploy.md`.
+
+**Autres hébergeurs – Railway / Scalingo / Scaleway** (≈ 10–25 €/mois)
 1. Créez une base PostgreSQL (Neon, Supabase, ou celle de l'hébergeur), région Europe.
 2. Créez un service web depuis ce dépôt GitHub : build `npm ci && npm run build`, démarrage `npm start` (ou utilisez le `Dockerfile`).
 3. Renseignez `DATABASE_URL`, `APP_URL`, `ADMIN_EMAILS` (et SMTP). Les tables sont créées au premier démarrage.
 4. Branchez votre nom de domaine. Vérification : `GET /api/health` → `{"ok":true}`.
 
-**Option serveur (VPS OVH / Scaleway)** : `docker compose up -d --build` derrière un proxy HTTPS (Caddy ou Nginx + Let's Encrypt). Sauvegardez le volume `pgdata` (photos comprises) chaque jour, par exemple avec `pg_dump`.
+**Option serveur (VPS OVH / Scaleway)** : `docker compose up -d --build` (le service `cron` appelle `/api/cron` toutes les 15 min ; mettez `CRON_SECRET` dans `.env`) derrière un proxy HTTPS (Caddy ou Nginx + Let's Encrypt). Sauvegardez le volume `pgdata` (photos comprises) chaque jour, par exemple avec `pg_dump`.
 
-**Paiement en ligne (facultatif)** : créez un compte Stripe, activez **Connect** (comptes Express), renseignez `STRIPE_SECRET_KEY`, puis ajoutez un webhook vers `https://votre-domaine/api/stripe/webhook` (événements `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `account.updated`) et copiez son secret dans `STRIPE_WEBHOOK_SECRET`. Les propriétaires activent les paiements depuis *Mon compte → Paiements en ligne*. Vérifiez avec Stripe que les comptes de particuliers domiciliés en Guyane sont acceptés. Ce module est vérifié par le typage mais **n'a pas encore été testé avec de vraies clés Stripe** : faites une location test en mode test avant d'ouvrir.
+**Paiement en ligne (facultatif)** : créez un compte Stripe, activez **Connect** (comptes Express), renseignez `STRIPE_SECRET_KEY`, puis ajoutez un webhook vers `https://votre-domaine/api/stripe/webhook` (événements `checkout.session.completed`, `checkout.session.async_payment_succeeded`, `account.updated`) et copiez son secret dans `STRIPE_WEBHOOK_SECRET`. Les propriétaires activent les paiements depuis *Mon compte → Paiements en ligne*. Vérifiez avec Stripe que les comptes de particuliers domiciliés en Guyane sont acceptés. Ce module est couvert par des tests d'intégration avec un Stripe simulé (empreinte, débit à l'acceptation, versement à la remise, remboursements), mais **n'a pas encore été testé avec de vraies clés Stripe** : faites une location test en mode test avant d'ouvrir.
 
 ### Avant l'ouverture au public
 
