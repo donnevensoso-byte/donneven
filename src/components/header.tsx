@@ -29,7 +29,7 @@ export async function Header() {
           </Link>
           <form action="/recherche" className="hidden flex-1 md:block" role="search">
             <label className="sr-only" htmlFor="header-q">
-              Rechercher un outil
+              Chercher du matériel près de chez vous
             </label>
             <input
               id="header-q"

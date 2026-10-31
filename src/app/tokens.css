@@ -3,7 +3,7 @@
   --color-bg: #f6f5f0;
   --color-surface: #ffffff;
   --color-surface-accent: #e9f6f0;
-  --color-surface-sun: #fdf3cf;
+  --color-surface-sun: #ffe9dc;
   --color-border: #e5e3da;
   --color-border-input: #8a887e;
   --color-text: #1c1c1a;
@@ -12,13 +12,13 @@
   --color-accent-strong: #08583f;
   --color-accent-text: #08583f;
   --color-on-accent: #ffffff;
-  --color-sun: #f4c430;
-  --color-sun-text: #8a6500;
+  --color-sun: #ff8f5a;
+  --color-sun-text: #a3400c;
   --color-on-sun: #1c1c1a;
   --color-danger: #b3311f;
   --color-on-danger: #ffffff;
   --color-success: #0b6e4f;
-  --color-warning: #8a6500;
+  --color-warning: #a3400c;
   --radius-token-sm: 0.5rem;
   --radius-token-md: 0.75rem;
   --radius-token-lg: 1rem;

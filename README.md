@@ -1,6 +1,6 @@
 # Zouti – location d'outils entre particuliers en Guyane
 
-**Zouti** (« outils » en créole) est une application web de location de matériel entre voisins, pensée pour la Guyane : débroussailleuse, nettoyeur haute pression, groupe électrogène, barnum, kayak… Elle reprend le principe de [Bricolib](docs/ANALYSE-BRICOLIB.md) en l'adaptant au territoire (22 communes, matériel local, paiement en main propre, WhatsApp, connexions mobiles lentes).
+**Zouti** (« outils » en créole) est une application web de location de matériel entre voisins, pensée pour la Guyane : débroussailleuse, nettoyeur haute pression, groupe électrogène, barnum, kayak… Elle est faite pour le territoire : 22 communes, matériel local, paiement en main propre sans commission, WhatsApp, connexions mobiles lentes.
 
 C'est une **web app installable sur téléphone (PWA)**, prête à être déployée.
 
@@ -108,7 +108,8 @@ src/
 drizzle/              migrations SQL
 scripts/              migration, données de démo
 tests/                unit/, integration/, e2e/
-docs/                 analyse de Bricolib et feuille de route
+docs/                 captures d'écran
+replica/              dossier de travail : analyse, plans, tests, parité, marque (non publié)
 ```
 
 La logique métier est isolée dans `src/lib/services` : une future application mobile (Expo / React Native) pourra s'appuyer dessus via une API, sans réécrire les règles.

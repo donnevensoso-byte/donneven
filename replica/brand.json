@@ -1,0 +1,7 @@
+{
+  "name": "Zouti",
+  "avoid": ["Bricolib"],
+  "domains": ["bricolib.net", "bricolib.fr", "bricolib.com"],
+  "colors": ["#f1b60d", "#ffbd01", "#f4c430"],
+  "_notes": "Couleurs relevées sur la page d'accueil publique de Bricolib le 2026-10-30 (#f1b60d, #ffbd01) ; #f4c430 est l'ancien jaune de Zouti, trop proche, retiré."
+}

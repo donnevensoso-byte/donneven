@@ -2,8 +2,8 @@ export function LogoMark({ size = 32 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 64 64" aria-hidden>
       <rect width="64" height="64" rx="16" fill="#0b6e4f" />
-      <path d="M17 19h30L23 45h24" fill="none" stroke="#f4c430" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
-      <circle cx="47" cy="19" r="4" fill="#d9412b" />
+      <path d="M17 19h30L23 45h24" fill="none" stroke="#ffffff" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round" />
+      <circle cx="47" cy="19" r="4" fill="#ff8f5a" />
     </svg>
   );
 }
