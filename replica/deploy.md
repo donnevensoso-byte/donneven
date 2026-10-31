@@ -2,7 +2,13 @@
 
 Date : 2026-10-31. Build vérifié : `b4f5a03` (branche `claude/zouti-web-app`).
 
-**Statut : prêt techniquement, pas encore en ligne.** La mise en ligne attend ton feu vert et trois choses que toi seul peux faire : l'identité légale de l'éditeur, le compte d'hébergement et le nom de domaine (voir « Ce qu'il te faut fournir »).
+**Statut : en ligne sur https://zouti97.fr depuis le 2026-10-31.** Vérifié en production : pages en 200, `www` redirigé, e-mails réels envoyés par Brevo (e-mail de test accepté, « 250 OK »), tâche `zouti-cron` verte toutes les 15 minutes. Restent à saisir dans Render : `LEGAL_SIRET`, l'adresse complète (code postal et commune), `LEGAL_MEDIATOR`, et l'adresse `bonjour@zouti97.fr` à créer chez IONOS.
+
+Pièges rencontrés à la mise en ligne, à connaître pour la suite :
+- `APP_URL` saisi sans `https://` faisait tomber toutes les pages (BUG-010, corrigé : l'adresse est complétée).
+- `SMTP_USER` est l'identifiant SMTP de Brevo (`…@smtp-brevo.com`), pas l'adresse du serveur ; `SMTP_PASSWORD` est la clé SMTP, pas le mot de passe du compte.
+- Brevo refuse les connexions (« 525 Unauthorized IP address ») tant que les IP de sortie de Render ne sont pas autorisées, ou que le blocage par IP n'est pas désactivé (Brevo → Sécurité → Adresses IP autorisées).
+- Le bouton « Envoyer un e-mail de test » de `/admin` affiche la réponse exacte du serveur SMTP : c'est le premier réflexe si un e-mail n'arrive pas.
 
 ## 1. Préflight
 

@@ -168,5 +168,5 @@ Status: open (S4, pas bloquant : le serveur refuse proprement)
 
 - `TRUSTED_PROXIES` doit correspondre à l'hébergement réel (1 derrière un seul proxy : Render, Railway, nginx…). Si l'application est exposée sans proxy, l'en-tête reste entièrement écrit par le client : à vérifier au déploiement (`/replica-deploy`).
 - Empreinte bancaire et remboursements avec un vrai compte Stripe test : jamais exécutés (Stripe injoignable d'ici). Voir la passe manuelle de `test-plan.md`.
-- E-mails réels (SMTP) : non testés.
+- E-mails réels (SMTP) : vérifiés en production le 2026-10-31 (Brevo, e-mail de test accepté). Délivrabilité (boîte de réception plutôt que spam) à confirmer après l'authentification DKIM/DMARC du domaine.
 - Conservation comptable : supprimer un compte efface aussi ses réservations terminées. Si le paiement en ligne est activé, il faudra conserver les traces de transactions (Stripe les garde de son côté) : à valider avec un comptable avant d'activer la carte.
