@@ -20,7 +20,7 @@ Date : 2026-10-31. Build vérifié : `b4f5a03` (branche `claude/zouti-web-app`).
 | Suppression de compte | test d'intégration | ✅ fonctionne ; refusée pendant une réservation en cours ou un litige ouvert (BUG-009, corrigé pendant ce préflight) |
 | Cookies | revue | ✅ un seul cookie de session, strictement nécessaire : **pas de bandeau requis** |
 | Favicon, titres, image de partage | revue | ✅ à Zouti ; image Open Graph 1200 × 630 ajoutée pendant ce préflight |
-| Mentions légales, CGU, confidentialité | revue | ❌ **bloquant** : 11 champs `[…]` à compléter (éditeur, adresse, statut et SIRET, hébergeur, prestataire e-mail, fournisseur de cartes, médiateur de la consommation) |
+| Mentions légales, CGU, confidentialité | revue + test e2e | ⚠️ hébergeur (Render), e-mails (Brevo) et cartes (OpenStreetMap) remplis. **Ton identité reste à saisir** dans les variables `LEGAL_*` et `CONTACT_EMAIL` de Render : les pages les lisent à chaque affichage, et le serveur affiche un avertissement au démarrage tant qu'il en manque. |
 | Docker | `docker compose config` | ✅ fichier valide. Image non construite ici (pas de démon Docker dans cet environnement) ; l'étape d'exécution a été rejouée à l'identique sans Docker. |
 
 **Conclusion :** un seul point bloque, les textes légaux, et il dépend de tes informations. Tout le reste est vert.
@@ -33,7 +33,14 @@ Date : 2026-10-31. Build vérifié : `b4f5a03` (branche `claude/zouti-web-app`).
 - **`.env.example`** : toutes les variables, dont `CRON_SECRET` et `TRUSTED_PROXIES`.
 - **`.dockerignore`** : `replica/`, `.claude/`, `tests/` et `docs/` restent hors de l'image.
 
-## 3. Ce qu'il te faut fournir (je ne crée ni n'achète rien à ta place)
+## 3. Tes choix (2026-10-31)
+
+- **Hébergement : Render**, avec le Blueprint `render.yaml`.
+- **Statut : micro-entreprise.** Nom suivi de « EI », TVA non applicable (art. 293 B du CGI) par défaut.
+- **E-mails : Brevo.**
+- **Domaine : à acheter chez IONOS.** Pour les `.fr`, IONOS interroge l'AFNIC, le registre officiel. Le 2026-10-31, l'AFNIC répondait que **zouti973.fr** et **zouti-guyane.fr** sont **libres** ; zouti.fr, zouti.com et zouti.app sont pris.
+
+## 3 bis. Ce qu'il te faut fournir (je ne crée ni n'achète rien à ta place)
 
 1. **Identité de l'éditeur**, pour les mentions légales, les CGU et la confidentialité : nom ou raison sociale, adresse, statut (particulier, micro-entreprise, association…), SIRET le cas échéant, e-mail de contact. Il faut aussi choisir un **médiateur de la consommation**, obligatoire dès qu'on s'adresse à des consommateurs. À faire relire par un juriste.
 2. **Hébergement.** Je conseille Render, avec le Blueprint fourni : environ 7 $ par mois pour le service web, environ 6 $ pour la base et environ 1 $ pour la tâche planifiée (tarifs à vérifier). Crée le compte et connecte le dépôt GitHub : *New → Blueprint →* `donnevensoso-byte/donneven`, branche à fusionner dans `main` d'abord.
@@ -49,6 +56,12 @@ Date : 2026-10-31. Build vérifié : `b4f5a03` (branche `claude/zouti-web-app`).
 | `DATABASE_URL` | fournie par Render (Blueprint) ou par ta base |
 | `APP_URL` | `https://<ton-domaine>` (sans `/` final) |
 | `ADMIN_EMAILS` | ton e-mail |
+| `CONTACT_EMAIL` | l'adresse affichée sur le site, par ex. `bonjour@zouti973.fr` |
+| `LEGAL_PUBLISHER` | `Prénom Nom EI` |
+| `LEGAL_ADDRESS` | ton adresse professionnelle (ou domiciliation), 973xx commune |
+| `LEGAL_SIRET` | ton numéro SIRET |
+| `LEGAL_MEDIATOR` | nom et site du médiateur de la consommation auquel tu adhères |
+| `LEGAL_REGISTRATION` | facultatif, par ex. « Immatriculée au RNE » |
 | `CRON_SECRET` | généré par Render ; sur un VPS : `openssl rand -hex 32` |
 | `TRUSTED_PROXIES` | `1` (un seul proxy devant l'app, à vérifier selon l'hébergeur) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | donnés par le prestataire e-mail ; `SMTP_FROM` = `Zouti <bonjour@<ton-domaine>>` |

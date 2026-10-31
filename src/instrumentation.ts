@@ -6,4 +6,10 @@ export async function register() {
     const { runMigrations } = await import("./lib/db/migrate");
     await runMigrations();
   }
+  if (process.env.NEXT_RUNTIME === "nodejs" && process.env.NODE_ENV === "production") {
+    const { missingLegalFields } = await import("./lib/legal");
+    const missing = missingLegalFields();
+    if (missing.length > 0) console.warn(`[Zouti] Mentions légales incomplètes, variables à renseigner : ${missing.join(", ")}`);
+    if (!process.env.CONTACT_EMAIL) console.warn("[Zouti] CONTACT_EMAIL n'est pas défini : l'adresse de contact par défaut ne vous appartient pas.");
+  }
 }

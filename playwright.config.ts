@@ -33,6 +33,11 @@ export default defineConfig({
       ADMIN_EMAILS: "admin-e2e@test.gf",
       SMTP_HOST: "",
       STRIPE_SECRET_KEY: "",
+      CONTACT_EMAIL: "bonjour@zouti-test.fr",
+      LEGAL_PUBLISHER: "Prénom Test EI",
+      LEGAL_ADDRESS: "1 rue des Tests, 97300 Cayenne",
+      LEGAL_SIRET: "000 000 000 00000",
+      LEGAL_MEDIATOR: "Médiateur Test (mediateur-test.fr)",
     },
   },
 });

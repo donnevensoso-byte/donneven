@@ -1,14 +1,16 @@
 import type { Metadata } from "next";
 import { ContentPage, ToFill } from "@/components/content-page";
 import { CONTACT_EMAIL } from "@/lib/config";
+import { EMAIL_PROVIDER, HOSTING, legalIdentity, MAP_TILES_PROVIDER } from "@/lib/legal";
 
 export const metadata: Metadata = { title: "Politique de confidentialité" };
 
 export default function PrivacyPage() {
+  const id = legalIdentity();
   return (
     <ContentPage title="Politique de confidentialité" updated="28 octobre 2026">
       <p>
-        Le responsable du traitement est <ToFill>raison sociale, adresse</ToFill>. Pour toute question ou pour exercer vos droits :{" "}
+        Le responsable du traitement est {id.publisher ?? <ToFill>Prénom Nom EI</ToFill>}, {id.address ?? <ToFill>adresse</ToFill>}. Pour toute question ou pour exercer vos droits :{" "}
         <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.
       </p>
 
@@ -32,8 +34,9 @@ export default function PrivacyPage() {
       <p>
         Les autres membres voient votre profil public (prénom, initiale du nom, commune, photo, présentation, avis). Votre téléphone et votre nom
         complet ne sont communiqués qu&apos;à l&apos;autre partie d&apos;une réservation confirmée. Nos sous-traitants : hébergement{" "}
-        <ToFill>hébergeur et localisation des serveurs</ToFill>, envoi d&apos;e-mails <ToFill>prestataire e-mail</ToFill>, paiement Stripe (si le paiement en ligne est activé), fonds de carte{" "}
-        <ToFill>fournisseur de tuiles de carte</ToFill> (votre navigateur lui transmet son adresse IP pour afficher la carte). Vos
+        {HOSTING.name} ({HOSTING.servers} ; {HOSTING.transfers}), envoi d&apos;e-mails {EMAIL_PROVIDER}, paiement Stripe (si le
+        paiement en ligne est activé), fonds de carte {MAP_TILES_PROVIDER} (votre navigateur lui transmet son adresse IP pour afficher la
+        carte). Vos
         données ne sont jamais vendues.
       </p>
 

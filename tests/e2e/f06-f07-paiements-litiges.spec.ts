@@ -98,3 +98,19 @@ test("F07-H2 litige déclaré depuis la réservation, arbitré par l'équipe ave
   await expect(a.page.getByText("Loueur Litige", { exact: true })).toBeVisible();
   await a.close();
 });
+
+test("pages légales : identité de l'éditeur et prestataires lus depuis la configuration, plus de champ vide", async ({ page }) => {
+  for (const path of ["/mentions-legales", "/cgu", "/confidentialite"]) {
+    await page.goto(path);
+    await expect(page.locator("mark")).toHaveCount(0);
+  }
+  await page.goto("/mentions-legales");
+  await expect(page.getByText("Prénom Test EI").first()).toBeVisible();
+  await expect(page.getByText(/Render Services, Inc\./)).toBeVisible();
+  await expect(page.getByText(/TVA non applicable/)).toBeVisible();
+  await page.goto("/confidentialite");
+  await expect(page.getByText(/Brevo/)).toBeVisible();
+  await expect(page.getByRole("link", { name: "bonjour@zouti-test.fr" }).first()).toBeVisible();
+  await page.goto("/cgu");
+  await expect(page.getByText(/Médiateur Test/)).toBeVisible();
+});

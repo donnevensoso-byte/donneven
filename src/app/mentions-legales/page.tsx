@@ -1,28 +1,33 @@
 import type { Metadata } from "next";
 import { ContentPage, ToFill } from "@/components/content-page";
 import { CONTACT_EMAIL } from "@/lib/config";
+import { HOSTING, legalIdentity } from "@/lib/legal";
 
 export const metadata: Metadata = { title: "Mentions légales" };
 
 export default function LegalNoticePage() {
+  const id = legalIdentity();
   return (
     <ContentPage title="Mentions légales">
       <h2>Éditeur</h2>
       <p>
-        <ToFill>Raison sociale ou nom de l&apos;entrepreneur</ToFill> – <ToFill>forme juridique et capital</ToFill>
+        {id.publisher ?? <ToFill>Prénom Nom EI</ToFill>} – {id.status}
         <br />
-        Siège : <ToFill>adresse, 973xx commune</ToFill>, Guyane
+        Adresse : {id.address ?? <ToFill>adresse, 973xx commune</ToFill>}
         <br />
-        SIRET : <ToFill>numéro SIRET</ToFill> – RCS <ToFill>ville</ToFill>
+        SIRET : {id.siret ?? <ToFill>numéro SIRET</ToFill>}
+        {id.registration && ` – ${id.registration}`}
         <br />
-        TVA intracommunautaire : <ToFill>le cas échéant</ToFill>
+        TVA : {id.vat}
         <br />
         Contact : <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
       </p>
       <h2>Directeur de la publication</h2>
-      <p><ToFill>Prénom Nom</ToFill></p>
+      <p>{id.director ?? <ToFill>Prénom Nom</ToFill>}</p>
       <h2>Hébergement</h2>
-      <p><ToFill>Nom de l&apos;hébergeur, adresse, téléphone</ToFill></p>
+      <p>
+        {HOSTING.name}, {HOSTING.place} – <a href={HOSTING.url}>{HOSTING.url.replace("https://", "")}</a>. Serveurs : {HOSTING.servers}.
+      </p>
       <h2>Propriété intellectuelle</h2>
       <p>
         La marque, le logo et les contenus éditoriaux de Zouti sont protégés. Les photos et textes des annonces restent la propriété de leurs

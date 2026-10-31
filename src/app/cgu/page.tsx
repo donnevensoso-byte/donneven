@@ -2,14 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ContentPage, ToFill } from "@/components/content-page";
 import { CONTACT_EMAIL, REQUEST_TTL_HOURS } from "@/lib/config";
+import { legalIdentity } from "@/lib/legal";
 
 export const metadata: Metadata = { title: "Conditions générales d'utilisation" };
 
 export default function TermsPage() {
+  const id = legalIdentity();
   return (
     <ContentPage title="Conditions générales d'utilisation" updated="28 octobre 2026">
       <p>
-        Les présentes conditions encadrent l&apos;utilisation du service Zouti (le « Service »), édité par <ToFill>raison sociale de l&apos;éditeur</ToFill>{" "}
+        Les présentes conditions encadrent l&apos;utilisation du service Zouti (le « Service »), édité par {id.publisher ?? <ToFill>Prénom Nom EI</ToFill>}{" "}
         (voir les <Link href="/mentions-legales">mentions légales</Link>). En créant un compte, vous les acceptez.
       </p>
 
@@ -98,7 +100,7 @@ export default function TermsPage() {
       <p>
         Les présentes conditions sont soumises au droit français. En cas de litige avec Zouti, contactez-nous d&apos;abord à{" "}
         <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>. Le consommateur peut recourir gratuitement au médiateur de la consommation{" "}
-        <ToFill>nom et coordonnées du médiateur</ToFill>. Les litiges entre membres relèvent de leur seule relation contractuelle.
+        {id.mediator ?? <ToFill>nom et site du médiateur</ToFill>}. Les litiges entre membres relèvent de leur seule relation contractuelle.
       </p>
     </ContentPage>
   );
