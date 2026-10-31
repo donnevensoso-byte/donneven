@@ -3,7 +3,23 @@
 Build testé : 67d7d9c. Navigateur : Chromium (Playwright), profil Pixel 7 (412 px), fr-FR, America/Cayenne.
 Seuls les bugs reproduits sont listés ; les doutes sont en bas, dans « À vérifier ».
 
-Bilan : 9 bugs (S1 : 0, S2 : 2, S3 : 6, S4 : 1). 8 corrigés, 1 ouvert (S4).
+Bilan : 10 bugs (S1 : 1, S2 : 2, S3 : 6, S4 : 1). 9 corrigés, 1 ouvert (S4).
+
+### BUG-010: erreur 500 sur toutes les pages en production si APP_URL est saisi sans https://
+
+- Severity: S1
+- Flow / case: mise en ligne (constaté sur https://zouti97.fr le 2026-10-31)
+- Screen: toutes les pages (la mise en page racine)
+- Build: 35a301e
+
+Steps
+1. Dans Render, saisir `APP_URL=zouti97.fr` (sans `https://`).
+2. Ouvrir https://zouti97.fr.
+
+Expected: le site s'affiche ; l'adresse est complétée en `https://zouti97.fr`.
+Actual: « Internal Server Error » (500) sur l'accueil et les pages légales : `new URL("zouti97.fr")` lève une erreur dans les métadonnées de la mise en page. `/api/health` répondait pourtant `{"ok":true}`. De plus, `robots.txt` était figé au build et annonçait `http://localhost:3000/sitemap.xml`.
+Evidence: pages en 500 et plan du site en `zouti97.fr/…` sans protocole, relevés sur le site en ligne ; test unitaire « appUrl » rouge avant correction.
+Status: fixed (appUrl() ajoute https:// ; robots.txt rendu à chaque requête ; la tâche planifiée suit les redirections)
 
 ### BUG-003: la limite anti-abus par adresse IP se contourne avec un en-tête falsifié
 

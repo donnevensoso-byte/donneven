@@ -5,8 +5,11 @@ export const APP_DESCRIPTION =
 /** Adresse de contact affichée sur le site et destinataire des signalements (à régler en production). */
 export const CONTACT_EMAIL = process.env.CONTACT_EMAIL?.trim() || "contact@zouti97.fr";
 
+/** URL publique du site. Tolère une saisie sans protocole (« zouti97.fr ») : https:// est ajouté. */
 export function appUrl(): string {
-  return (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  const raw = (process.env.APP_URL ?? "").trim().replace(/\/+$/, "");
+  if (!raw) return "http://localhost:3000";
+  return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
 }
 
 export function adminEmails(): string[] {
