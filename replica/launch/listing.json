@@ -1,0 +1,18 @@
+{
+  "avoid": [
+    "Bricolib"
+  ],
+  "app_store": {
+    "name": "Zouti – Location d'outils",
+    "subtitle": "Louer entre voisins en Guyane",
+    "promotional_text": "Écrivez gratuitement au propriétaire avant de réserver, et réglez en main propre sans commission. État des lieux en photos inclus.",
+    "description": "Zouti, c'est la location de matériel entre voisins, partout en Guyane.\n\nVous avez besoin d'une débroussailleuse pour le week-end, d'un nettoyeur haute pression pour la terrasse, d'un groupe électrogène pendant une coupure, d'un kayak pour le fleuve ? Quelqu'un près de chez vous l'a sûrement.\n\nCe qui change avec Zouti :\n- Question gratuite : écrivez au propriétaire avant toute demande, sans carte bancaire.\n- Aucune commission quand vous réglez en main propre.\n- État des lieux en photos à la remise et au retour, datées et reprises dans le contrat.\n- Un propriétaire qui répond : il est relancé avant l'expiration de la demande, et si c'est non, Zouti vous montre d'autres annonces libres aux mêmes dates.\n- Annulation gratuite jusqu'à la veille, avec la date exacte affichée avant d'envoyer la demande.\n- Code de remise : la location démarre quand vous donnez votre code au propriétaire.\n\nPour les propriétaires :\n- Annonce gratuite en quelques minutes, avec photos, prix au jour et à la semaine, caution.\n- Vous choisissez qui loue et quand, vous bloquez vos dates.\n- Contrat de location prêt à imprimer.\n- Paiement par carte en option : le locataire n'est débité que si vous acceptez, et la location vous est virée dès la remise.\n\nLes 22 communes sont couvertes, de Saint-Laurent-du-Maroni à Saint-Georges, de Kourou à Maripasoula. L'application est légère et fonctionne sur une connexion lente.\n\nGratuit pour louer et proposer. En paiement par carte, des frais de service de 10 % sont payés par le locataire.",
+    "keywords": "outils,bricolage,jardin,cayenne,kourou,matériel,prêt,karcher,débroussailleuse,remire,matoury",
+    "whats_new": "Photos d'état des lieux reprises dans le contrat, pages par commune, rappel aux propriétaires avant l'expiration d'une demande."
+  },
+  "google_play": {
+    "title": "Zouti – Location d'outils",
+    "short_description": "Louez le matériel de vos voisins en Guyane, question gratuite, sans commission.",
+    "full_description": "Zouti, c'est la location de matériel entre voisins, partout en Guyane.\n\nDébroussailleuse, nettoyeur haute pression, groupe électrogène, barnum, kayak : quelqu'un près de chez vous l'a sûrement.\n\nCe qui change avec Zouti :\n- Question gratuite au propriétaire avant toute demande, sans carte bancaire.\n- Aucune commission quand vous réglez en main propre.\n- État des lieux en photos à la remise et au retour, repris dans le contrat.\n- Un propriétaire relancé avant l'expiration, et d'autres annonces proposées si c'est non.\n- Annulation gratuite jusqu'à la veille, avec la date exacte affichée.\n- Code de remise : la location démarre quand vous donnez votre code.\n\nPour les propriétaires : annonce gratuite, vos dates, vos conditions, contrat prêt à imprimer, paiement par carte en option avec virement dès la remise.\n\nLes 22 communes de Guyane sont couvertes. Gratuit pour louer et proposer ; en paiement par carte, 10 % de frais de service payés par le locataire."
+  }
+}
