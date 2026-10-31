@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Politique de confidentialité" };
 export default function PrivacyPage() {
   const id = legalIdentity();
   return (
-    <ContentPage title="Politique de confidentialité" updated="28 octobre 2026">
+    <ContentPage title="Politique de confidentialité" updated="31 octobre 2026">
       <p>
         Le responsable du traitement est {id.publisher ?? <ToFill>Prénom Nom EI</ToFill>}, {id.address ?? <ToFill>adresse</ToFill>}. Pour toute question ou pour exercer vos droits :{" "}
         <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>.

@@ -114,3 +114,10 @@ test("pages légales : identité de l'éditeur et prestataires lus depuis la con
   await page.goto("/cgu");
   await expect(page.getByText(/Médiateur Test/)).toBeVisible();
 });
+
+test("CGU : le classement décrit est celui appliqué (tri « Recommandées » par réactivité)", async ({ page }) => {
+  await page.goto("/cgu");
+  await expect(page.getByText(/par défaut \(« Recommandées »\)/)).toBeVisible();
+  await page.goto("/recherche");
+  await expect(page.getByLabel("Trier par")).toHaveValue("recommended");
+});

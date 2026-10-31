@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: "Conditions générales d'utilisation
 export default function TermsPage() {
   const id = legalIdentity();
   return (
-    <ContentPage title="Conditions générales d'utilisation" updated="28 octobre 2026">
+    <ContentPage title="Conditions générales d'utilisation" updated="31 octobre 2026">
       <p>
         Les présentes conditions encadrent l&apos;utilisation du service Zouti (le « Service »), édité par {id.publisher ?? <ToFill>Prénom Nom EI</ToFill>}{" "}
         (voir les <Link href="/mentions-legales">mentions légales</Link>). En créant un compte, vous les acceptez.
@@ -34,8 +34,10 @@ export default function TermsPage() {
         <li>Le Propriétaire garantit être propriétaire du matériel proposé, qu&apos;il est en bon état de fonctionnement, conforme aux normes de sécurité et décrit fidèlement (photos réelles, état, accessoires).</li>
         <li>Sont interdits : armes et munitions, produits dangereux ou réglementés, matériel volé ou contrefait, véhicules terrestres à moteur soumis à obligation d&apos;assurance, et tout bien dont la location est illicite.</li>
         <li>
-          Classement des annonces : par défaut, les annonces sont affichées de la plus récente à la plus ancienne. L&apos;utilisateur peut les trier
-          par prix ou par distance. Aucun Propriétaire ne paie pour améliorer son classement.
+          Classement des annonces : par défaut (« Recommandées »), les annonces des Propriétaires qui répondent à leurs demandes passent devant
+          celles des Propriétaires qui les laissent expirer, d&apos;après leurs 10 dernières demandes (un nouveau membre part avec un bon niveau) ; à
+          réactivité égale, les plus récentes d&apos;abord. L&apos;utilisateur peut aussi trier par date, prix ou distance. Aucun Propriétaire ne paie
+          pour améliorer son classement.
         </li>
       </ul>
 
