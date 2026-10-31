@@ -19,7 +19,7 @@ Steps
 Expected: le site s'affiche ; l'adresse est complétée en `https://zouti97.fr`.
 Actual: « Internal Server Error » (500) sur l'accueil et les pages légales : `new URL("zouti97.fr")` lève une erreur dans les métadonnées de la mise en page. `/api/health` répondait pourtant `{"ok":true}`. De plus, `robots.txt` était figé au build et annonçait `http://localhost:3000/sitemap.xml`.
 Evidence: pages en 500 et plan du site en `zouti97.fr/…` sans protocole, relevés sur le site en ligne ; test unitaire « appUrl » rouge avant correction.
-Status: fixed (appUrl() ajoute https:// ; robots.txt rendu à chaque requête ; la tâche planifiée suit les redirections)
+Status: fixed in f30d953 (appUrl() ajoute https:// ; robots.txt rendu à chaque requête ; la tâche planifiée suit les redirections)
 
 ### BUG-003: la limite anti-abus par adresse IP se contourne avec un en-tête falsifié
 
