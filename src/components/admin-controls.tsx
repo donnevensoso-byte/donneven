@@ -1,14 +1,14 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { banUserAction, hideListingAction, resolveReportAction } from "@/app/actions/admin";
+import { banUserAction, hideListingAction, resolveReportAction, sendTestEmailAction } from "@/app/actions/admin";
 import type { ActionState } from "@/lib/errors";
 
 function AdminButton({ label, action, danger, confirmText }: { label: string; action: () => Promise<ActionState>; danger?: boolean; confirmText?: string }) {
   const [pending, startTransition] = useTransition();
   const [state, setState] = useState<ActionState>();
   return (
-    <span className="inline-flex items-center gap-2">
+    <span className="inline-flex flex-wrap items-center gap-2">
       <button
         type="button"
         className={`${danger ? "btn-danger" : "btn-secondary"} px-3 py-1.5 text-xs`}
@@ -20,7 +20,11 @@ function AdminButton({ label, action, danger, confirmText }: { label: string; ac
       >
         {label}
       </button>
-      {state && <span className="text-xs text-muted">{state.error ?? state.message}</span>}
+      {state && (
+        <span role="status" className={`text-xs break-words ${state.error ? "text-flame-500" : "text-muted"}`}>
+          {state.error ?? state.message}
+        </span>
+      )}
     </span>
   );
 }
@@ -43,4 +47,8 @@ export function BanUser({ id, banned }: { id: string; banned: boolean }) {
   ) : (
     <AdminButton label="Suspendre" danger confirmText="Suspendre ce membre ? Ses annonces seront masquées." action={() => banUserAction(id, true)} />
   );
+}
+
+export function TestEmail() {
+  return <AdminButton label="Envoyer un e-mail de test" action={sendTestEmailAction} />;
 }

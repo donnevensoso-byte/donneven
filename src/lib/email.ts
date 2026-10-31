@@ -54,3 +54,26 @@ export async function sendEmail(mail: Mail): Promise<void> {
     console.error("Échec d'envoi d'e-mail", err);
   }
 }
+
+/**
+ * E-mail de test pour l'administration : renvoie la configuration utilisée (sans mot de passe)
+ * et laisse remonter l'erreur exacte du serveur SMTP, que sendEmail se contente de journaliser.
+ */
+export async function sendTestEmail(to: string): Promise<string> {
+  if (!emailEnabled()) throw new Error("SMTP_HOST n'est pas défini : le site écrit les e-mails dans ses logs au lieu de les envoyer.");
+  const from = process.env.SMTP_FROM ?? `${APP_NAME} <no-reply@zouti97.fr>`;
+  const config = `serveur ${process.env.SMTP_HOST}:${process.env.SMTP_PORT ?? 587}, identifiant ${process.env.SMTP_USER || "(aucun)"}, expéditeur ${from}`;
+  try {
+    const info = await getTransporter().sendMail({
+      from,
+      to,
+      subject: `E-mail de test – ${APP_NAME}`,
+      text: "Si vous lisez ceci, l'envoi d'e-mails de Zouti fonctionne.",
+      html: renderHtml({ to, subject: "E-mail de test", text: "Si vous lisez ceci, l'envoi d'e-mails de Zouti fonctionne." }),
+    });
+    return `E-mail de test accepté par le serveur (${info.response ?? "OK"}) et envoyé à ${to}. Configuration : ${config}.`;
+  } catch (err) {
+    transporter = null; // repartir d'une connexion neuve après une correction des variables
+    throw new Error(`${err instanceof Error ? err.message : String(err)} — configuration : ${config}`);
+  }
+}

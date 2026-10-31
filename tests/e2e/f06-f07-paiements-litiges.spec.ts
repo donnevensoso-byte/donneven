@@ -121,3 +121,13 @@ test("CGU : le classement décrit est celui appliqué (tri « Recommandées » p
   await page.goto("/recherche");
   await expect(page.getByLabel("Trier par")).toHaveValue("recommended");
 });
+
+test("admin : l'e-mail de test explique pourquoi rien ne part (SMTP non configuré)", async ({ browser }) => {
+  const admin = await createUser("Admin E-mails", "cayenne", { role: "admin" });
+  const a = await openAs(browser, admin);
+  await a.page.goto("/admin");
+  await a.page.getByRole("button", { name: "Envoyer un e-mail de test" }).click();
+  await expect(a.page.getByRole("status").filter({ hasText: /SMTP_HOST n'est pas défini/ })).toBeVisible();
+  await expectAccessible(a.page);
+  await a.close();
+});

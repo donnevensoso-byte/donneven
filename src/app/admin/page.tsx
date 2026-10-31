@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { BanUser, HideListing, ResolveReport } from "@/components/admin-controls";
+import { BanUser, HideListing, ResolveReport, TestEmail } from "@/components/admin-controls";
 import { Badge, PageHeader } from "@/components/ui";
 import { requireAdmin } from "@/lib/auth";
 import { emailEnabled, stripeEnabled } from "@/lib/config";
@@ -24,6 +24,11 @@ export default async function AdminPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 py-8">
       <PageHeader title="Administration" subtitle={`E-mails : ${emailEnabled() ? "activés" : "désactivés (logs)"} · Paiement en ligne : ${stripeEnabled() ? "activé" : "désactivé"}`} />
+      <div className="mb-6 rounded-card border border-line bg-surface p-4 text-sm">
+        <p className="mb-2 font-semibold">Envoi d&apos;e-mails</p>
+        <p className="mb-3 text-muted">Envoie un e-mail à votre adresse d&apos;administrateur et affiche la réponse exacte du serveur SMTP.</p>
+        <TestEmail />
+      </div>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
         {tiles.map((t) => (
           <div key={t.label} className="card p-4">
