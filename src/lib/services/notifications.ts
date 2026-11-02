@@ -47,3 +47,17 @@ export async function markAllNotificationsRead(userId: string): Promise<void> {
     .set({ readAt: new Date() })
     .where(and(eq(notifications.userId, userId), isNull(notifications.readAt)));
 }
+
+/** Marque une notification comme lue et renvoie son lien (null si elle n'appartient pas à l'utilisateur). */
+export async function openNotification(userId: string, id: string): Promise<string | null> {
+  const [row] = await db
+    .select({ link: notifications.link, readAt: notifications.readAt })
+    .from(notifications)
+    .where(and(eq(notifications.id, id), eq(notifications.userId, userId)))
+    .limit(1);
+  if (!row) return null;
+  if (!row.readAt) {
+    await db.update(notifications).set({ readAt: new Date() }).where(eq(notifications.id, id));
+  }
+  return row.link;
+}
