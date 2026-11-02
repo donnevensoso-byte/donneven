@@ -204,7 +204,10 @@ export default async function BookingPage({ params, searchParams }: Props) {
                 )}
                 {isOwner && today >= addDays(booking.startDate, -1) && <HandoverForm bookingId={booking.id} onsite={!online} />}
                 {isOwner && today < addDays(booking.startDate, -1) && (
-                  <p className="text-xs text-muted">Le jour de la remise, demandez au locataire son code à 4 chiffres pour confirmer.</p>
+                  <p className="text-xs text-muted">
+                    À partir du {formatDate(addDays(booking.startDate, -1), { weekday: "long" })}, veille de la location, un champ apparaîtra ici :
+                    à la remise, saisissez le code à 4 chiffres du locataire pour démarrer la location.
+                  </p>
                 )}
                 {!isOwner && today < booking.startDate && <p className="text-xs text-muted">{cancellationPolicy(booking.startDate, online)}</p>}
                 {(isOwner || today < booking.startDate) && <CancelForm bookingId={booking.id} />}
