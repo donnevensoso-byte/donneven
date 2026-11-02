@@ -1,0 +1,205 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Visuels Instagram Zouti</title>
+<style>
+  :root { --g: #0b6e4f; --gs: #08583f; --m: #ff8f5a; --mt: #a3400c; --ms: #ffe9dc; --bg: #f6f5f0; --tx: #1c1c1a; --mu: #66655d; --ga: #e9f6f0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Inter, sans-serif; color: var(--tx); background: #ccc; }
+  .s { width: 1080px; height: 1350px; position: relative; overflow: hidden; display: flex; flex-direction: column; padding: 96px 88px; margin-bottom: 20px; }
+  .sq { height: 1080px; }
+  .st { height: 1920px; padding: 220px 96px; }
+  .green { background: var(--g); color: #fff; }
+  .sand { background: var(--bg); }
+  .mango { background: var(--ms); }
+  .glow::before { content: ""; position: absolute; right: -260px; top: -260px; width: 900px; height: 900px; border-radius: 50%; background: radial-gradient(circle, rgba(255,143,90,.5), transparent 65%); }
+  .glow2::after { content: ""; position: absolute; left: -300px; bottom: -300px; width: 900px; height: 900px; border-radius: 50%; background: radial-gradient(circle, rgba(46,160,120,.55), transparent 65%); }
+  .brand { display: flex; align-items: center; gap: 22px; font-size: 56px; font-weight: 800; letter-spacing: -1px; position: relative; z-index: 1; }
+  .brand img { width: 76px; height: 76px; }
+  .green .brand img { outline: 5px solid #fff; border-radius: 22px; }
+  .tag { display: inline-block; align-self: flex-start; margin-top: 56px; padding: 12px 26px; border-radius: 99px; font-size: 26px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; position: relative; z-index: 1; }
+  .green .tag { background: rgba(255,255,255,.15); }
+  .sand .tag, .mango .tag { background: var(--ga); color: var(--gs); }
+  h1 { font-size: 104px; line-height: 1.02; font-weight: 800; letter-spacing: -3px; margin-top: 36px; position: relative; z-index: 1; }
+  h1 em { font-style: normal; color: var(--m); }
+  .sand h1 em, .mango h1 em { color: var(--g); }
+  h2 { font-size: 80px; line-height: 1.05; font-weight: 800; letter-spacing: -2px; margin-top: 30px; position: relative; z-index: 1; }
+  p.lead { font-size: 40px; line-height: 1.35; margin-top: 36px; position: relative; z-index: 1; }
+  .green p.lead { color: rgba(255,255,255,.92); }
+  .sand p.lead, .mango p.lead { color: var(--mu); }
+  .foot { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; position: relative; z-index: 1; }
+  .url { font-size: 52px; font-weight: 800; }
+  .green .url { color: #fff; }
+  .sand .url, .mango .url { color: var(--g); }
+  .small { font-size: 28px; opacity: .85; margin-top: 8px; }
+  .emoji { font-size: 230px; line-height: 1; position: relative; z-index: 1; }
+  .num { width: 110px; height: 110px; border-radius: 32px; background: var(--g); color: #fff; font-size: 64px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .green .num { background: #fff; color: var(--g); }
+  .list { margin-top: 48px; display: grid; gap: 26px; position: relative; z-index: 1; }
+  .li { display: grid; grid-template-columns: 88px 1fr; gap: 26px; align-items: center; font-size: 40px; font-weight: 600; }
+  .li span { width: 88px; height: 88px; border-radius: 26px; background: var(--ga); color: var(--g); display: flex; align-items: center; justify-content: center; font-size: 46px; font-weight: 800; }
+  .green .li span { background: rgba(255,255,255,.15); color: #fff; }
+  .swipe { font-size: 32px; font-weight: 700; }
+  .cmp { margin-top: 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; position: relative; z-index: 1; }
+  .box { border-radius: 40px; padding: 44px 40px; }
+  .box .k { font-size: 30px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; }
+  .box .v { font-size: 96px; white-space: nowrap; font-weight: 800; margin-top: 16px; letter-spacing: -2px; }
+  .box .d { font-size: 30px; margin-top: 12px; line-height: 1.35; }
+  .bad { background: #fff; color: var(--mu); }
+  .good { background: var(--g); color: #fff; }
+  .communes { margin-top: 44px; display: flex; flex-wrap: wrap; gap: 14px; position: relative; z-index: 1; }
+  .communes b { font-size: 29px; font-weight: 600; padding: 12px 22px; border-radius: 99px; background: rgba(255,255,255,.14); }
+  .phone { position: absolute; right: 56px; bottom: -40px; width: 430px; border-radius: 64px; border: 18px solid #1c1c1a; overflow: hidden; box-shadow: 0 40px 80px rgba(0,0,0,.35); z-index: 1; }
+  .phone img { width: 100%; display: block; }
+  .codebox { margin-top: 44px; padding: 32px 44px !important; align-self: flex-start; background: #fff; color: var(--tx); border-radius: 40px; padding: 40px 56px; position: relative; z-index: 1; }
+  .codebox .k { font-size: 28px; color: var(--mu); font-weight: 600; }
+  .codebox .v { font-size: 110px; font-weight: 800; letter-spacing: 14px; color: var(--g); }
+  .cta { display: inline-block; align-self: flex-start; margin-top: 60px; background: var(--m); color: var(--tx); font-size: 46px; font-weight: 800; padding: 34px 56px; border-radius: 99px; position: relative; z-index: 1; }
+  .avatar { width: 1080px; height: 1080px; background: var(--g); display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+  .num ~ p.lead { font-size: 46px; }
+  .num ~ h2 { font-size: 92px; margin-top: 48px; }
+</style>
+</head>
+<body>
+
+<!-- 00 Photo de profil -->
+<div class="avatar" id="00-photo-profil">
+  <svg width="720" height="720" viewBox="0 0 64 64"><path d="M17 19h30L23 45h24" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="47" cy="19" r="4" fill="#ff8f5a"/></svg>
+</div>
+
+<!-- 01 Annonce du lancement -->
+<div class="s green glow" id="01-lancement">
+  <div class="brand"><img src="../../../src/app/icon.svg" alt="">Zouti</div>
+  <div class="tag">C'est parti · Guyane</div>
+  <h1>Louez le matériel de vos voisins. <em>Zouti est en ligne.</em></h1>
+  <p class="lead">Débroussailleuse, karcher, groupe électrogène, barnum, kayak… Entre particuliers, dans les 22 communes.</p>
+  <div class="foot"><div><div class="url">zouti97.fr</div><div class="small">Lien en bio</div></div><div class="emoji">🔧</div></div>
+</div>
+
+<!-- 02 à 06 Carrousel « Comment ça marche » -->
+<div class="s sand" id="02-carrousel-1-couverture">
+  <div class="brand" style="color:var(--g)"><img src="../../../src/app/icon.svg" alt="">Zouti</div>
+  <div class="tag">Comment ça marche</div>
+  <h1>Louer entre voisins, <em>en 3 étapes.</em></h1>
+  <p class="lead">Sans commission quand on se paie en main propre. Sans carte bancaire pour poser une question.</p>
+  <div class="foot"><div class="emoji">🤝</div><div class="swipe">Glissez →</div></div>
+</div>
+<div class="s sand" id="03-carrousel-2-question">
+  <div class="num">1</div>
+  <h2>Posez votre question, gratuitement.</h2>
+  <p class="lead">Le harnais est fourni ? Le réservoir est plein ? Écrivez au propriétaire avant de réserver, sans payer, sans carte bancaire.</p>
+  <div class="foot"><div class="emoji">💬</div><div class="swipe">→</div></div>
+</div>
+<div class="s sand" id="04-carrousel-3-dates">
+  <div class="num">2</div>
+  <h2>Demandez vos dates.</h2>
+  <p class="lead">Le propriétaire a 48&nbsp;h pour répondre. Si c'est non, Zouti vous montre d'autres annonces libres aux mêmes dates, les plus proches d'abord.</p>
+  <div class="foot"><div style="font-size:200px;font-weight:800;color:var(--g);line-height:1;letter-spacing:-6px">48&nbsp;h</div><div class="swipe">→</div></div>
+</div>
+<div class="s sand" id="05-carrousel-4-remise">
+  <div class="num">3</div>
+  <h2>Récupérez, photographiez, rendez.</h2>
+  <p class="lead">Un code à 4 chiffres pour la remise, l'état des lieux en photos à l'aller et au retour, un contrat prêt à imprimer. Et chacun laisse un avis.</p>
+  <div class="foot"><div class="emoji">📸</div><div class="swipe">→</div></div>
+</div>
+<div class="s green glow" id="06-carrousel-5-fin">
+  <div class="brand"><img src="../../../src/app/icon.svg" alt="">Zouti</div>
+  <h1 style="margin-top:120px">Le matériel est déjà <em>dans votre quartier.</em></h1>
+  <div class="cta">zouti97.fr</div>
+  <div class="foot"><div class="small">Lien en bio · Gratuit à publier · 0 % de commission en main propre</div></div>
+</div>
+
+<!-- 07 Recrutement des propriétaires -->
+<div class="s mango" id="07-proprietaires">
+  <div class="brand" style="color:var(--g)"><img src="../../../src/app/icon.svg" alt="">Zouti</div>
+  <div class="tag">Propriétaires</div>
+  <h1>Votre matériel dort ? <em>Faites-le travailler.</em></h1>
+  <div class="list">
+    <div class="li"><span>0€</span>Gratuit à publier</div>
+    <div class="li"><span>✓</span>Votre prix, votre caution, vos dates</div>
+    <div class="li"><span>🔢</span>La location démarre avec le code du locataire</div>
+    <div class="li"><span>📸</span>État des lieux en photos, contrat prêt</div>
+  </div>
+  <div class="foot"><div><div class="url">zouti97.fr</div><div class="small" style="color:var(--mu)">Publiez votre premier outil en 2 minutes</div></div></div>
+</div>
+
+<!-- 08 Zéro commission -->
+<div class="s sand" id="08-zero-commission">
+  <div class="brand" style="color:var(--g)"><img src="../../../src/app/icon.svg" alt="">Zouti</div>
+  <h1 style="margin-top:80px">Une location de 20&nbsp;€, <em>c'est 20&nbsp;€.</em></h1>
+  <p class="lead">Quand vous vous réglez en main propre (espèces, virement, Wero), Zouti ne prend rien. Ni au locataire, ni au propriétaire.</p>
+  <div class="cmp">
+    <div class="box good"><div class="k">Commission Zouti</div><div class="v">0 %</div><div class="d">en main propre</div></div>
+    <div class="box bad"><div class="k">Pour poser une question</div><div class="v" style="color:var(--g)">0 €</div><div class="d">la messagerie est gratuite</div></div>
+  </div>
+  <div class="foot"><div class="url">zouti97.fr</div></div>
+</div>
+
+<!-- 09 Coupures de courant -->
+<div class="s green glow2" id="09-coupure-courant">
+  <div class="tag" style="margin-top:0">Coupure de courant ?</div>
+  <h1>Un groupe électrogène <em>à deux rues de chez vous.</em></h1>
+  <p class="lead">Le congélateur n'attend pas. Cherchez par commune, écrivez au propriétaire, récupérez-le dans l'heure si il est libre.</p>
+  <div class="foot"><div><div class="url">zouti97.fr</div><div class="small">Lien en bio</div></div><div class="emoji">⚡</div></div>
+</div>
+
+<!-- 10 Saison des pluies -->
+<div class="s sand" id="10-debroussailleuse">
+  <div class="tag" style="margin-top:0">Saison des pluies</div>
+  <h1>L'herbe pousse plus vite <em>que vous ne tondez.</em></h1>
+  <p class="lead">Pas besoin d'acheter une débroussailleuse à 400&nbsp;€ pour trois week-ends par an. Louez celle du voisin.</p>
+  <div class="foot"><div><div class="url">zouti97.fr</div><div class="small" style="color:var(--mu)">Et si vous en avez une, publiez-la</div></div><div class="emoji">🌿</div></div>
+</div>
+
+<!-- 11 Fêtes -->
+<div class="s mango" id="11-fetes">
+  <div class="tag" style="margin-top:0">Baptême, communion, anniversaire</div>
+  <h1>Barnum, tables, sono : <em>tout se loue entre voisins.</em></h1>
+  <p class="lead">Réservez les dates, le propriétaire accepte, et l'état des lieux en photos protège tout le monde au retour.</p>
+  <div class="foot"><div class="url">zouti97.fr</div><div class="emoji">🎉</div></div>
+</div>
+
+<!-- 12 Le code de remise (capture réelle du site) -->
+<div class="s green glow" id="12-code-remise">
+  <div class="tag" style="margin-top:0">Ce que Zouti fait autrement</div>
+  <h2 style="max-width:460px;font-size:72px">La location commence avec <span style="color:var(--m)">votre code.</span></h2>
+  <p class="lead" style="max-width:430px;font-size:34px">Le locataire montre son code à 4 chiffres, le propriétaire le saisit : tout le monde sait quand le matériel a changé de mains.</p>
+  <div class="codebox"><div class="k">Code de remise</div><div class="v">7415</div></div>
+  <div class="phone"><img src="../../../public/landing/reservation-mobile.webp" alt=""></div>
+  <div class="foot"><div class="url">zouti97.fr</div></div>
+</div>
+
+<!-- 13 Les 22 communes -->
+<div class="s green glow2" id="13-communes">
+  <div class="brand"><img src="../../../src/app/icon.svg" alt="">Zouti</div>
+  <h2>De Saint-Laurent à Saint-Georges, <span style="color:var(--m)">les 22 communes.</span></h2>
+  <div class="communes">
+    <b>Cayenne</b><b>Matoury</b><b>Rémire-Montjoly</b><b>Kourou</b><b>Macouria</b><b>Saint-Laurent-du-Maroni</b><b>Mana</b><b>Awala-Yalimapo</b><b>Apatou</b><b>Grand-Santi</b><b>Papaïchton</b><b>Maripasoula</b><b>Saül</b><b>Sinnamary</b><b>Iracoubo</b><b>Montsinéry-Tonnegrande</b><b>Roura</b><b>Régina</b><b>Ouanary</b><b>Saint-Georges</b><b>Camopi</b><b>Saint-Élie</b>
+  </div>
+  <div class="foot"><div><div class="url">zouti97.fr</div><div class="small">Léger, marche sur une connexion lente, sans appli à télécharger</div></div></div>
+</div>
+
+<!-- Stories 1080 × 1920 -->
+<div class="s st green glow" id="14-story-lancement">
+  <div class="brand"><img src="../../../src/app/icon.svg" alt="">Zouti</div>
+  <div class="tag">C'est en ligne</div>
+  <h1>Louez le matériel de vos voisins.</h1>
+  <p class="lead">Gratuit pour poser une question. 0 % de commission en main propre.</p>
+  <div class="emoji" style="margin-top:120px">🔧</div>
+  <div class="foot"><div class="cta" style="margin-top:0">zouti97.fr</div></div>
+</div>
+<div class="s st mango" id="15-story-proprietaires">
+  <div class="brand" style="color:var(--g)"><img src="../../../src/app/icon.svg" alt="">Zouti</div>
+  <div class="tag">Propriétaires</div>
+  <h1>Publiez votre premier outil <em>en 2 minutes.</em></h1>
+  <div class="list">
+    <div class="li"><span>📷</span>3 photos</div>
+    <div class="li"><span>€</span>Votre prix et votre caution</div>
+    <div class="li"><span>✓</span>Vous acceptez chaque demande</div>
+  </div>
+  <div class="foot"><div class="cta" style="margin-top:0">zouti97.fr</div></div>
+</div>
+
+</body>
+</html>
