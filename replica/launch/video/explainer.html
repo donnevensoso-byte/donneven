@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Zouti, comment ça marche (vidéo)</title>
+<style>
+  :root { --g: #0b6e4f; --gs: #08583f; --gl: #e9f6f0; --m: #ff8f5a; --mt: #a3400c; --ms: #ffe9dc; --bg: #f6f5f0; --tx: #1c1c1a; --mu: #66655d; --ln: #e5e3da; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1920px; overflow: hidden; }
+  body { font-family: Inter, sans-serif; color: var(--tx); background: var(--bg); }
+  #stage { position: absolute; inset: 0; overflow: hidden; }
+  .scene { position: absolute; inset: 0; opacity: 0; display: flex; flex-direction: column; align-items: center; padding: 230px 80px 0; }
+  .green { background: var(--g); color: #fff; } .sand { background: var(--bg); } .mango { background: var(--ms); }
+  .glow::before { content: ""; position: absolute; right: -300px; top: -300px; width: 1100px; height: 1100px; border-radius: 50%; background: radial-gradient(circle, rgba(255,143,90,.45), transparent 65%); }
+  .z { position: relative; z-index: 1; }
+  .big { font-size: 104px; line-height: 1.04; font-weight: 800; letter-spacing: -3px; text-align: center; }
+  .big em { font-style: normal; color: var(--m); }
+  .sand .big em, .mango .big em { color: var(--g); }
+  .mid { font-size: 52px; line-height: 1.2; font-weight: 700; text-align: center; margin-top: 40px; }
+  .green .mid { color: rgba(255,255,255,.92); }
+  .step { display: flex; align-items: center; gap: 22px; font-size: 54px; font-weight: 800; letter-spacing: -1px; }
+  .step b { width: 92px; height: 92px; border-radius: 28px; background: var(--g); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 54px; }
+  .cap { position: absolute; left: 80px; right: 80px; top: 1400px; text-align: center; font-size: 46px; line-height: 1.28; font-weight: 700; }
+  .cap span { color: var(--g); }
+  .demo { position: absolute; top: 1345px; left: 0; right: 0; text-align: center; font-size: 22px; color: var(--mu); font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+  .chip { display: inline-block; padding: 18px 32px; border-radius: 99px; font-size: 38px; font-weight: 700; background: rgba(255,255,255,.15); margin: 10px; }
+
+  /* Barre d'étapes */
+  #steps { position: absolute; top: 120px; left: 80px; right: 80px; display: flex; gap: 14px; opacity: 0; z-index: 5; }
+  #steps i { flex: 1; height: 12px; border-radius: 6px; background: rgba(28,28,26,.12); overflow: hidden; position: relative; }
+  #steps i u { position: absolute; inset: 0; background: var(--g); transform-origin: left; transform: scaleX(0); }
+
+  /* Téléphone */
+  .phone { width: 600px; height: 950px; border-radius: 76px; background: #1c1c1a; padding: 18px; box-shadow: 0 50px 100px rgba(0,0,0,.25); margin-top: 40px; }
+  .screen { width: 100%; height: 100%; border-radius: 60px; overflow: hidden; background: var(--bg); position: relative; }
+  .sbar { height: 70px; display: flex; justify-content: space-between; align-items: center; padding: 0 46px; font-size: 24px; font-weight: 700; color: var(--tx); }
+  .appbar { background: #fff; display: flex; align-items: center; gap: 14px; padding: 18px 28px; border-bottom: 2px solid var(--ln); font-weight: 800; color: var(--g); font-size: 34px; }
+  .appbar svg { width: 50px; height: 50px; }
+  .pad { padding: 24px; }
+  .field { background: #fff; border: 3px solid var(--ln); border-radius: 22px; padding: 20px 22px; font-size: 28px; display: flex; align-items: center; gap: 14px; min-height: 80px; }
+  .field.on { border-color: var(--g); }
+  .caret { display: inline-block; width: 3px; height: 32px; background: var(--g); margin-left: 2px; vertical-align: middle; }
+  .res { background: #fff; border-radius: 26px; padding: 16px; display: flex; gap: 18px; align-items: center; margin-top: 18px; box-shadow: 0 6px 16px rgba(28,28,26,.06); }
+  .res .th { width: 130px; height: 130px; border-radius: 20px; background: var(--gl); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .res .th svg { width: 112px; height: 112px; }
+  .res:nth-child(odd) .th { background: var(--ms); }
+  .res b { display: block; font-size: 27px; }
+  .res span { display: block; font-size: 22px; color: var(--mu); margin-top: 4px; }
+  .res em { display: block; font-style: normal; font-size: 28px; font-weight: 800; color: var(--g); margin-top: 6px; }
+  .who { color: var(--tx); display: flex; align-items: center; gap: 16px; padding: 20px 28px; background: #fff; border-bottom: 2px solid var(--ln); font-size: 26px; font-weight: 700; }
+  .av { width: 60px; height: 60px; border-radius: 50%; background: var(--ms); color: var(--mt); font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 26px; flex-shrink: 0; }
+  .chat { padding: 26px 24px; display: flex; flex-direction: column; gap: 20px; }
+  .bub { max-width: 84%; padding: 20px 24px; border-radius: 30px; font-size: 27px; line-height: 1.36; }
+  .me { align-self: flex-end; background: var(--g); color: #fff; border-bottom-right-radius: 8px; }
+  .them { align-self: flex-start; background: #fff; color: var(--tx); border-bottom-left-radius: 8px; box-shadow: 0 2px 0 var(--ln); }
+  .sys { align-self: center; background: var(--ms); color: var(--mt); font-size: 22px; font-weight: 700; padding: 12px 22px; border-radius: 99px; }
+  .cal { background: #fff; border-radius: 28px; padding: 22px; }
+  .cal h4 { font-size: 28px; text-align: center; margin-bottom: 14px; }
+  .cal .gr { display: grid; grid-template-columns: repeat(7, 1fr); gap: 8px; text-align: center; font-size: 25px; }
+  .cal .gr span { padding: 14px 0; border-radius: 16px; font-weight: 600; }
+  .cal .gr .h { color: var(--mu); font-size: 20px; padding: 6px 0; }
+  .cal .gr .x { color: #c9c6bb; }
+  .cal .gr span.on { background: var(--g); color: #fff; }
+  .sum { margin-top: 20px; background: #fff; border-radius: 26px; padding: 22px 26px; font-size: 27px; }
+  .sum div { display: flex; justify-content: space-between; margin-top: 8px; }
+  .sum .tot { font-size: 34px; font-weight: 800; border-top: 2px solid var(--ln); padding-top: 14px; margin-top: 14px; }
+  .btn { margin-top: 20px; border-radius: 99px; text-align: center; font-weight: 800; font-size: 30px; padding: 24px; background: var(--m); color: var(--tx); position: relative; }
+  .btn.gr { background: var(--g); color: #fff; }
+  .toast { position: absolute; left: 24px; right: 24px; bottom: 30px; background: var(--tx); color: #fff; border-radius: 26px; padding: 24px 26px; font-size: 26px; font-weight: 700; display: flex; gap: 14px; align-items: center; }
+  .toast i { width: 46px; height: 46px; border-radius: 50%; background: var(--g); display: flex; align-items: center; justify-content: center; font-style: normal; flex-shrink: 0; }
+  .tap { position: absolute; width: 120px; height: 120px; border-radius: 50%; background: rgba(28,28,26,.35); left: 50%; top: 50%; margin: -60px 0 0 -60px; opacity: 0; pointer-events: none; }
+  .notif { background: #fff; border-radius: 34px; padding: 30px 32px; display: flex; gap: 22px; align-items: center; box-shadow: 0 20px 50px rgba(28,28,26,.15); width: 880px; margin-top: 70px; }
+  .notif .ic { width: 96px; height: 96px; border-radius: 26px; background: var(--g); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .notif .ic svg { width: 64px; height: 64px; }
+  .notif b { display: block; font-size: 36px; }
+  .notif span { display: block; font-size: 28px; color: var(--mu); margin-top: 4px; }
+  .codecard { margin-top: 60px; background: #fff; border-radius: 44px; padding: 44px 60px 54px; text-align: center; box-shadow: 0 20px 50px rgba(28,28,26,.12); }
+  .codecard .k { font-size: 34px; color: var(--mu); font-weight: 600; }
+  .codecard .v { display: flex; gap: 22px; justify-content: center; margin-top: 22px; }
+  .codecard .v span { width: 150px; height: 190px; border-radius: 30px; background: var(--gl); color: var(--g); font-size: 130px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .codecard p { font-size: 28px; color: var(--mu); margin-top: 26px; }
+  .polas { position: relative; width: 920px; height: 560px; margin-top: 40px; }
+  .pola { position: absolute; width: 430px; background: #fff; padding: 20px 20px 28px; border-radius: 14px; box-shadow: 0 24px 50px rgba(28,28,26,.2); }
+  .pola .ph { height: 360px; border-radius: 6px; display: flex; align-items: center; justify-content: center; background: var(--gl); }
+  .pola .ph svg { width: 290px; height: 290px; }
+  .pola .c1 { margin-top: 16px; font-size: 28px; font-weight: 800; }
+  .pola .c2 { font-size: 23px; color: var(--mu); margin-top: 4px; }
+  .flash { position: absolute; inset: 0; background: #fff; opacity: 0; z-index: 9; pointer-events: none; }
+  .split { display: flex; gap: 40px; align-items: flex-start; margin-top: 30px; }
+  .mini { width: 440px; background: #fff; border-radius: 40px; padding: 30px; box-shadow: 0 20px 50px rgba(28,28,26,.12); }
+  .mini h5 { font-size: 26px; color: var(--mu); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+  .codein { display: flex; gap: 14px; margin-top: 20px; }
+  .codein span { flex: 1; height: 110px; border-radius: 20px; border: 3px solid var(--ln); font-size: 64px; font-weight: 800; color: var(--g); display: flex; align-items: center; justify-content: center; }
+  .codein span.on { border-color: var(--g); }
+  .ok { margin-top: 22px; background: var(--gl); color: var(--gs); font-weight: 800; font-size: 30px; padding: 18px; border-radius: 22px; text-align: center; }
+  .stars { display: flex; gap: 18px; justify-content: center; margin-top: 30px; }
+  .stars span { font-size: 130px; line-height: 1; color: var(--m); }
+  .recap { width: 920px; display: grid; gap: 30px; margin-top: 70px; }
+  .rc { background: #fff; border-radius: 40px; padding: 36px 40px; display: flex; align-items: center; gap: 34px; box-shadow: 0 14px 34px rgba(28,28,26,.08); }
+  .rc .n { min-width: 190px; font-size: 92px; font-weight: 800; color: var(--g); letter-spacing: -3px; }
+  .rc p { font-size: 38px; font-weight: 700; line-height: 1.25; }
+  .tools { display: grid; grid-template-columns: repeat(3, 250px); gap: 30px; margin-top: 70px; }
+  .tools div { height: 250px; border-radius: 44px; background: rgba(255,255,255,.12); display: flex; align-items: center; justify-content: center; }
+  .tools svg { width: 200px; height: 200px; }
+  .url { font-size: 110px; font-weight: 800; letter-spacing: -3px; margin-top: 60px; }
+  .cta { margin-top: 50px; background: var(--m); color: var(--tx); font-size: 52px; font-weight: 800; padding: 34px 70px; border-radius: 99px; }
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="logo" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#0b6e4f"/><path d="M17 19h30L23 45h24" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="47" cy="19" r="4" fill="#ff8f5a"/></symbol>
+    <symbol id="logo-w" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#fff"/><path d="M17 19h30L23 45h24" fill="none" stroke="#0b6e4f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="47" cy="19" r="4" fill="#ff8f5a"/></symbol>
+    <symbol id="i-gen" viewBox="0 0 200 200"><ellipse cx="100" cy="178" rx="78" ry="8" fill="#1c1c1a" opacity=".12"/><rect x="58" y="44" width="84" height="22" rx="10" fill="#0b6e4f"/><rect x="88" y="36" width="24" height="12" rx="4" fill="#1c1c1a"/><rect x="32" y="62" width="136" height="88" rx="14" fill="#ff8f5a"/><path d="M24 72v80M176 72v80M24 66h152" stroke="#1c1c1a" stroke-width="9" fill="none" stroke-linecap="round"/><rect x="48" y="80" width="62" height="50" rx="10" fill="#1c1c1a"/><path d="M58 92h42M58 104h42M58 116h42" stroke="#555" stroke-width="5" stroke-linecap="round"/><rect x="120" y="80" width="38" height="32" rx="6" fill="#fff"/><circle cx="131" cy="96" r="6" fill="#0b6e4f"/><circle cx="147" cy="96" r="6" fill="#0b6e4f"/><rect x="122" y="118" width="34" height="10" rx="5" fill="#a3400c"/><circle cx="52" cy="160" r="17" fill="#1c1c1a"/><circle cx="52" cy="160" r="6" fill="#fff"/><circle cx="148" cy="160" r="17" fill="#1c1c1a"/><circle cx="148" cy="160" r="6" fill="#fff"/></symbol>
+    <symbol id="i-brush" viewBox="0 0 200 200"><ellipse cx="150" cy="182" rx="40" ry="7" fill="#1c1c1a" opacity=".12"/><path d="M44 44L158 158" stroke="#1c1c1a" stroke-width="9" stroke-linecap="round"/><g transform="rotate(45 44 44)"><rect x="14" y="26" width="60" height="38" rx="12" fill="#ff8f5a"/><rect x="22" y="34" width="20" height="22" rx="5" fill="#1c1c1a"/><circle cx="62" cy="45" r="7" fill="#fff"/></g><path d="M64 118L118 64" stroke="#0b6e4f" stroke-width="10" stroke-linecap="round"/><circle cx="64" cy="118" r="10" fill="#1c1c1a"/><circle cx="118" cy="64" r="10" fill="#1c1c1a"/><path d="M140 176a34 34 0 0 1 40-40" stroke="#ff8f5a" stroke-width="10" fill="none" stroke-linecap="round"/><circle cx="162" cy="162" r="24" fill="#0b6e4f"/><circle cx="162" cy="162" r="9" fill="#fff"/><path d="M140 162h-12M184 162h12M162 140v-12M162 184v12" stroke="#1c1c1a" stroke-width="4" stroke-linecap="round"/></symbol>
+    <symbol id="i-karcher" viewBox="0 0 200 200"><ellipse cx="96" cy="180" rx="66" ry="7" fill="#1c1c1a" opacity=".12"/><path d="M66 74V38h52v36" stroke="#1c1c1a" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/><rect x="48" y="70" width="90" height="88" rx="18" fill="#0b6e4f"/><rect x="62" y="86" width="40" height="24" rx="6" fill="#fff"/><circle cx="120" cy="98" r="9" fill="#ff8f5a"/><circle cx="72" cy="164" r="15" fill="#1c1c1a"/><circle cx="72" cy="164" r="5" fill="#fff"/><path d="M138 132c40 0 44 44 10 46s-36-30-4-48" stroke="#1c1c1a" stroke-width="6" fill="none"/><path d="M150 92l36-58" stroke="#1c1c1a" stroke-width="7" stroke-linecap="round"/><rect x="140" y="84" width="22" height="34" rx="6" fill="#ff8f5a" transform="rotate(30 151 101)"/></symbol>
+    <symbol id="i-tent" viewBox="0 0 200 200"><ellipse cx="100" cy="176" rx="80" ry="7" fill="#1c1c1a" opacity=".12"/><path d="M26 82L100 36l74 46z" fill="#ff8f5a"/><path d="M100 36L74 82M100 36l26 46" stroke="#fff" stroke-width="5" opacity=".7"/><path d="M26 82q12 16 24 0q12 16 24 0q13 16 26 0q12 16 24 0q12 16 24 0q12 16 26 0z" fill="#a3400c"/><path d="M34 90v84M166 90v84" stroke="#1c1c1a" stroke-width="7" stroke-linecap="round"/><rect x="66" y="130" width="68" height="10" rx="4" fill="#0b6e4f"/><path d="M74 140v32M126 140v32" stroke="#0b6e4f" stroke-width="6" stroke-linecap="round"/></symbol>
+    <symbol id="i-kayak" viewBox="0 0 200 200"><path d="M10 150q90 22 180 0" stroke="#8cc7de" stroke-width="6" fill="none" stroke-linecap="round"/><path d="M16 118Q100 72 184 118Q100 152 16 118z" fill="#ff8f5a"/><path d="M16 118Q100 132 184 118" stroke="#a3400c" stroke-width="4" fill="none"/><ellipse cx="100" cy="110" rx="26" ry="10" fill="#1c1c1a"/><path d="M44 56L156 168" stroke="#1c1c1a" stroke-width="6" stroke-linecap="round"/><ellipse cx="40" cy="52" rx="10" ry="22" fill="#0b6e4f" transform="rotate(-45 40 52)"/><ellipse cx="160" cy="172" rx="10" ry="22" fill="#0b6e4f" transform="rotate(-45 160 172)"/></symbol>
+    <symbol id="i-mixer" viewBox="0 0 200 200"><ellipse cx="100" cy="182" rx="74" ry="7" fill="#1c1c1a" opacity=".12"/><path d="M52 62l74-22 34 74-74 26z" fill="#ff8f5a"/><path d="M126 40l14-6 30 70-10 10" fill="#a3400c"/><ellipse cx="143" cy="72" rx="14" ry="40" fill="#1c1c1a" transform="rotate(-24 143 72)"/><path d="M80 140l-30 38M120 128l30 50M60 160h80" stroke="#0b6e4f" stroke-width="8" stroke-linecap="round"/><circle cx="152" cy="176" r="12" fill="#1c1c1a"/></symbol>
+    <symbol id="i-check" viewBox="0 0 64 64"><path d="M16 33l11 11 21-24" stroke="#fff" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<div id="stage">
+  <div id="steps"><i><u></u></i><i><u></u></i><i><u></u></i><i><u></u></i><i><u></u></i><i><u></u></i></div>
+
+  <!-- 1. Accroche -->
+  <section class="scene green glow" data-start="0" data-end="4.6">
+    <div class="big z" data-at="0.15" style="margin-top:120px">Besoin d'une débroussailleuse <em>ce week-end ?</em></div>
+    <svg class="z" width="420" height="420" style="margin-top:60px" data-at="0.8" data-fx="pop"><use href="#i-brush"/></svg>
+    <div class="mid z" data-at="2.2">Pas besoin de l'acheter.</div>
+  </section>
+
+  <!-- 2. Zouti -->
+  <section class="scene green glow" data-start="4.6" data-end="9.2">
+    <svg class="z" width="260" height="260" style="margin-top:160px" data-at="0.15" data-fx="pop"><use href="#logo-w"/></svg>
+    <div class="big z" style="font-size:150px;margin-top:30px" data-at="0.45">Zouti</div>
+    <div class="mid z" data-at="1.2">Louez le matériel de vos voisins,<br>partout en Guyane.</div>
+    <div class="z" style="margin-top:50px;text-align:center"><span class="chip" data-at="2.1" data-fx="pop">📍 22 communes</span><span class="chip" data-at="2.5" data-fx="pop">🤝 Entre particuliers</span></div>
+  </section>
+
+  <!-- 3. Étape 1 : chercher -->
+  <section class="scene sand" data-start="9.2" data-end="17.4" data-step="1">
+    <div class="step" data-at="0.1"><b>1</b>Cherchez près de chez vous</div>
+    <div class="phone" data-at="0.4" data-fx="rise">
+      <div class="screen">
+        <div class="sbar"><span>9:41</span><span>●●● ▮</span></div>
+        <div class="appbar"><svg><use href="#logo"/></svg>Zouti</div>
+        <div class="pad">
+          <div class="field on">🔍 <span data-type="débroussailleuse" data-type-at="1.0" data-type-dur="1.4"></span></div>
+          <div class="field" style="margin-top:14px" data-at="2.7">📍 Matoury</div>
+          <div class="res" data-at="3.4"><div class="th"><svg><use href="#i-brush"/></svg></div><div><b>Débroussailleuse thermique</b><span>Matoury · à 1,2 km</span><em>20&nbsp;€ / jour</em></div></div>
+          <div class="res" data-at="3.8"><div class="th"><svg><use href="#i-brush"/></svg></div><div><b>Débroussailleuse + harnais</b><span>Rémire-Montjoly · à 3 km</span><em>18&nbsp;€ / jour</em></div></div>
+          <div class="res" data-at="4.2"><div class="th"><svg><use href="#i-brush"/></svg></div><div><b>Coupe-bordure électrique</b><span>Cayenne · à 5 km</span><em>12&nbsp;€ / jour</em></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="demo" data-at="0.4" data-fx="fade">Images de démonstration</div>
+    <div class="cap" data-at="4.8">Cherchez par commune :<br><span>les annonces les plus proches d'abord.</span></div>
+  </section>
+
+  <!-- 4. Étape 2 : question gratuite -->
+  <section class="scene sand" data-start="17.4" data-end="25.6" data-step="2">
+    <div class="step" data-at="0.1"><b>2</b>Posez vos questions</div>
+    <div class="phone" data-at="0.3">
+      <div class="screen">
+        <div class="sbar"><span>9:42</span><span>●●● ▮</span></div>
+        <div class="who"><div class="av">P</div><div>Propriétaire · Matoury<br><span style="font-size:20px;color:var(--mu);font-weight:500">Débroussailleuse thermique</span></div></div>
+        <div class="chat">
+          <div class="bub me" data-at="1.0" data-fx="right">Bonjour ! Le harnais est fourni ?</div>
+          <div class="bub them" data-at="2.2" data-fx="left">Oui, harnais et lunettes. Le réservoir sera plein 👍</div>
+          <div class="bub me" data-at="3.4" data-fx="right">Parfait, je fais la demande pour vendredi.</div>
+        </div>
+      </div>
+    </div>
+    <div class="cap" data-at="4.4">Écrivez au propriétaire avant de réserver.<br><span>Gratuit, sans carte bancaire.</span></div>
+  </section>
+
+  <!-- 5. Étape 3 : les dates -->
+  <section class="scene sand" data-start="25.6" data-end="34.4" data-step="3">
+    <div class="step" data-at="0.1"><b>3</b>Demandez vos dates</div>
+    <div class="phone" data-at="0.3">
+      <div class="screen">
+        <div class="sbar"><span>9:44</span><span>●●● ▮</span></div>
+        <div class="pad">
+          <div class="cal">
+            <h4>Novembre 2026</h4>
+            <div class="gr">
+              <span class="h">L</span><span class="h">M</span><span class="h">M</span><span class="h">J</span><span class="h">V</span><span class="h">S</span><span class="h">D</span>
+              <span class="x">2</span><span class="x">3</span><span>4</span><span>5</span><span data-on-at="1.0">6</span><span data-on-at="1.3">7</span><span data-on-at="1.6">8</span>
+              <span>9</span><span>10</span><span>11</span><span>12</span><span>13</span><span>14</span><span>15</span>
+            </div>
+          </div>
+          <div class="sum" data-at="2.0">
+            <div><span>20&nbsp;€ × 3 jours</span><span>60&nbsp;€</span></div>
+            <div><span>Caution (en main propre)</span><span>150&nbsp;€</span></div>
+            <div class="tot"><span>Total location</span><span><span data-count-to="60" data-count-at="2.1" data-count-dur="0.9">0</span>&nbsp;€</span></div>
+          </div>
+          <div class="btn">Demander à réserver<span class="tap" data-at="3.5" data-fx="tap"></span></div>
+        </div>
+        <div class="toast" data-at="4.0" data-fx="rise"><i>✓</i>Demande envoyée. Le propriétaire a 48&nbsp;h pour répondre.</div>
+      </div>
+    </div>
+    <div class="cap" data-at="4.8">Le prix total s'affiche avant d'envoyer.<br><span>Annulation gratuite jusqu'à la veille.</span></div>
+  </section>
+
+  <!-- 6. Étape 4 : acceptée + code -->
+  <section class="scene mango" data-start="34.4" data-end="41.2" data-step="4">
+    <div class="step" data-at="0.1"><b>4</b>Le propriétaire accepte</div>
+    <div class="notif" data-at="0.7" data-fx="down"><div class="ic"><svg><use href="#i-check"/></svg></div><div><b>Demande acceptée !</b><span>Débroussailleuse · du 6 au 8 novembre</span></div></div>
+    <div class="codecard" data-at="1.7" data-fx="pop">
+      <div class="k">Votre code de remise</div>
+      <div class="v"><span data-at="2.2" data-fx="pop">7</span><span data-at="2.45" data-fx="pop">4</span><span data-at="2.7" data-fx="pop">1</span><span data-at="2.95" data-fx="pop">5</span></div>
+      <p>À montrer au propriétaire le jour J.</p>
+    </div>
+    <div class="cap" data-at="3.8" style="top:1420px">Et si c'est non ? Zouti vous montre<br><span>d'autres annonces libres aux mêmes dates.</span></div>
+  </section>
+
+  <!-- 7. Étape 5 : remise -->
+  <section class="scene sand" data-start="41.2" data-end="49.4" data-step="5">
+    <div class="step" data-at="0.1"><b>5</b>Le jour J, la remise</div>
+    <div class="split">
+      <div class="mini" data-at="0.4" data-fx="left">
+        <h5>Le propriétaire saisit</h5>
+        <div class="codein"><span data-on-at="1.0" data-text="7" data-text-at="1.0"></span><span data-on-at="1.3" data-text="4" data-text-at="1.3"></span><span data-on-at="1.6" data-text="1" data-text-at="1.6"></span><span data-on-at="1.9" data-text="5" data-text-at="1.9"></span></div>
+        <div class="btn gr" style="font-size:26px;padding:20px">Confirmer la remise<span class="tap" data-at="2.4" data-fx="tap"></span></div>
+        <div class="ok" data-at="2.8" data-fx="pop">✓ Location démarrée</div>
+      </div>
+      <div class="mini" data-at="0.6" data-fx="right" style="padding:24px">
+        <h5>Vous gardez</h5>
+        <div style="font-size:30px;font-weight:700;margin-top:18px;line-height:1.4">📄 Le contrat<br>📸 Les photos<br>💬 La conversation</div>
+      </div>
+    </div>
+    <div class="polas">
+      <div class="pola" style="left:40px;top:10px;transform:rotate(-5deg)" data-at="3.5" data-fx="pop"><div class="ph"><svg><use href="#i-brush"/></svg></div><div class="c1">📤 À la remise</div><div class="c2">vendredi 6 novembre · 9 h 12</div></div>
+    </div>
+    <div class="flash" data-at="3.4" data-fx="flash"></div>
+    <div class="cap" data-at="4.4" style="top:1460px">Chacun photographie le matériel :<br><span>les photos sont datées.</span></div>
+  </section>
+
+  <!-- 8. Étape 6 : retour + avis -->
+  <section class="scene sand" data-start="49.4" data-end="56.4" data-step="6">
+    <div class="step" data-at="0.1"><b>6</b>Le retour, puis l'avis</div>
+    <div class="polas" style="height:520px">
+      <div class="pola" style="left:20px;top:20px;transform:rotate(-5deg)"><div class="ph"><svg><use href="#i-brush"/></svg></div><div class="c1">📤 À la remise</div><div class="c2">vendredi 6 novembre · 9 h 12</div></div>
+      <div class="pola" style="right:20px;top:50px;transform:rotate(4deg)" data-at="0.6" data-fx="pop"><div class="ph" style="background:var(--ms)"><svg><use href="#i-brush"/></svg></div><div class="c1">📥 Au retour</div><div class="c2">dimanche 8 novembre · 18 h 40</div></div>
+    </div>
+    <div class="flash" data-at="0.5" data-fx="flash"></div>
+    <div class="mid" data-at="1.6" style="color:var(--tx);margin-top:60px">Comment s'est passée la location ?</div>
+    <div class="stars"><span data-at="2.1" data-fx="pop">★</span><span data-at="2.3" data-fx="pop">★</span><span data-at="2.5" data-fx="pop">★</span><span data-at="2.7" data-fx="pop">★</span><span data-at="2.9" data-fx="pop">★</span></div>
+    <div class="cap" data-at="3.6" style="top:1480px">Vous réglez en main propre, <span>sans commission.</span><br>Puis chacun laisse un avis.</div>
+  </section>
+
+  <!-- 9. Récap -->
+  <section class="scene mango" data-start="56.4" data-end="62.6">
+    <div class="big" data-at="0.1" style="font-size:88px">Avec Zouti</div>
+    <div class="recap">
+      <div class="rc" data-at="0.5" data-fx="left"><div class="n">0&nbsp;€</div><p>pour poser une question au propriétaire</p></div>
+      <div class="rc" data-at="1.2" data-fx="left"><div class="n">0&nbsp;%</div><p>de commission quand on se paie en main propre</p></div>
+      <div class="rc" data-at="1.9" data-fx="left"><div class="n">📸</div><p>état des lieux en photos datées et contrat prêt</p></div>
+    </div>
+  </section>
+
+  <!-- 10. Propriétaires -->
+  <section class="scene green glow" data-start="62.6" data-end="68.2">
+    <div class="big z" data-at="0.1" style="font-size:96px">Votre matériel dort ? <em>Publiez-le gratuitement.</em></div>
+    <div class="tools z">
+      <div data-at="0.8" data-fx="pop"><svg><use href="#i-gen"/></svg></div><div data-at="1.0" data-fx="pop"><svg><use href="#i-karcher"/></svg></div><div data-at="1.2" data-fx="pop"><svg><use href="#i-tent"/></svg></div>
+      <div data-at="1.4" data-fx="pop"><svg><use href="#i-kayak"/></svg></div><div data-at="1.6" data-fx="pop"><svg><use href="#i-mixer"/></svg></div><div data-at="1.8" data-fx="pop"><svg><use href="#i-brush"/></svg></div>
+    </div>
+    <div class="mid z" data-at="2.5">Vous fixez le prix et la caution,<br>vous acceptez chaque demande.</div>
+  </section>
+
+  <!-- 11. Appel à l'action -->
+  <section class="scene green glow" data-start="68.2" data-end="74">
+    <svg class="z" width="220" height="220" style="margin-top:220px" data-at="0.1" data-fx="pop"><use href="#logo-w"/></svg>
+    <div class="url z" data-at="0.5">zouti97.fr</div>
+    <div class="mid z" data-at="1.0">Le matériel est déjà<br>dans votre quartier.</div>
+    <div class="cta z" data-at="1.6" data-fx="pop" data-pulse="2.2">Lien en bio</div>
+  </section>
+</div>
+
+<script>
+  const DURATION = 74;
+  const clamp = (x) => Math.max(0, Math.min(1, x));
+  const prog = (t, a, b) => clamp((t - a) / (b - a));
+  const easeOut = (x) => 1 - Math.pow(1 - x, 3);
+  const easeBack = (x) => { const c = 1.7; return 1 + (c + 1) * Math.pow(x - 1, 3) + c * Math.pow(x - 1, 2); };
+  const scenes = [...document.querySelectorAll(".scene")];
+  const stepsBar = document.getElementById("steps");
+  const stepFills = [...stepsBar.querySelectorAll("u")];
+  for (const el of document.querySelectorAll("[data-type]")) el.dataset.full = el.dataset.type;
+  // Transformation d'origine (rotation des polaroïds…), mémorisée avant toute animation.
+  for (const el of document.querySelectorAll("[data-at]")) el.dataset.baseTransform = el.style.transform || "";
+
+  function fx(el, local) {
+    const at = parseFloat(el.dataset.at);
+    const kind = el.dataset.fx || "rise";
+    if (kind === "tap") {
+      const p = prog(local, at, at + 0.5);
+      el.style.opacity = p > 0 && p < 1 ? (0.6 * (1 - p)).toFixed(3) : 0;
+      el.style.transform = `scale(${0.3 + 1.5 * p})`;
+      return;
+    }
+    if (kind === "flash") {
+      const p = prog(local, at, at + 0.45);
+      el.style.opacity = p > 0 && p < 1 ? (p < 0.25 ? p / 0.25 : 1 - (p - 0.25) / 0.75) * 0.9 : 0;
+      return;
+    }
+    const raw = prog(local, at, at + (kind === "pop" ? 0.45 : 0.55));
+    const p = easeOut(raw);
+    el.style.opacity = kind === "fade" ? raw : Math.min(1, raw * 1.6);
+    const base = el.dataset.baseTransform;
+    let tr = "";
+    if (kind === "rise") tr = `translateY(${(1 - p) * 60}px)`;
+    if (kind === "down") tr = `translateY(${(p - 1) * 80}px)`;
+    if (kind === "left") tr = `translateX(${(p - 1) * 90}px)`;
+    if (kind === "right") tr = `translateX(${(1 - p) * 90}px)`;
+    if (kind === "pop") tr = `scale(${0.4 + 0.6 * easeBack(raw)})`;
+    if (el.dataset.pulse) {
+      const pt = local - parseFloat(el.dataset.pulse);
+      if (pt > 0) tr += ` scale(${1 + 0.05 * Math.sin(pt * 6)})`;
+    }
+    el.style.transform = `${base} ${tr}`;
+  }
+
+  function seek(t) {
+    let activeStep = 0;
+    for (const sc of scenes) {
+      const start = parseFloat(sc.dataset.start), end = parseFloat(sc.dataset.end), dur = end - start;
+      const local = t - start;
+      const fadeIn = start === 0 ? 1 : prog(local, 0, 0.35);
+      const fadeOut = end >= DURATION ? 1 : 1 - prog(local, dur - 0.3, dur);
+      const vis = local >= 0 && local <= dur ? Math.min(fadeIn, fadeOut) : 0;
+      sc.style.opacity = vis;
+      sc.style.zIndex = vis > 0 ? 2 : 1;
+      if (vis <= 0) continue;
+      if (sc.dataset.step) activeStep = { n: +sc.dataset.step, p: prog(local, 0.2, dur - 0.4) };
+      sc.querySelectorAll("[data-at]").forEach((el) => fx(el, local));
+      sc.querySelectorAll("[data-on-at]").forEach((el) => el.classList.toggle("on", local >= parseFloat(el.dataset.onAt)));
+      sc.querySelectorAll("[data-text]").forEach((el) => { el.textContent = local >= parseFloat(el.dataset.textAt) ? el.dataset.text : ""; });
+      sc.querySelectorAll("[data-type]").forEach((el) => {
+        const p = prog(local, parseFloat(el.dataset.typeAt), parseFloat(el.dataset.typeAt) + parseFloat(el.dataset.typeDur));
+        const n = Math.round(p * el.dataset.full.length);
+        const caret = p < 1 || Math.floor(local * 2) % 2 === 0 ? '<span class="caret"></span>' : "";
+        el.innerHTML = el.dataset.full.slice(0, n) + caret;
+      });
+      sc.querySelectorAll("[data-count-to]").forEach((el) => {
+        const p = easeOut(prog(local, parseFloat(el.dataset.countAt), parseFloat(el.dataset.countAt) + parseFloat(el.dataset.countDur)));
+        el.textContent = Math.round(p * parseFloat(el.dataset.countTo));
+      });
+    }
+    // Barre d'étapes, visible pendant les 6 étapes
+    const inSteps = t >= 9.2 && t <= 56.4;
+    stepsBar.style.opacity = inSteps ? Math.min(prog(t, 9.2, 9.6), 1 - prog(t, 56.0, 56.4)) : 0;
+    stepFills.forEach((u, i) => {
+      const n = i + 1;
+      const s = !activeStep ? 0 : n < activeStep.n ? 1 : n === activeStep.n ? activeStep.p : 0;
+      u.style.transform = `scaleX(${s})`;
+    });
+  }
+  window.seek = seek;
+  window.DURATION = DURATION;
+  seek(0);
+</script>
+</body>
+</html>
