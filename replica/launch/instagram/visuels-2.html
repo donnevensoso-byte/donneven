@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<title>Visuels Instagram Zouti, série 2</title>
+<style>
+  :root { --g: #0b6e4f; --gs: #08583f; --gl: #e9f6f0; --m: #ff8f5a; --mt: #a3400c; --ms: #ffe9dc; --bg: #f6f5f0; --tx: #1c1c1a; --mu: #66655d; --ln: #e5e3da; --sky: #cfe8f3; --river: #8cc7de; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Inter, sans-serif; color: var(--tx); background: #bbb; }
+  .s { width: 1080px; height: 1350px; position: relative; overflow: hidden; padding: 84px 80px; margin-bottom: 20px; display: flex; flex-direction: column; }
+  .st { height: 1920px; padding: 200px 90px; }
+  .sand { background: var(--bg); } .green { background: var(--g); color: #fff; } .mango { background: var(--ms); }
+  .glow::before { content: ""; position: absolute; right: -260px; top: -260px; width: 900px; height: 900px; border-radius: 50%; background: radial-gradient(circle, rgba(255,143,90,.45), transparent 65%); }
+  .z { position: relative; z-index: 1; }
+  .top { display: flex; justify-content: space-between; align-items: center; }
+  .brand { display: flex; align-items: center; gap: 16px; font-size: 40px; font-weight: 800; letter-spacing: -.5px; }
+  .brand svg { width: 56px; height: 56px; }
+  .sand .brand, .mango .brand { color: var(--g); }
+  .chip { padding: 10px 22px; border-radius: 99px; font-size: 22px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; }
+  .sand .chip, .mango .chip { background: var(--gl); color: var(--gs); }
+  .green .chip { background: rgba(255,255,255,.15); }
+  h1 { font-size: 84px; line-height: 1.03; font-weight: 800; letter-spacing: -2.5px; margin-top: 40px; }
+  h1 em { font-style: normal; color: var(--g); }
+  .green h1 em { color: var(--m); }
+  .lead { font-size: 34px; line-height: 1.4; color: var(--mu); margin-top: 22px; }
+  .green .lead { color: rgba(255,255,255,.9); }
+  .note { font-size: 22px; color: var(--mu); line-height: 1.4; }
+  .green .note { color: rgba(255,255,255,.75); }
+  .foot { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; }
+  .url { font-size: 44px; font-weight: 800; color: var(--g); white-space: nowrap; }
+  .green .url { color: #fff; }
+  .card { background: #fff; border-radius: 36px; box-shadow: 0 18px 50px rgba(28,28,26,.10); }
+
+  /* 20 Acheter ou louer */
+  .bars { margin-top: 56px; display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: end; height: 640px; }
+  .bar { display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+  .bar .val { font-size: 92px; font-weight: 800; letter-spacing: -3px; }
+  .bar .lab { font-size: 30px; font-weight: 700; margin-top: 6px; }
+  .bar .sub { font-size: 24px; color: var(--mu); margin-top: 6px; line-height: 1.35; }
+  .bar .col { margin-top: 22px; border-radius: 28px 28px 10px 10px; display: flex; align-items: flex-start; justify-content: center; padding-top: 26px; }
+  .bar.buy .col { height: 380px; background: repeating-linear-gradient(135deg, #ddd9cc 0 18px, #e8e5da 18px 36px); }
+  .bar.rent .col { height: 58px; background: var(--g); }
+  .saving { position: absolute; right: 80px; top: 470px; background: var(--m); color: var(--tx); border-radius: 30px; padding: 26px 34px; transform: rotate(4deg); box-shadow: 0 14px 34px rgba(163,64,12,.25); }
+  .saving b { display: block; font-size: 58px; letter-spacing: -1px; }
+  .saving span { font-size: 24px; font-weight: 600; }
+
+  /* Téléphone */
+  .phone { width: 520px; border-radius: 70px; background: #1c1c1a; padding: 18px; box-shadow: 0 40px 90px rgba(0,0,0,.28); }
+  .screen { border-radius: 54px; overflow: hidden; background: var(--bg); height: 1000px; position: relative; }
+  .sbar { color: var(--tx); height: 64px; display: flex; justify-content: space-between; align-items: center; padding: 0 40px; font-size: 22px; font-weight: 700; }
+  .appbar { background: #fff; display: flex; align-items: center; gap: 12px; padding: 16px 26px; border-bottom: 2px solid var(--ln); font-weight: 800; color: var(--g); font-size: 30px; }
+  .appbar svg { width: 44px; height: 44px; }
+
+  /* 21 Annonce */
+  .ann-img { height: 330px; background: var(--gl); display: flex; align-items: center; justify-content: center; position: relative; }
+  .ann-img svg { width: 280px; height: 280px; }
+  .ex { position: absolute; left: 22px; top: 22px; background: var(--tx); color: #fff; font-size: 18px; font-weight: 700; padding: 6px 14px; border-radius: 99px; letter-spacing: 1px; text-transform: uppercase; }
+  .ann-body { padding: 26px 28px; }
+  .ann-body h3 { font-size: 34px; font-weight: 800; letter-spacing: -.5px; }
+  .ann-body .loc { font-size: 22px; color: var(--mu); margin-top: 6px; }
+  .price { margin-top: 18px; display: flex; gap: 12px; }
+  .price div { flex: 1; background: #fff; border: 2px solid var(--ln); border-radius: 20px; padding: 14px 16px; }
+  .price b { display: block; font-size: 30px; }
+  .price span { font-size: 18px; color: var(--mu); }
+  .owner { margin-top: 18px; display: flex; align-items: center; gap: 14px; font-size: 21px; }
+  .av { width: 54px; height: 54px; border-radius: 50%; background: var(--ms); color: var(--mt); font-weight: 800; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+  .btn { margin-top: 16px; border-radius: 99px; text-align: center; font-weight: 800; font-size: 24px; padding: 18px; }
+  .btn.sec { border: 2px solid var(--g); color: var(--g); background: #fff; }
+  .btn.pri { background: var(--m); color: var(--tx); }
+  .tiny { font-size: 17px; color: var(--mu); text-align: center; margin-top: 10px; }
+  .callouts { position: absolute; left: 80px; top: 470px; width: 420px; display: grid; gap: 34px; z-index: 2; }
+  .co { background: #fff; border-radius: 26px; padding: 22px 26px; box-shadow: 0 12px 30px rgba(28,28,26,.10); position: relative; }
+  .co b { display: block; font-size: 28px; color: var(--g); }
+  .co span { font-size: 22px; color: var(--mu); line-height: 1.35; display: block; margin-top: 4px; }
+  .co::after { content: ""; position: absolute; right: -60px; top: 50%; width: 60px; border-top: 3px dashed var(--g); }
+  .co i { position: absolute; right: -72px; top: calc(50% - 7px); width: 14px; height: 14px; border-radius: 50%; background: var(--m); }
+
+  /* 22 Conversation */
+  .chat { padding: 26px 24px; display: flex; flex-direction: column; gap: 18px; }
+  .who { color: var(--tx); display: flex; align-items: center; gap: 14px; padding: 18px 26px; background: #fff; border-bottom: 2px solid var(--ln); font-size: 24px; font-weight: 700; }
+  .bub { max-width: 82%; padding: 18px 22px; border-radius: 28px; font-size: 24px; line-height: 1.38; }
+  .bub small { display: block; font-size: 16px; margin-top: 6px; opacity: .75; }
+  .me { align-self: flex-end; background: var(--g); color: #fff; border-bottom-right-radius: 8px; }
+  .them { align-self: flex-start; background: #fff; color: var(--tx); border-bottom-left-radius: 8px; box-shadow: 0 2px 0 var(--ln); }
+  .sys { align-self: center; background: var(--ms); color: var(--mt); font-size: 19px; font-weight: 700; padding: 12px 20px; border-radius: 99px; text-align: center; }
+  .free { position: absolute; left: 80px; bottom: 260px; z-index: 2; display: grid; gap: 22px; }
+  .free div { display: flex; align-items: center; gap: 18px; font-size: 32px; font-weight: 700; }
+  .free div span { width: 64px; height: 64px; border-radius: 20px; background: var(--g); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 34px; }
+
+  /* 23 État des lieux */
+  .polas { margin-top: 70px; position: relative; height: 640px; }
+  .pola { position: absolute; width: 440px; background: #fff; padding: 22px 22px 30px; border-radius: 14px; box-shadow: 0 24px 50px rgba(28,28,26,.18); }
+  .pola .ph { height: 380px; border-radius: 6px; display: flex; align-items: center; justify-content: center; }
+  .pola .ph svg { width: 300px; height: 300px; }
+  .pola .cap { margin-top: 18px; font-size: 26px; font-weight: 800; }
+  .pola .ts { font-size: 21px; color: var(--mu); margin-top: 4px; font-variant-numeric: tabular-nums; }
+  .pola.a { left: 0; top: 0; transform: rotate(-5deg); }
+  .pola.b { right: 0; top: 70px; transform: rotate(4deg); }
+  .pola.a .ph { background: var(--gl); } .pola.b .ph { background: var(--ms); }
+  .stamp { position: absolute; left: 520px; top: 0px; z-index: 3; border: 6px solid var(--g); color: var(--g); background: rgba(255,255,255,.9); font-weight: 800; font-size: 30px; padding: 14px 24px; border-radius: 16px; transform: rotate(-8deg); text-transform: uppercase; letter-spacing: 2px; }
+  .checks { display: grid; gap: 16px; margin-top: 10px; }
+  .checks div { display: flex; align-items: center; gap: 16px; font-size: 30px; font-weight: 600; }
+  .checks div::before { content: "✓"; width: 48px; height: 48px; border-radius: 50%; background: var(--g); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; flex-shrink: 0; }
+
+  /* 24 Ce que peut rapporter */
+  .grid6 { margin-top: 46px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; }
+  .tool { background: #fff; border-radius: 30px; padding: 22px 20px 26px; text-align: center; box-shadow: 0 10px 26px rgba(28,28,26,.07); }
+  .tool .ic { height: 170px; border-radius: 22px; background: var(--gl); display: flex; align-items: center; justify-content: center; }
+  .tool .ic svg { width: 150px; height: 150px; }
+  .tool:nth-child(even) .ic { background: var(--ms); }
+  .tool b { display: block; font-size: 26px; margin-top: 16px; }
+  .tool span { display: block; font-size: 34px; font-weight: 800; color: var(--g); margin-top: 6px; letter-spacing: -.5px; }
+  .tool small { font-size: 20px; color: var(--mu); }
+  .calc { margin-top: 30px; background: var(--g); color: #fff; border-radius: 30px; padding: 26px 34px; display: flex; justify-content: space-between; align-items: center; }
+  .calc .k { font-size: 26px; opacity: .9; }
+  .calc .v { font-size: 50px; font-weight: 800; letter-spacing: -1px; white-space: nowrap; }
+
+  /* 25 Parcours */
+  .tl { margin-top: 64px; position: relative; display: grid; gap: 48px; }
+  .tl::before { content: ""; position: absolute; left: 47px; top: 40px; bottom: 40px; width: 6px; background: linear-gradient(var(--m), var(--g)); border-radius: 3px; }
+  .stp { display: grid; grid-template-columns: 100px 1fr 330px; gap: 26px; align-items: center; position: relative; }
+  .dot { width: 100px; height: 100px; border-radius: 50%; background: #fff; border: 6px solid var(--g); color: var(--g); font-size: 44px; font-weight: 800; display: flex; align-items: center; justify-content: center; }
+  .stp h3 { font-size: 34px; font-weight: 800; letter-spacing: -.5px; }
+  .stp p { font-size: 23px; color: var(--mu); margin-top: 4px; line-height: 1.35; }
+  .ui { background: #fff; border-radius: 24px; padding: 18px 20px; box-shadow: 0 8px 22px rgba(28,28,26,.08); font-size: 22px; }
+  .ui .b1 { background: var(--g); color: #fff; padding: 10px 16px; border-radius: 18px 18px 6px 18px; display: inline-block; }
+  .ui .cal { display: flex; gap: 8px; }
+  .ui .cal span { flex: 1; text-align: center; padding: 8px 0; border-radius: 12px; background: var(--bg); font-weight: 700; }
+  .ui .cal span.on { background: var(--g); color: #fff; }
+  .ui .ok { display: inline-block; background: var(--gl); color: var(--gs); font-weight: 800; padding: 8px 18px; border-radius: 99px; }
+  .ui .code { font-size: 46px; font-weight: 800; letter-spacing: 12px; color: var(--g); text-align: center; }
+  .ui .stars { font-size: 38px; color: var(--m); letter-spacing: 4px; text-align: center; }
+
+  /* 26 Quartier */
+  .map { margin-top: 44px; height: 760px; border-radius: 40px; background: #eef3e6; position: relative; overflow: hidden; box-shadow: inset 0 0 0 2px var(--ln); }
+  .map svg.bgmap { position: absolute; inset: 0; }
+  .pin { position: absolute; transform: translate(-50%, -100%); display: flex; flex-direction: column; align-items: center; }
+  .pin .bub2 { background: #fff; border-radius: 26px; padding: 12px 16px 12px 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 10px 24px rgba(28,28,26,.15); white-space: nowrap; }
+  .pin .bub2 svg { width: 66px; height: 66px; background: var(--gl); border-radius: 18px; }
+  .pin .bub2 b { display: block; font-size: 22px; }
+  .pin .bub2 span { font-size: 19px; color: var(--mu); }
+  .pin .tip { width: 0; height: 0; border-left: 14px solid transparent; border-right: 14px solid transparent; border-top: 16px solid #fff; }
+  .home { position: absolute; left: 50%; top: 52%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; }
+  .home .hc { width: 120px; height: 120px; border-radius: 50%; background: var(--m); display: flex; align-items: center; justify-content: center; box-shadow: 0 0 0 26px rgba(255,143,90,.25), 0 0 0 60px rgba(255,143,90,.12); }
+  .home .hc svg { width: 64px; height: 64px; }
+  .home b { margin-top: 70px; font-size: 26px; background: var(--tx); color: #fff; padding: 8px 18px; border-radius: 99px; }
+
+  /* 27 Abîmé */
+  .prot { margin-top: 64px; display: grid; gap: 34px; }
+  .pr { display: grid; grid-template-columns: 130px 1fr; gap: 28px; align-items: center; background: #fff; border-radius: 32px; padding: 34px 32px; }
+  .pr .pi { width: 130px; height: 130px; border-radius: 30px; display: flex; align-items: center; justify-content: center; }
+  .pr .pi svg { width: 84px; height: 84px; }
+  .pr:nth-child(1) .pi { background: var(--gl); } .pr:nth-child(2) .pi { background: var(--ms); } .pr:nth-child(3) .pi { background: #e8eefb; }
+  .pr h3 { font-size: 34px; font-weight: 800; letter-spacing: -.5px; }
+  .pr p { font-size: 25px; color: var(--mu); margin-top: 6px; line-height: 1.38; }
+
+  /* Stories */
+  .pollzone { margin-top: 90px; height: 420px; border: 4px dashed rgba(255,255,255,.5); border-radius: 40px; display: flex; align-items: center; justify-content: center; font-size: 28px; color: rgba(255,255,255,.7); text-align: center; padding: 30px; }
+  .photozone { margin-top: 60px; height: 900px; border-radius: 48px; border: 5px dashed var(--g); background: rgba(255,255,255,.6); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; color: var(--gs); font-size: 30px; font-weight: 700; text-align: center; padding: 40px; }
+  .photozone svg { width: 140px; height: 140px; opacity: .7; }
+  .tagline { display: flex; gap: 16px; margin-top: 34px; flex-wrap: wrap; }
+  .tagline span { background: #fff; border-radius: 99px; padding: 14px 26px; font-size: 30px; font-weight: 700; }
+</style>
+</head>
+<body>
+
+<!-- Illustrations vectorielles maison (aucune image externe) -->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <symbol id="logo" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#0b6e4f"/><path d="M17 19h30L23 45h24" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="47" cy="19" r="4" fill="#ff8f5a"/></symbol>
+    <symbol id="logo-w" viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#fff"/><path d="M17 19h30L23 45h24" fill="none" stroke="#0b6e4f" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/><circle cx="47" cy="19" r="4" fill="#ff8f5a"/></symbol>
+    <!-- Groupe électrogène -->
+    <symbol id="i-gen" viewBox="0 0 200 200">
+      <ellipse cx="100" cy="178" rx="78" ry="8" fill="#1c1c1a" opacity=".12"/>
+      <rect x="58" y="44" width="84" height="22" rx="10" fill="#0b6e4f"/><rect x="88" y="36" width="24" height="12" rx="4" fill="#1c1c1a"/>
+      <rect x="32" y="62" width="136" height="88" rx="14" fill="#ff8f5a"/>
+      <path d="M24 72v80M176 72v80M24 66h152" stroke="#1c1c1a" stroke-width="9" fill="none" stroke-linecap="round"/>
+      <rect x="48" y="80" width="62" height="50" rx="10" fill="#1c1c1a"/><path d="M58 92h42M58 104h42M58 116h42" stroke="#555" stroke-width="5" stroke-linecap="round"/>
+      <rect x="120" y="80" width="38" height="32" rx="6" fill="#fff"/><circle cx="131" cy="96" r="6" fill="#0b6e4f"/><circle cx="147" cy="96" r="6" fill="#0b6e4f"/>
+      <rect x="122" y="118" width="34" height="10" rx="5" fill="#a3400c"/>
+      <circle cx="52" cy="160" r="17" fill="#1c1c1a"/><circle cx="52" cy="160" r="6" fill="#fff"/><circle cx="148" cy="160" r="17" fill="#1c1c1a"/><circle cx="148" cy="160" r="6" fill="#fff"/>
+    </symbol>
+    <!-- Débroussailleuse -->
+    <symbol id="i-brush" viewBox="0 0 200 200">
+      <ellipse cx="150" cy="182" rx="40" ry="7" fill="#1c1c1a" opacity=".12"/>
+      <path d="M44 44L158 158" stroke="#1c1c1a" stroke-width="9" stroke-linecap="round"/>
+      <g transform="rotate(45 44 44)"><rect x="14" y="26" width="60" height="38" rx="12" fill="#ff8f5a"/><rect x="22" y="34" width="20" height="22" rx="5" fill="#1c1c1a"/><circle cx="62" cy="45" r="7" fill="#fff"/></g>
+      <path d="M64 118L118 64" stroke="#0b6e4f" stroke-width="10" stroke-linecap="round"/>
+      <circle cx="64" cy="118" r="10" fill="#1c1c1a"/><circle cx="118" cy="64" r="10" fill="#1c1c1a"/>
+      <path d="M140 176a34 34 0 0 1 40-40" stroke="#ff8f5a" stroke-width="10" fill="none" stroke-linecap="round"/>
+      <circle cx="162" cy="162" r="24" fill="#0b6e4f"/><circle cx="162" cy="162" r="9" fill="#fff"/>
+      <path d="M140 162h-12M184 162h12M162 140v-12M162 184v12" stroke="#1c1c1a" stroke-width="4" stroke-linecap="round"/>
+    </symbol>
+    <!-- Nettoyeur haute pression -->
+    <symbol id="i-karcher" viewBox="0 0 200 200">
+      <ellipse cx="96" cy="180" rx="66" ry="7" fill="#1c1c1a" opacity=".12"/>
+      <path d="M66 74V38h52v36" stroke="#1c1c1a" stroke-width="9" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="48" y="70" width="90" height="88" rx="18" fill="#0b6e4f"/><rect x="62" y="86" width="40" height="24" rx="6" fill="#fff"/><circle cx="120" cy="98" r="9" fill="#ff8f5a"/>
+      <circle cx="72" cy="164" r="15" fill="#1c1c1a"/><circle cx="72" cy="164" r="5" fill="#fff"/>
+      <path d="M138 132c40 0 44 44 10 46s-36-30-4-48" stroke="#1c1c1a" stroke-width="6" fill="none"/>
+      <path d="M150 92l36-58" stroke="#1c1c1a" stroke-width="7" stroke-linecap="round"/><rect x="140" y="84" width="22" height="34" rx="6" fill="#ff8f5a" transform="rotate(30 151 101)"/>
+      <path d="M186 34l8-10M186 34l12-2M186 34l2-12" stroke="#8cc7de" stroke-width="4" stroke-linecap="round"/>
+    </symbol>
+    <!-- Barnum -->
+    <symbol id="i-tent" viewBox="0 0 200 200">
+      <ellipse cx="100" cy="176" rx="80" ry="7" fill="#1c1c1a" opacity=".12"/>
+      <path d="M26 82L100 36l74 46z" fill="#ff8f5a"/><path d="M100 36L74 82M100 36l26 46" stroke="#fff" stroke-width="5" opacity=".7"/>
+      <path d="M26 82q12 16 24 0q12 16 24 0q13 16 26 0q12 16 24 0q12 16 24 0q12 16 26 0z" fill="#a3400c"/>
+      <path d="M34 90v84M166 90v84" stroke="#1c1c1a" stroke-width="7" stroke-linecap="round"/>
+      <rect x="66" y="130" width="68" height="10" rx="4" fill="#0b6e4f"/><path d="M74 140v32M126 140v32" stroke="#0b6e4f" stroke-width="6" stroke-linecap="round"/>
+      <circle cx="88" cy="122" r="7" fill="#fff"/><rect x="104" y="114" width="16" height="16" rx="3" fill="#fff"/>
+    </symbol>
+    <!-- Kayak -->
+    <symbol id="i-kayak" viewBox="0 0 200 200">
+      <path d="M10 150q90 22 180 0" stroke="#8cc7de" stroke-width="6" fill="none" stroke-linecap="round"/>
+      <path d="M16 118Q100 72 184 118Q100 152 16 118z" fill="#ff8f5a"/><path d="M16 118Q100 132 184 118" stroke="#a3400c" stroke-width="4" fill="none"/>
+      <ellipse cx="100" cy="110" rx="26" ry="10" fill="#1c1c1a"/>
+      <path d="M44 56L156 168" stroke="#1c1c1a" stroke-width="6" stroke-linecap="round"/>
+      <ellipse cx="40" cy="52" rx="10" ry="22" fill="#0b6e4f" transform="rotate(-45 40 52)"/><ellipse cx="160" cy="172" rx="10" ry="22" fill="#0b6e4f" transform="rotate(-45 160 172)"/>
+    </symbol>
+    <!-- Perceuse -->
+    <symbol id="i-drill" viewBox="0 0 200 200">
+      <ellipse cx="92" cy="182" rx="50" ry="7" fill="#1c1c1a" opacity=".12"/>
+      <path d="M36 64h96q22 0 22 22t-22 22H100l10 52H72l-6-52H36q-10 0-10-10V74q0-10 10-10z" fill="#0b6e4f"/>
+      <rect x="154" y="78" width="16" height="18" rx="3" fill="#1c1c1a"/><path d="M170 87h22" stroke="#1c1c1a" stroke-width="6" stroke-linecap="round"/>
+      <rect x="58" y="156" width="64" height="22" rx="6" fill="#ff8f5a"/><rect x="104" y="108" width="10" height="20" rx="4" fill="#1c1c1a"/>
+      <circle cx="58" cy="86" r="10" fill="#fff" opacity=".85"/>
+    </symbol>
+    <!-- Bétonnière -->
+    <symbol id="i-mixer" viewBox="0 0 200 200">
+      <ellipse cx="100" cy="182" rx="74" ry="7" fill="#1c1c1a" opacity=".12"/>
+      <path d="M52 62l74-22 34 74-74 26z" fill="#ff8f5a"/><path d="M126 40l14-6 30 70-10 10" fill="#a3400c"/><ellipse cx="143" cy="72" rx="14" ry="40" fill="#1c1c1a" transform="rotate(-24 143 72)"/>
+      <path d="M68 76l52-16M76 96l52-16M84 116l52-16" stroke="#fff" stroke-width="4" opacity=".6"/>
+      <path d="M80 140l-30 38M120 128l30 50M60 160h80" stroke="#0b6e4f" stroke-width="8" stroke-linecap="round"/>
+      <circle cx="152" cy="176" r="12" fill="#1c1c1a"/>
+    </symbol>
+    <!-- Icônes de service -->
+    <symbol id="i-camera" viewBox="0 0 100 100"><rect x="10" y="28" width="80" height="56" rx="12" fill="#0b6e4f"/><rect x="34" y="18" width="32" height="16" rx="5" fill="#0b6e4f"/><circle cx="50" cy="56" r="17" fill="#fff"/><circle cx="50" cy="56" r="9" fill="#ff8f5a"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 100 100"><path d="M24 10h38l18 18v62H24z" fill="#a3400c"/><path d="M62 10v18h18" fill="#ff8f5a"/><path d="M34 44h36M34 56h36M34 68h22" stroke="#fff" stroke-width="5" stroke-linecap="round"/></symbol>
+    <symbol id="i-help" viewBox="0 0 100 100"><circle cx="50" cy="50" r="38" fill="#3b5ba5"/><circle cx="50" cy="50" r="16" fill="#e8eefb"/><path d="M50 12v22M50 66v22M12 50h22M66 50h22" stroke="#e8eefb" stroke-width="10"/></symbol>
+    <symbol id="i-house" viewBox="0 0 100 100"><path d="M14 48L50 18l36 30v38H14z" fill="#fff"/><rect x="40" y="58" width="20" height="28" fill="#ff8f5a"/></symbol>
+    <symbol id="i-photo" viewBox="0 0 100 100"><rect x="8" y="18" width="84" height="64" rx="12" fill="none" stroke="#08583f" stroke-width="7"/><circle cx="34" cy="40" r="8" fill="#08583f"/><path d="M14 76l24-24 16 14 14-12 22 22" stroke="#08583f" stroke-width="7" fill="none" stroke-linejoin="round"/></symbol>
+  </defs>
+</svg>
+
+<!-- 20 Acheter ou louer -->
+<div class="s sand" id="20-acheter-ou-louer">
+  <div class="top z"><div class="brand"><svg><use href="#logo"/></svg>Zouti</div><div class="chip">Le calcul</div></div>
+  <h1 class="z">Acheter une débroussailleuse <em>ou la louer 3&nbsp;week-ends ?</em></h1>
+  <div class="bars z">
+    <div class="bar buy"><div class="val" style="color:var(--mu)">≈ 400&nbsp;€</div><div class="lab">Acheter</div><div class="sub">+ la stocker, l'entretenir,<br>la faire réparer</div><div class="col"><svg width="190" height="190"><use href="#i-brush"/></svg></div></div>
+    <div class="bar rent"><div class="val" style="color:var(--g)">60&nbsp;€</div><div class="lab">Louer sur Zouti</div><div class="sub">3 week-ends × 20&nbsp;€<br>chez un voisin</div><div class="col"></div></div>
+  </div>
+  <div class="saving z"><b>≈ 340&nbsp;€</b><span>gardés dans la poche</span></div>
+  <div class="foot z"><div class="note">Exemple indicatif : prix d'achat moyen d'une débroussailleuse thermique,<br>location fixée à 20&nbsp;€ par jour par son propriétaire.</div><div class="url">zouti97.fr</div></div>
+</div>
+
+<!-- 21 Annonce annotée -->
+<div class="s mango" id="21-annonce-annotee">
+  <div class="top z"><div class="brand"><svg><use href="#logo"/></svg>Zouti</div><div class="chip">Une annonce Zouti</div></div>
+  <h1 class="z" style="font-size:70px;max-width:900px">Tout est clair <em>avant même de réserver.</em></h1>
+  <div class="callouts">
+    <div class="co"><b>Question gratuite</b><span>Écrivez au propriétaire sans carte bancaire.</span><i></i></div>
+    <div class="co"><b>Prix et caution affichés</b><span>Fixés par le propriétaire, connus d'avance.</span><i></i></div>
+    <div class="co"><b>Dans votre commune</b><span>Les annonces les plus proches d'abord.</span><i></i></div>
+  </div>
+  <div class="phone z" style="position:absolute;right:60px;top:300px;transform:scale(.9);transform-origin:top right">
+    <div class="screen">
+      <div class="sbar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="appbar"><svg><use href="#logo"/></svg>Zouti</div>
+      <div class="ann-img"><span class="ex">Exemple</span><svg><use href="#i-brush"/></svg></div>
+      <div class="ann-body">
+        <h3>Débroussailleuse thermique</h3>
+        <div class="loc">📍 Matoury · harnais et lunettes fournis</div>
+        <div class="price"><div><b>20&nbsp;€</b><span>par jour</span></div><div><b>110&nbsp;€</b><span>par semaine</span></div><div><b>150&nbsp;€</b><span>de caution</span></div></div>
+        <div class="owner"><div class="av">V</div><div><b>Votre voisin</b><br><span style="color:var(--mu)">Avis publiés après chaque location</span></div></div>
+        <div class="btn sec">💬 Écrire au propriétaire</div>
+        <div class="btn pri">Demander à réserver</div>
+        <div class="tiny">Vous ne payez rien maintenant.</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot z" style="position:absolute;left:80px;bottom:84px"><div class="url">zouti97.fr</div></div>
+</div>
+
+<!-- 22 Conversation -->
+<div class="s green glow" id="22-conversation">
+  <div class="top z"><div class="brand"><svg><use href="#logo-w"/></svg>Zouti</div><div class="chip">Avant de réserver</div></div>
+  <h1 class="z" style="font-size:62px;max-width:380px">Posez toutes vos questions. <em>C'est gratuit.</em></h1>
+  <div class="free">
+    <div><span>€</span>0 € pour écrire</div>
+    <div><span>💳</span>Sans carte bancaire</div>
+    <div><span>⏱</span>Réponse sous 48 h</div>
+  </div>
+  <div class="phone z" style="position:absolute;right:56px;top:190px">
+    <div class="screen">
+      <div class="sbar"><span>9:41</span><span>●●● ▮</span></div>
+      <div class="who"><div class="av">P</div><div>Propriétaire · Kourou<br><span style="font-size:18px;color:var(--mu);font-weight:500">Groupe électrogène 3 kW</span></div></div>
+      <div class="chat">
+        <div class="sys">Exemple de conversation</div>
+        <div class="bub me">Bonjour ! Il tient combien de temps avec un plein ?<small>10:02</small></div>
+        <div class="bub them">Environ 8 h à mi-charge. Je vous le donne avec le plein et une rallonge 👍<small>10:05</small></div>
+        <div class="bub me">Parfait. Je peux le récupérer samedi matin ?<small>10:06</small></div>
+        <div class="bub them">Oui, à partir de 8 h. Faites la demande sur Zouti et je l'accepte.<small>10:08</small></div>
+        <div class="sys">✓ Demande envoyée · réponse sous 48 h</div>
+      </div>
+    </div>
+  </div>
+  <div class="foot z"><div class="url">zouti97.fr</div></div>
+</div>
+
+<!-- 23 État des lieux -->
+<div class="s sand" id="23-etat-des-lieux">
+  <div class="top z"><div class="brand"><svg><use href="#logo"/></svg>Zouti</div><div class="chip">État des lieux</div></div>
+  <h1 class="z" style="font-size:76px">Des photos datées <em>au départ et au retour.</em></h1>
+  <div class="polas z">
+    <div class="pola a"><div class="ph"><svg><use href="#i-gen"/></svg></div><div class="cap">📤 À la remise</div><div class="ts">vendredi 6 novembre · 9 h 12</div></div>
+    <div class="pola b"><div class="ph"><svg><use href="#i-gen"/></svg></div><div class="cap">📥 Au retour</div><div class="ts">dimanche 8 novembre · 18 h 40</div></div>
+    <div class="stamp">Repris dans le contrat</div>
+  </div>
+  <div class="checks z"><div>Les deux membres ajoutent leurs photos</div><div>Remarques écrites sous les photos</div><div>Contrat de location prêt à imprimer</div></div>
+  <div class="foot z"><div class="note">Illustration. En cas de désaccord, ces photos font foi.</div><div class="url">zouti97.fr</div></div>
+</div>
+
+<!-- 24 Ce que peut rapporter votre matériel -->
+<div class="s mango" id="24-ce-que-rapporte">
+  <div class="top z"><div class="brand"><svg><use href="#logo"/></svg>Zouti</div><div class="chip">Propriétaires</div></div>
+  <h1 class="z" style="font-size:72px">Ce que votre matériel <em>peut rapporter.</em></h1>
+  <div class="grid6 z">
+    <div class="tool"><div class="ic"><svg><use href="#i-brush"/></svg></div><b>Débroussailleuse</b><span>15–20&nbsp;€</span><small>par jour</small></div>
+    <div class="tool"><div class="ic"><svg><use href="#i-gen"/></svg></div><b>Groupe électrogène</b><span>25–35&nbsp;€</span><small>par jour</small></div>
+    <div class="tool"><div class="ic"><svg><use href="#i-karcher"/></svg></div><b>Nettoyeur HP</b><span>15&nbsp;€</span><small>par jour</small></div>
+    <div class="tool"><div class="ic"><svg><use href="#i-tent"/></svg></div><b>Barnum</b><span>20–40&nbsp;€</span><small>par jour</small></div>
+    <div class="tool"><div class="ic"><svg><use href="#i-kayak"/></svg></div><b>Kayak</b><span>20–30&nbsp;€</span><small>par jour</small></div>
+    <div class="tool"><div class="ic"><svg><use href="#i-mixer"/></svg></div><b>Bétonnière</b><span>20–30&nbsp;€</span><small>par jour</small></div>
+  </div>
+  <div class="calc z"><div class="k">Exemple : un groupe loué<br>4 week-ends de 2 jours à 30&nbsp;€</div><div class="v">= 240&nbsp;€</div></div>
+  <div class="foot z"><div class="note">Prix indicatifs : c'est vous qui fixez le vôtre.<br>Publier est gratuit, 0 % de commission en main propre.</div><div class="url">zouti97.fr</div></div>
+</div>
+
+<!-- 25 Parcours d'une location -->
+<div class="s sand" id="25-parcours">
+  <div class="top z"><div class="brand"><svg><use href="#logo"/></svg>Zouti</div><div class="chip">Une location, étape par étape</div></div>
+  <h1 class="z" style="font-size:70px">De la question <em>à l'avis.</em></h1>
+  <div class="tl z">
+    <div class="stp"><div class="dot">1</div><div><h3>Vous posez votre question</h3><p>Gratuitement, sans carte.</p></div><div class="ui"><span class="b1">Le harnais est fourni ?</span></div></div>
+    <div class="stp"><div class="dot">2</div><div><h3>Vous demandez vos dates</h3><p>Le prix total s'affiche avant.</p></div><div class="ui"><div class="cal"><span>5</span><span class="on">6</span><span class="on">7</span><span class="on">8</span><span>9</span></div></div></div>
+    <div class="stp"><div class="dot">3</div><div><h3>Le propriétaire accepte</h3><p>Sous 48 h, sinon un plan B.</p></div><div class="ui" style="text-align:center"><span class="ok">✓ Confirmée</span></div></div>
+    <div class="stp"><div class="dot">4</div><div><h3>Remise avec votre code</h3><p>Et photos de l'état des lieux.</p></div><div class="ui"><div class="code">7415</div></div></div>
+    <div class="stp"><div class="dot">5</div><div><h3>Retour, puis avis</h3><p>Chacun note l'autre.</p></div><div class="ui"><div class="stars">★★★★★</div></div></div>
+  </div>
+  <div class="foot z"><div class="note">Paiement en main propre, sans commission.</div><div class="url">zouti97.fr</div></div>
+</div>
+
+<!-- 26 Dans votre quartier -->
+<div class="s green glow" id="26-quartier">
+  <div class="top z"><div class="brand"><svg><use href="#logo-w"/></svg>Zouti</div><div class="chip">Près de chez vous</div></div>
+  <h1 class="z" style="font-size:72px">Le matériel est souvent <em>à deux rues.</em></h1>
+  <div class="map z">
+    <svg class="bgmap" viewBox="0 0 920 760" preserveAspectRatio="none">
+      <path d="M-20 600 C 180 520, 260 700, 460 640 S 760 520, 960 600 L960 800 L-20 800Z" fill="#8cc7de" opacity=".8"/>
+      <path d="M0 210 H920 M0 430 H920 M240 0 V760 M600 0 V760" stroke="#fff" stroke-width="22"/>
+      <path d="M0 330 C 300 300, 520 380, 920 300" stroke="#fff" stroke-width="12" fill="none"/>
+      <g fill="#dfe8d2"><rect x="40" y="40" width="160" height="130" rx="18"/><rect x="290" y="40" width="270" height="130" rx="18"/><rect x="650" y="40" width="230" height="130" rx="18"/><rect x="40" y="470" width="160" height="90" rx="18"/><rect x="650" y="470" width="230" height="70" rx="18"/></g>
+      <g fill="#b9d8a6"><circle cx="120" cy="300" r="40"/><circle cx="820" cy="370" r="46"/><circle cx="420" cy="520" r="34"/></g>
+    </svg>
+    <div class="home"><div class="hc"><svg><use href="#i-house"/></svg></div><b>Vous</b></div>
+    <div class="pin" style="left:22%;top:30%"><div class="bub2"><svg><use href="#i-brush"/></svg><div><b>Débroussailleuse</b><span>à 400 m</span></div></div><div class="tip"></div></div>
+    <div class="pin" style="left:76%;top:24%"><div class="bub2"><svg><use href="#i-gen"/></svg><div><b>Groupe</b><span>à 900 m</span></div></div><div class="tip"></div></div>
+    <div class="pin" style="left:26%;top:78%"><div class="bub2"><svg><use href="#i-tent"/></svg><div><b>Barnum</b><span>à 1,2 km</span></div></div><div class="tip"></div></div>
+    <div class="pin" style="left:78%;top:72%"><div class="bub2"><svg><use href="#i-karcher"/></svg><div><b>Karcher</b><span>à 650 m</span></div></div><div class="tip"></div></div>
+  </div>
+  <div class="foot z"><div class="note">Illustration. Cherchez par commune : les annonces les plus proches s'affichent d'abord.</div><div class="url">zouti97.fr</div></div>
+</div>
+
+<!-- 27 Et si c'est abîmé ? -->
+<div class="s mango" id="27-et-si-abime">
+  <div class="top z"><div class="brand"><svg><use href="#logo"/></svg>Zouti</div><div class="chip">Vos questions</div></div>
+  <h1 class="z" style="font-size:76px">« Et si le matériel <em>revient abîmé ?</em> »</h1>
+  <div class="prot z">
+    <div class="pr"><div class="pi"><svg><use href="#i-camera"/></svg></div><div><h3>Des photos datées</h3><p>Prises par les deux membres à la remise et au retour, avec des remarques écrites.</p></div></div>
+    <div class="pr"><div class="pi"><svg><use href="#i-doc"/></svg></div><div><h3>Un contrat et une caution</h3><p>La caution est convenue à l'avance. Le contrat reprend les dates, le prix et l'état des lieux.</p></div></div>
+    <div class="pr"><div class="pi"><svg><use href="#i-help"/></svg></div><div><h3>L'équipe Zouti en appui</h3><p>Signalez le problème depuis la réservation : l'équipe s'appuie sur les photos, le contrat et la conversation.</p></div></div>
+  </div>
+  <div class="foot z"><div class="note">Zouti n'est pas une assurance : pensez à vérifier<br>votre responsabilité civile.</div><div class="url">zouti97.fr</div></div>
+</div>
+
+<!-- 28 Story sondage (ajouter l'autocollant Sondage dans Instagram) -->
+<div class="s st green glow" id="28-story-sondage">
+  <div class="top z"><div class="brand"><svg><use href="#logo-w"/></svg>Zouti</div></div>
+  <h1 class="z" style="font-size:96px;margin-top:120px">Quel outil vous manque <em>le plus souvent ?</em></h1>
+  <div class="pollzone z">Placez ici l'autocollant « Sondage »<br>Débroussailleuse · Groupe électrogène</div>
+  <div class="z" style="display:flex;gap:30px;margin-top:80px;justify-content:center">
+    <svg width="220" height="220"><use href="#i-brush"/></svg><svg width="220" height="220"><use href="#i-gen"/></svg><svg width="220" height="220"><use href="#i-karcher"/></svg>
+  </div>
+  <div class="foot z"><div class="url">zouti97.fr</div></div>
+</div>
+
+<!-- 29 Story « L'outil de la semaine » (modèle : poser la vraie photo par-dessus) -->
+<div class="s st mango" id="29-story-outil-semaine">
+  <div class="top z"><div class="brand"><svg><use href="#logo"/></svg>Zouti</div><div class="chip">L'outil de la semaine</div></div>
+  <h1 class="z" style="font-size:88px;margin-top:60px">À louer <em>près de chez vous.</em></h1>
+  <div class="photozone z"><svg><use href="#i-photo"/></svg>Posez ici la vraie photo<br>de l'annonce (avec l'accord du propriétaire)</div>
+  <div class="tagline z"><span>📍 Commune</span><span>€ Prix / jour</span></div>
+  <div class="foot z"><div class="url">zouti97.fr</div></div>
+</div>
+
+</body>
+</html>

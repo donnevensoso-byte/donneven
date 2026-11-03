@@ -121,3 +121,20 @@ Ensuite, 2 à 3 posts par semaine. `09`, `10` et `11` sortent **au bon moment**,
 - Publier une fausse annonce, un faux avis ou un faux témoignage.
 - Citer ou critiquer une autre application de location.
 - Publier la photo d'un membre, ou de son matériel chez lui, sans son accord.
+
+## Série 2 : visuels détaillés (`serie-2/`, source `visuels-2.html`)
+
+Illustrations vectorielles dessinées pour Zouti, sans image externe. Les maquettes d'annonce et de conversation portent la mention « Exemple », et les cartes la mention « Illustration » : ce ne sont pas de vraies annonces.
+
+| fichier | idée | légende courte |
+| --- | --- | --- |
+| `20-acheter-ou-louer` | infographie, environ 400 € à l'achat contre 60 € pour 3 week-ends de location | « Avant d'acheter, faites le calcul 👀 Une débroussailleuse neuve, c'est environ 400 €. Trois week-ends de location chez un voisin, 60 €. #Guyane #VieChère » |
+| `21-annonce-annotee` | fausse capture d'annonce, annotée | « Une annonce Zouti, c'est le prix, la caution et la commune affichés d'avance, et une question gratuite au propriétaire avant de réserver. » |
+| `22-conversation` | exemple d'échange avant réservation | « Combien de temps tient le plein ? La rallonge est fournie ? Posez toutes vos questions avant de réserver, c'est gratuit et sans carte bancaire. » |
+| `23-etat-des-lieux` | deux polaroïds datés | « À la remise et au retour, chacun prend ses photos. Elles sont datées et reprises dans le contrat : en cas de désaccord, elles font foi. » |
+| `24-ce-que-rapporte` | 6 outils avec des prix indicatifs | « Ce qui dort dans votre carbet peut rapporter. Prix indicatifs : c'est vous qui fixez le vôtre, et publier est gratuit. » |
+| `25-parcours` | frise en 5 étapes | « De la question à l'avis, une location Zouti en 5 étapes 👇 Enregistrez ce post ! » |
+| `26-quartier` | carte illustrée avec des épingles | « Le matériel dont vous avez besoin est souvent à deux rues. Cherchez par commune sur Zouti. » |
+| `27-et-si-abime` | réponse à la question la plus fréquente | « La question qu'on nous pose le plus 👇 Photos datées, contrat, caution convenue, et l'équipe Zouti en appui. (Zouti n'est pas une assurance : vérifiez votre responsabilité civile.) » |
+| `28-story-sondage` | story, ajouter l'autocollant Sondage dans la zone en pointillés | — |
+| `29-story-outil-semaine` | modèle de story, poser par-dessus la vraie photo d'une annonce | — |
