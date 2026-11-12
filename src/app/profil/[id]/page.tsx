@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { Check, MapPin } from "lucide-react";
 import { ListingGrid } from "@/components/listing-card";
 import { ReportButton } from "@/components/listing-actions";
-import { Avatar, Badge, Stars } from "@/components/ui";
+import { Avatar, Badge, RatingStars, Stars } from "@/components/ui";
 import { getCurrentUser } from "@/lib/auth";
 import { formatMonthYear } from "@/lib/dates";
 import { communeName } from "@/lib/guyane";
@@ -31,11 +32,17 @@ export default async function PublicProfilePage({ params }: Props) {
         <Avatar name={profile.name} imageId={profile.avatarImageId} size={96} />
         <div className="flex-1">
           <h1 className="text-2xl font-bold">{publicName(profile.name)}</h1>
-          <p className="text-muted">📍 {communeName(profile.commune)} · membre depuis {formatMonthYear(profile.createdAt)}</p>
+          <p className="inline-flex items-center gap-1 text-muted">
+            <MapPin className="size-4" aria-hidden /> {communeName(profile.commune)} · membre depuis {formatMonthYear(profile.createdAt)}
+          </p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <Stars value={profile.rating.average} count={profile.rating.count} size="md" />
-            {profile.emailVerifiedAt && <Badge tone="green">✓ E-mail vérifié</Badge>}
-            {profile.stats.hasPhone && <Badge tone="green">✓ Téléphone renseigné</Badge>}
+            {profile.emailVerifiedAt && <Badge tone="green">
+                <Check aria-hidden /> E-mail vérifié
+              </Badge>}
+            {profile.stats.hasPhone && <Badge tone="green">
+                <Check aria-hidden /> Téléphone renseigné
+              </Badge>}
           </div>
           {profile.bio && <p className="mt-3 max-w-2xl whitespace-pre-line text-sm">{profile.bio}</p>}
         </div>
@@ -84,7 +91,7 @@ export default async function PublicProfilePage({ params }: Props) {
                     <p className="text-sm font-semibold">
                       {publicName(r.authorName)} <span className="font-normal text-muted">· {r.role === "renter" ? "locataire" : "propriétaire"}</span>
                     </p>
-                    <p className="truncate text-xs text-muted">{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)} · {r.listingTitle} · {formatMonthYear(r.createdAt)}</p>
+                    <p className="truncate text-xs text-muted"><RatingStars rating={r.rating} className="size-3" /> · {r.listingTitle} · {formatMonthYear(r.createdAt)}</p>
                   </div>
                 </div>
                 <p className="mt-2 text-sm">{r.comment}</p>

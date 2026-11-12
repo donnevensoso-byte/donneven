@@ -106,7 +106,7 @@ test("parcours complet d'une location entre particuliers", async ({ page, browse
   await page.locator("label[title='5 étoiles']").click();
   await page.getByLabel("Votre avis").fill("Locataire ponctuel, matériel rendu propre. Merci !");
   await page.getByRole("button", { name: "Publier mon avis" }).click();
-  await expect(page.getByText(/Vous avez laissé 5 ★/)).toBeVisible();
+  await expect(page.getByText(/Vous avez laissé 5 étoiles/)).toBeVisible();
 
   // 5. Le locataire voit la réponse, le contrat et laisse son avis
   await login(page, renter);
@@ -117,11 +117,11 @@ test("parcours complet d'une location entre particuliers", async ({ page, browse
   await expect(page.getByRole("heading", { name: /Contrat de location/ })).toBeVisible();
   await expect(page.getByText(owner.name, { exact: true })).toBeVisible();
   await page.goto(bookingUrl);
-  await expect(page.getByText(/vous a laissé 5 ★/)).toBeVisible();
+  await expect(page.getByText(/vous a laissé 5 étoiles/)).toBeVisible();
   await page.locator("label[title='4 étoiles']").click();
   await page.getByLabel("Votre avis").fill("Kärcher très efficace, propriétaire arrangeante.");
   await page.getByRole("button", { name: "Publier mon avis" }).click();
-  await expect(page.getByText(/Vous avez laissé 4 ★/)).toBeVisible();
+  await expect(page.getByText(/Vous avez laissé 4 étoiles/)).toBeVisible();
 
   // 6. L'avis apparaît sur l'annonce
   await page.goto(listingUrl);

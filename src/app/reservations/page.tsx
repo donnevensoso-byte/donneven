@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { CalendarDays, Inbox } from "lucide-react";
 import { Badge, EmptyState, imageUrl, PageHeader } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { formatDateRange } from "@/lib/dates";
@@ -31,11 +32,11 @@ export default async function BookingsPage({ searchParams }: { searchParams: Pro
 
       {rows.length === 0 ? (
         as === "renter" ? (
-          <EmptyState icon="📅" title="Aucune location pour l'instant" action={{ href: "/recherche", label: "Trouver du matériel" }}>
+          <EmptyState icon={<CalendarDays />} title="Aucune location pour l'instant" action={{ href: "/recherche", label: "Trouver du matériel" }}>
             Vos demandes de réservation apparaîtront ici.
           </EmptyState>
         ) : (
-          <EmptyState icon="📬" title="Aucune demande reçue" action={{ href: "/annonces/nouvelle", label: "Proposer un outil" }}>
+          <EmptyState icon={<Inbox />} title="Aucune demande reçue" action={{ href: "/annonces/nouvelle", label: "Proposer un outil" }}>
             Les demandes des locataires pour votre matériel apparaîtront ici.
           </EmptyState>
         )

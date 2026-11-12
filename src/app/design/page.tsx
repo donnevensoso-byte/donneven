@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { Toolbox } from "lucide-react";
 import { ListingCard } from "@/components/listing-card";
 import { Alert, Avatar, Badge, EmptyState, Stars } from "@/components/ui";
 
@@ -84,7 +85,7 @@ export default function DesignPage() {
           <div>
             <label className="label" htmlFor="d-4">Liste</label>
             <select className="input" id="d-4" defaultValue="jardin">
-              <option value="jardin">🌿 Jardin & débroussaillage</option>
+              <option value="jardin">Jardin & débroussaillage</option>
             </select>
           </div>
           <div>
@@ -160,7 +161,7 @@ export default function DesignPage() {
 
       <Section title="Messages">
         <div className="max-w-md space-y-2 rounded-xl bg-sand p-3">
-          <p className="mx-auto max-w-md rounded-xl bg-sun-100 px-3 py-2 text-center text-xs">✅ Réservation confirmée !</p>
+          <p className="mx-auto max-w-md rounded-xl bg-sun-100 px-3 py-2 text-center text-xs">Réservation confirmée !</p>
           <div className="flex justify-start">
             <div className="max-w-[80%] rounded-2xl rounded-bl-md border border-line bg-white px-3.5 py-2 text-[15px]">Bonjour ! Toujours disponible samedi ?</div>
           </div>
@@ -170,7 +171,7 @@ export default function DesignPage() {
         </div>
       </Section>
 
-      <EmptyState icon="🧰" title="État vide" action={{ href: "/recherche", label: "Action principale" }}>
+      <EmptyState icon={<Toolbox />} title="État vide" action={{ href: "/recherche", label: "Action principale" }}>
         Une phrase qui explique quoi faire ensuite.
       </EmptyState>
     </div>

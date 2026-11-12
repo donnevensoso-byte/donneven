@@ -9,7 +9,7 @@ export function Footer() {
         <div>
           <Logo />
           <p className="mt-3 text-sm text-muted">
-            La location d&apos;outils entre voisins, de Saint-Laurent à Saint-Georges. Fait en Guyane 🇬🇫
+            La location d&apos;outils entre voisins, de Saint-Laurent à Saint-Georges. Fait en Guyane.
           </p>
         </div>
         <div>

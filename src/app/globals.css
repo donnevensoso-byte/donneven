@@ -38,6 +38,11 @@
   h1, h2, h3 {
     @apply tracking-tight text-balance;
   }
+  /* Icônes Lucide : un trait fin et régulier partout. */
+  .lucide {
+    stroke-width: 1.75;
+    flex-shrink: 0;
+  }
 }
 
 @utility btn {

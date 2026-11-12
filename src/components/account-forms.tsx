@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { Camera } from "lucide-react";
 import { changePasswordAction, resendVerificationAction } from "@/app/actions/auth";
 import { deleteAccountAction, stripeDashboardAction, stripeOnboardingAction, updateProfileAction } from "@/app/actions/account";
 import type { ActionState } from "@/lib/errors";
@@ -24,7 +25,7 @@ export function ProfileForm({ profile, communeOptions }: { profile: Profile; com
           <Avatar name={profile.name} imageId={profile.avatarImageId} size={80} />
         )}
         <label className="btn-secondary cursor-pointer">
-          📷 Changer la photo
+          <Camera className="size-4" aria-hidden /> Changer la photo
           <input
             type="file"
             name="avatar"

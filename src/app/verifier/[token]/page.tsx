@@ -14,7 +14,7 @@ export default async function VerifyEmailPage({ params }: { params: Promise<{ to
   const userId = await consumeEmailToken(token, "verify");
   if (userId) await db.update(users).set({ emailVerifiedAt: new Date() }).where(eq(users.id, userId));
   return (
-    <AuthShell title={userId ? "Adresse confirmée 🎉" : "Lien invalide"}>
+    <AuthShell title={userId ? "Adresse confirmée" : "Lien invalide"}>
       {userId ? (
         <Alert tone="success">Merci ! Vous pouvez maintenant publier des annonces et réserver du matériel.</Alert>
       ) : (

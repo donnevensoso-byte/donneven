@@ -67,7 +67,7 @@ export async function openDispute(userId: string, bookingId: string, reason: str
   const who = firstName(author?.name ?? "Un membre");
   await postSystemMessage(
     await getOrCreateConversation(booking.listingId, booking.renterId),
-    `⚠️ ${who} a signalé un problème à l'équipe Zouti : ${reason}. Gardez vos échanges ici ; les photos d'état des lieux servent de preuve.`,
+    `${who} a signalé un problème à l'équipe Zouti : ${reason}. Gardez vos échanges ici ; les photos d'état des lieux servent de preuve.`,
   );
   await notify(otherId, {
     title: "Litige ouvert sur une location",

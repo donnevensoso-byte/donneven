@@ -8,7 +8,7 @@ import { TILE_ATTRIBUTION, TILE_URL } from "./tiles";
 
 const pin = L.divIcon({
   className: "",
-  html: `<span style="display:block;transform:translate(-50%,-100%);font-size:30px;line-height:30px;filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))">📍</span>`,
+  html: `<svg width="32" height="40" viewBox="0 0 32 40" aria-hidden="true" style="display:block;transform:translate(-50%,-100%);filter:drop-shadow(0 2px 2px rgba(0,0,0,.3))"><path d="M16 1C8 1 2 7 2 15c0 10 14 24 14 24s14-14 14-24C30 7 24 1 16 1z" fill="var(--color-accent)" stroke="var(--color-surface)" stroke-width="2"/><circle cx="16" cy="15" r="5" fill="var(--color-surface)"/></svg>`,
   iconSize: [0, 0],
 });
 

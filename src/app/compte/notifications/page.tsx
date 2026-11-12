@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Bell } from "lucide-react";
 import { markNotificationsReadAction } from "@/app/actions/account";
 import { Badge, EmptyState, PageHeader } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
@@ -28,7 +29,7 @@ export default async function NotificationsPage() {
         }
       />
       {notifications.length === 0 ? (
-        <EmptyState icon="🔔" title="Rien de neuf">Vous serez prévenu ici des demandes, réponses et messages.</EmptyState>
+        <EmptyState icon={<Bell />} title="Rien de neuf">Vous serez prévenu ici des demandes, réponses et messages.</EmptyState>
       ) : (
         <ul className="card divide-y divide-line overflow-hidden">
           {notifications.map((n) => (

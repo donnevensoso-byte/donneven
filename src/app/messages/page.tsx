@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { MessageCircle } from "lucide-react";
 import { Avatar, EmptyState, imageUrl, PageHeader } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
 import { timeAgo } from "@/lib/dates";
@@ -15,7 +16,7 @@ export default async function MessagesPage() {
     <div className="mx-auto max-w-3xl px-4 py-8">
       <PageHeader title="Messages" />
       {conversations.length === 0 ? (
-        <EmptyState icon="💬" title="Aucune conversation" action={{ href: "/recherche", label: "Parcourir les annonces" }}>
+        <EmptyState icon={<MessageCircle />} title="Aucune conversation" action={{ href: "/recherche", label: "Parcourir les annonces" }}>
           Posez une question à un propriétaire depuis une annonce : la conversation apparaîtra ici.
         </EmptyState>
       ) : (

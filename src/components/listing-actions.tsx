@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
+import { Flag, Heart, MessageCircle, Pause, Pencil, Play } from "lucide-react";
 import { contactOwnerAction } from "@/app/actions/bookings";
 import { reportAction, setListingStatusAction, toggleFavoriteAction } from "@/app/actions/listings";
 import { REPORT_REASONS } from "@/lib/services/moderation-reasons";
@@ -25,7 +26,7 @@ export function FavoriteButton({ listingId, initial }: { listingId: string; init
         })
       }
     >
-      <span aria-hidden>{favorite ? "❤️" : "🤍"}</span>
+      <Heart className={`size-4 ${favorite ? "fill-flame-500 text-flame-500" : ""}`} aria-hidden />
       {favorite ? "Enregistré" : "Enregistrer"}
     </button>
   );
@@ -47,7 +48,7 @@ export function ContactButton({ listingId, className = "btn-secondary w-full" }:
           })
         }
       >
-        💬 {pending ? "Ouverture…" : "Poser une question"}
+        <MessageCircle className="size-4" aria-hidden /> {pending ? "Ouverture…" : "Poser une question"}
       </button>
       {error && <p className="field-error">{error}</p>}
     </>
@@ -66,12 +67,18 @@ export function OwnerListingControls({ listingId, status }: { listingId: string;
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-2">
-        <a href={`/annonces/${listingId}/modifier`} className="btn-primary">✏️ Modifier</a>
+        <a href={`/annonces/${listingId}/modifier`} className="btn-primary">
+          <Pencil className="size-4" aria-hidden /> Modifier
+        </a>
         {status === "active" && (
-          <button type="button" className="btn-secondary" disabled={pending} onClick={() => change("paused")}>⏸️ Mettre en pause</button>
+          <button type="button" className="btn-secondary" disabled={pending} onClick={() => change("paused")}>
+            <Pause className="size-4" aria-hidden /> Mettre en pause
+          </button>
         )}
         {status === "paused" && (
-          <button type="button" className="btn-secondary" disabled={pending} onClick={() => change("active")}>▶️ Réactiver</button>
+          <button type="button" className="btn-secondary" disabled={pending} onClick={() => change("active")}>
+            <Play className="size-4" aria-hidden /> Réactiver
+          </button>
         )}
         <button type="button" className="btn-danger" disabled={pending} onClick={() => change("deleted")}>Supprimer</button>
       </div>
@@ -85,8 +92,8 @@ export function ReportButton({ listingId, userId }: { listingId?: string; userId
   const form = useActionForm(reportAction);
   if (!open) {
     return (
-      <button type="button" className="text-xs text-muted underline hover:text-ink" onClick={() => setOpen(true)}>
-        🚩 Signaler {listingId ? "cette annonce" : "ce membre"}
+      <button type="button" className="inline-flex items-center gap-1 text-xs text-muted underline hover:text-ink" onClick={() => setOpen(true)}>
+        <Flag className="size-3.5" aria-hidden /> Signaler {listingId ? "cette annonce" : "ce membre"}
       </button>
     );
   }

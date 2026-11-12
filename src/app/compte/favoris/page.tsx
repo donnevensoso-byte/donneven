@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Heart } from "lucide-react";
 import { ListingGrid } from "@/components/listing-card";
 import { EmptyState, PageHeader } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
@@ -13,7 +14,7 @@ export default async function FavoritesPage() {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <PageHeader title="Mes favoris" />
       {favorites.length === 0 ? (
-        <EmptyState icon="❤️" title="Aucun favori" action={{ href: "/recherche", label: "Parcourir les annonces" }}>
+        <EmptyState icon={<Heart />} title="Aucun favori" action={{ href: "/recherche", label: "Parcourir les annonces" }}>
           Enregistrez les annonces qui vous intéressent pour les retrouver facilement.
         </EmptyState>
       ) : (

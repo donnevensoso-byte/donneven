@@ -35,7 +35,7 @@ export default async function PaymentsPage({ searchParams }: { searchParams: Pro
         <div className="card space-y-4 p-5 sm:p-6">
           {retour && !onboarded && <Alert tone="warning">Votre inscription n&apos;est pas terminée : quelques informations manquent encore.</Alert>}
           {onboarded ? (
-            <Alert tone="success">✅ Vos annonces acceptent le paiement par carte. Les versements arrivent sur votre compte bancaire.</Alert>
+            <Alert tone="success">Vos annonces acceptent le paiement par carte. Les versements arrivent sur votre compte bancaire.</Alert>
           ) : (
             <p className="text-sm">
               Activez le paiement par carte : vos locataires posent une empreinte bancaire avec leur demande, sont débités quand vous acceptez, et vous recevez la location

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { TriangleAlert } from "lucide-react";
 import { openDisputeAction } from "@/app/actions/bookings";
 import { DISPUTE_REASONS } from "@/lib/services/moderation-reasons";
 import { ActionForm, FormMessage, SubmitButton, useActionForm } from "./form";
@@ -12,7 +13,7 @@ export function DisputeForm({ bookingId }: { bookingId: string }) {
   if (!open) {
     return (
       <button type="button" className="btn-ghost text-sm" onClick={() => setOpen(true)}>
-        ⚠️ Signaler un problème sur cette location
+        <TriangleAlert className="size-4" aria-hidden /> Signaler un problème sur cette location
       </button>
     );
   }

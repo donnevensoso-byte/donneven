@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Clock, MapPin, MessageCircle, ShieldCheck, Truck } from "lucide-react";
 import { BookingWidget } from "@/components/booking-widget";
 import { ListingGrid } from "@/components/listing-card";
 import { ContactButton, FavoriteButton, OwnerListingControls, ReportButton } from "@/components/listing-actions";
 import { AreaMap } from "@/components/map";
-import { Alert, Avatar, Badge, imageUrl, Stars } from "@/components/ui";
+import { Alert, Avatar, Badge, imageUrl, RatingStars, Stars } from "@/components/ui";
 import { getCurrentUser } from "@/lib/auth";
 import { MAX_RENTAL_DAYS, serviceFeePercent, stripeEnabled } from "@/lib/config";
 import { formatMonthYear, todayInGuyane } from "@/lib/dates";
@@ -16,6 +17,7 @@ import { getListingDetail, incrementViews, listingsByOwner } from "@/lib/service
 import { ratingSummary, reviewsForListing } from "@/lib/services/reviews";
 import { publicName, responseTimeLabel, truncate } from "@/lib/text";
 import { getPublicProfile } from "@/lib/services/users";
+import { CategoryIcon } from "@/components/category-icon";
 
 type Props = { params: Promise<{ id: string }>; searchParams: Promise<{ publiee?: string; modifiee?: string }> };
 
@@ -57,7 +59,7 @@ export default async function ListingPage({ params, searchParams }: Props) {
     <div className="mx-auto max-w-6xl px-4 py-6">
       {flags.publiee && (
         <div className="mb-4">
-          <Alert tone="success">🎉 Votre annonce est en ligne ! Partagez-la à vos voisins et sur vos groupes WhatsApp.</Alert>
+          <Alert tone="success">Votre annonce est en ligne ! Partagez-la à vos voisins et sur vos groupes WhatsApp.</Alert>
         </div>
       )}
       {flags.modifiee && (
@@ -103,12 +105,19 @@ export default async function ListingPage({ params, searchParams }: Props) {
           <div className="mt-6 flex flex-wrap items-start justify-between gap-3">
             <div>
               <div className="flex flex-wrap items-center gap-2">
-                <Badge tone="green">{category?.icon} {category?.name}</Badge>
-                {listing.delivery && <Badge tone="yellow">🚚 Livraison possible</Badge>}
+                <Badge tone="green">
+                  <CategoryIcon slug={category?.slug} /> {category?.name}
+                </Badge>
+                {listing.delivery && <Badge tone="yellow">
+                    <Truck aria-hidden /> Livraison possible
+                  </Badge>}
               </div>
               <h1 className="mt-2 text-2xl font-bold sm:text-3xl">{listing.title}</h1>
               <p className="mt-1 flex flex-wrap items-center gap-2 text-muted">
-                <span>📍 {communeName(listing.commune)}{listing.neighborhood ? ` · ${listing.neighborhood}` : ""}</span>
+                <span className="inline-flex items-center gap-1">
+                  <MapPin className="size-4" aria-hidden /> {communeName(listing.commune)}
+                  {listing.neighborhood ? ` · ${listing.neighborhood}` : ""}
+                </span>
                 <Stars value={listingRating} count={reviews.length} size="md" />
               </p>
             </div>
@@ -189,7 +198,9 @@ export default async function ListingPage({ params, searchParams }: Props) {
                       <Avatar name={r.authorName} imageId={r.authorAvatarId} size={36} />
                       <div>
                         <p className="text-sm font-semibold">{publicName(r.authorName)}</p>
-                        <p className="text-xs text-muted">{"★".repeat(r.rating)}{"☆".repeat(5 - r.rating)} · {formatMonthYear(r.createdAt)}</p>
+                        <p className="text-xs text-muted">
+                          <RatingStars rating={r.rating} /> · {formatMonthYear(r.createdAt)}
+                        </p>
                       </div>
                     </div>
                     <p className="mt-2 text-sm">{r.comment}</p>
@@ -226,7 +237,11 @@ export default async function ListingPage({ params, searchParams }: Props) {
                 <p className="font-semibold">{publicName(owner.name)}</p>
                 <p className="text-sm text-muted">{communeName(owner.commune)} · membre depuis {formatMonthYear(owner.createdAt)}</p>
                 <Stars value={ownerRating.average} count={ownerRating.count} />
-                {responseTime && <p className="mt-1 text-sm text-muted">⚡ {responseTime}</p>}
+                {responseTime && (
+                  <p className="mt-1 flex items-center gap-1 text-sm text-muted">
+                    <Clock className="size-4" aria-hidden /> {responseTime}
+                  </p>
+                )}
               </div>
             </Link>
             {!isOwner && (
@@ -234,13 +249,17 @@ export default async function ListingPage({ params, searchParams }: Props) {
                 {user ? (
                   <ContactButton listingId={listing.id} />
                 ) : (
-                  <Link href={`/connexion?next=/annonces/${listing.id}`} className="btn-secondary w-full">💬 Poser une question</Link>
+                  <Link href={`/connexion?next=/annonces/${listing.id}`} className="btn-secondary w-full">
+                    <MessageCircle className="size-4" aria-hidden /> Poser une question
+                  </Link>
                 )}
               </div>
             )}
           </div>
           <div className="rounded-card border border-brand-100 bg-brand-50 p-4 text-sm text-brand-800">
-            <p className="font-semibold">🛡️ Louez sereinement</p>
+            <p className="flex items-center gap-2 font-semibold">
+              <ShieldCheck className="size-4" aria-hidden /> Louez sereinement
+            </p>
             <ul className="mt-1 list-disc space-y-0.5 pl-4">
               <li>Échangez uniquement via la messagerie Zouti avant la réservation.</li>
               <li>Vérifiez le matériel ensemble et imprimez le contrat de location.</li>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ImagePlus, LoaderCircle, X } from "lucide-react";
 import { imageUrl } from "./ui";
 
 const MAX_SIDE = 1800;
@@ -81,7 +82,7 @@ export function PhotoInput({
               className="absolute top-1 right-1 flex size-6 items-center justify-center rounded-full bg-white/90 text-sm shadow"
               aria-label="Retirer la photo"
             >
-              ✕
+              <X className="size-4" aria-hidden />
             </button>
           </li>
         ))}
@@ -98,16 +99,14 @@ export function PhotoInput({
               className="absolute top-1 right-1 flex size-6 items-center justify-center rounded-full bg-white/90 text-sm shadow"
               aria-label="Retirer la photo"
             >
-              ✕
+              <X className="size-4" aria-hidden />
             </button>
           </li>
         ))}
         {remaining > 0 && (
           <li>
             <label className="flex aspect-square cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-line bg-white text-center text-xs font-medium text-muted hover:border-brand-200 hover:text-brand-700">
-              <span className="text-2xl" aria-hidden>
-                {busy ? "⏳" : "📷"}
-              </span>
+              {busy ? <LoaderCircle className="size-6 animate-spin" aria-hidden /> : <ImagePlus className="size-6" aria-hidden />}
               {busy ? "Préparation…" : "Ajouter"}
               <input type="file" accept="image/*" multiple className="sr-only" onChange={onPick} data-testid="photo-picker" />
             </label>

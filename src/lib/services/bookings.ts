@@ -180,7 +180,7 @@ export async function requestBooking(renterId: string, req: BookingRequest): Pro
   const conversationId = await getOrCreateConversation(listing.id, renterId);
   await postSystemMessage(
     conversationId,
-    `📅 Demande de réservation ${formatDateRange(req.startDate, req.endDate)} (${price.days} j) – ${formatEuros(price.rentalAmount)}.`,
+    `Demande de réservation ${formatDateRange(req.startDate, req.endDate)} (${price.days} j) – ${formatEuros(price.rentalAmount)}.`,
   );
   const message = req.message?.trim();
   // Le propriétaire est déjà notifié de la demande : pas de seconde notification.
@@ -227,7 +227,7 @@ export async function payOutBooking(bookingId: string): Promise<boolean> {
     .returning({ id: bookings.id });
   if (saved) {
     await notify(booking.ownerId, {
-      title: "Versement envoyé 💸",
+      title: "Versement envoyé",
       body: `${formatEuros(booking.rentalAmount)} pour « ${row.title} » partent sur votre compte bancaire (quelques jours ouvrés).`,
       link: "/compte/paiements",
     });
@@ -381,7 +381,7 @@ export async function markBookingAuthorized(bookingId: string, paymentIntentId: 
   if (!updated) return false;
   await postSystemMessage(
     await conversationFor(updated),
-    `💳 Empreinte bancaire de ${formatEuros(updated.rentalAmount + updated.serviceFee)} validée. Le locataire ne sera débité que si la demande est acceptée.`,
+    `Empreinte bancaire de ${formatEuros(updated.rentalAmount + updated.serviceFee)} validée. Le locataire ne sera débité que si la demande est acceptée.`,
   );
   await notifyOwnerOfRequest(bookingId);
   return true;
@@ -493,17 +493,17 @@ export async function respondToBooking(
     await postSystemMessage(
       conversationId,
       online
-        ? "✅ Réservation confirmée et payée en ligne. Convenez ensemble du lieu et de l'heure de remise."
-        : "✅ Réservation confirmée ! Convenez ensemble du lieu et de l'heure de remise. Le paiement et la caution se règlent en main propre.",
+        ? "Réservation confirmée et payée en ligne. Convenez ensemble du lieu et de l'heure de remise."
+        : "Réservation confirmée ! Convenez ensemble du lieu et de l'heure de remise. Le paiement et la caution se règlent en main propre.",
     );
     await notify(booking.renterId, {
-      title: "Réservation confirmée 🎉",
+      title: "Réservation confirmée",
       body: `Votre demande pour « ${listingTitle} » ${formatDateRange(booking.startDate, booking.endDate)} a été acceptée.`,
       link: `/reservations/${booking.id}`,
       email: true,
     });
   } else {
-    await postSystemMessage(conversationId, `❌ Demande refusée${reason ? ` : ${reason}` : ""}.`);
+    await postSystemMessage(conversationId, `Demande refusée${reason ? ` : ${reason}` : ""}.`);
     await notify(booking.renterId, {
       title: "Demande refusée",
       body: `Le propriétaire n'est pas disponible pour « ${listingTitle} » ${formatDateRange(booking.startDate, booking.endDate)}. D'autres annonces peuvent vous convenir !`,
@@ -512,7 +512,7 @@ export async function respondToBooking(
     });
   }
   for (const other of autoDeclined) {
-    await postSystemMessage(await conversationFor(other), "❌ Demande refusée : ces dates viennent d'être réservées.");
+    await postSystemMessage(await conversationFor(other), "Demande refusée : ces dates viennent d'être réservées.");
     await notify(other.renterId, {
       title: "Demande refusée",
       body: `« ${listingTitle} » vient d'être réservé sur ces dates.`,
@@ -558,7 +558,7 @@ export async function cancelBooking(userId: string, bookingId: string, reason?: 
   if (!updated) throw new UserError("La réservation a changé entre-temps. Rechargez la page.");
 
   const who = isRenter ? "le locataire" : "le propriétaire";
-  await postSystemMessage(await conversationFor(booking), `🚫 Réservation annulée par ${who}${reason ? ` : ${reason}` : ""}.`);
+  await postSystemMessage(await conversationFor(booking), `Réservation annulée par ${who}${reason ? ` : ${reason}` : ""}.`);
   await notify(isRenter ? booking.ownerId : booking.renterId, {
     title: "Réservation annulée",
     body: `La réservation de « ${listingTitle} » ${formatDateRange(booking.startDate, booking.endDate)} a été annulée par ${who}.${paymentStatus === "refunded" ? " Le paiement est intégralement remboursé." : ""}`,
@@ -601,7 +601,7 @@ export async function confirmHandover(ownerId: string, bookingId: string, code: 
     .where(and(eq(bookings.id, bookingId), eq(bookings.status, "accepted")))
     .returning({ id: bookings.id });
   if (!updated) throw new UserError("La réservation a changé entre-temps. Rechargez la page.");
-  await postSystemMessage(await conversationFor(booking), "🤝 Remise confirmée avec le code du locataire. Bonne location !");
+  await postSystemMessage(await conversationFor(booking), "Remise confirmée avec le code du locataire. Bonne location !");
   await payOutBooking(bookingId);
   await notify(booking.renterId, {
     title: "Location en cours",
@@ -627,7 +627,7 @@ export async function confirmReturn(ownerId: string, bookingId: string): Promise
     .where(eq(bookings.id, bookingId));
   await postSystemMessage(
     await conversationFor(booking),
-    "📦 Matériel rendu, location terminée. Pensez à vous laisser un avis mutuel !",
+    "Matériel rendu, location terminée. Pensez à vous laisser un avis mutuel !",
   );
   for (const userId of [booking.renterId, booking.ownerId]) {
     await notify(userId, {
@@ -648,7 +648,7 @@ export async function markBookingPaid(bookingId: string, paymentIntentId: string
     .returning();
   if (!updated) return false;
   const conversationId = await conversationFor(updated);
-  await postSystemMessage(conversationId, "💳 Paiement reçu : la réservation est confirmée. Convenez du lieu et de l'heure de remise.");
+  await postSystemMessage(conversationId, "Paiement reçu : la réservation est confirmée. Convenez du lieu et de l'heure de remise.");
   await notify(updated.ownerId, {
     title: "Réservation payée",
     body: `La location ${formatDateRange(updated.startDate, updated.endDate)} est payée et confirmée.`,

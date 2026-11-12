@@ -88,7 +88,7 @@ export function ListingForm({
               <option value="" disabled>Choisir…</option>
               {CATEGORIES.map((c) => (
                 <option key={c.slug} value={c.slug}>
-                  {c.icon} {c.name}
+                  {c.name}
                 </option>
               ))}
             </select>

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Camera, CreditCard, FileText, MapPin, MessageCircle, MessageCircleMore, Phone } from "lucide-react";
 import {
   CancelForm,
   HandoverForm,
@@ -112,7 +113,10 @@ export default async function BookingPage({ params, searchParams }: Props) {
               <p className="text-sm text-muted">
                 {formatDateRange(booking.startDate, booking.endDate)} · {booking.days} jour{booking.days > 1 ? "s" : ""}
               </p>
-              <p className="text-sm text-muted">📍 {communeName(listing.commune)}{listing.neighborhood ? ` · ${listing.neighborhood}` : ""}</p>
+              <p className="inline-flex items-center gap-1 text-sm text-muted">
+                <MapPin className="size-4" aria-hidden /> {communeName(listing.commune)}
+                {listing.neighborhood ? ` · ${listing.neighborhood}` : ""}
+              </p>
             </div>
           </div>
 
@@ -153,7 +157,8 @@ export default async function BookingPage({ params, searchParams }: Props) {
                 </p>
                 {online && (
                   <p className="text-sm text-muted">
-                    💳 L&apos;empreinte bancaire de {formatEuros(total)} est validée : le locataire est débité dès que vous acceptez.
+                    <CreditCard className="mr-1 inline size-4 align-[-3px]" aria-hidden />
+                    L&apos;empreinte bancaire de {formatEuros(total)} est validée : le locataire est débité dès que vous acceptez.
                   </p>
                 )}
                 <RespondForm bookingId={booking.id} />
@@ -190,8 +195,12 @@ export default async function BookingPage({ params, searchParams }: Props) {
                     : `C'est confirmé ! Convenez avec ${firstName(other.name)} du lieu et de l'heure de remise.${online ? "" : ` Prévoyez ${formatEuros(total)} à régler sur place`}${booking.deposit > 0 ? `${online ? " Prévoyez" : " et"} une caution de ${formatEuros(booking.deposit)}` : ""}.`}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  <Link href={`/messages/${conversationId}`} className="btn-secondary">💬 Messagerie</Link>
-                  <Link href={`/reservations/${booking.id}/contrat`} className="btn-secondary">📄 Contrat de location</Link>
+                  <Link href={`/messages/${conversationId}`} className="btn-secondary">
+                    <MessageCircle className="size-4" aria-hidden /> Messagerie
+                  </Link>
+                  <Link href={`/reservations/${booking.id}/contrat`} className="btn-secondary">
+                    <FileText className="size-4" aria-hidden /> Contrat de location
+                  </Link>
                 </div>
                 {!isOwner && booking.handoverCode && (
                   <div className="rounded-xl bg-sun-100 p-4 text-center" data-testid="handover-code">
@@ -221,7 +230,9 @@ export default async function BookingPage({ params, searchParams }: Props) {
                   {isOwner ? " Une fois le matériel rendu et vérifié, confirmez le retour." : " Rendez le matériel propre et en bon état pour récupérer votre caution."}
                 </p>
                 {isOwner && <ReturnButton bookingId={booking.id} />}
-                <Link href={`/reservations/${booking.id}/contrat`} className="btn-secondary">📄 Contrat de location</Link>
+                <Link href={`/reservations/${booking.id}/contrat`} className="btn-secondary">
+                  <FileText className="size-4" aria-hidden /> Contrat de location
+                </Link>
               </>
             )}
 
@@ -229,13 +240,13 @@ export default async function BookingPage({ params, searchParams }: Props) {
               <>
                 <p className="text-sm">Location terminée le {booking.returnedAt ? formatDateTime(booking.returnedAt) : ""}. Merci d&apos;avoir utilisé Zouti !</p>
                 {myReview ? (
-                  <Alert tone="success">Vous avez laissé {myReview.rating} ★ : « {myReview.comment} »</Alert>
+                  <Alert tone="success">Vous avez laissé {myReview.rating} étoile{myReview.rating > 1 ? "s" : ""} : « {myReview.comment} »</Alert>
                 ) : canReview(booking, reviews, user.id) ? (
                   <ReviewForm bookingId={booking.id} targetName={firstName(other.name)} />
                 ) : null}
                 {theirReview && (
                   <div className="rounded-xl bg-sand p-3 text-sm">
-                    <p className="font-semibold">{firstName(other.name)} vous a laissé {theirReview.rating} ★</p>
+                    <p className="font-semibold">{firstName(other.name)} vous a laissé {theirReview.rating} étoile{theirReview.rating > 1 ? "s" : ""}</p>
                     <p className="mt-1">« {theirReview.comment} »</p>
                   </div>
                 )}
@@ -276,7 +287,9 @@ export default async function BookingPage({ params, searchParams }: Props) {
           {(photos.length > 0 || photoStages.length > 0) && (
             <section className="card space-y-4 p-5" aria-labelledby="etat-des-lieux">
               <div>
-                <h2 id="etat-des-lieux" className="font-semibold">📸 État des lieux en photos</h2>
+                <h2 id="etat-des-lieux" className="flex items-center gap-2 font-semibold">
+                  <Camera className="size-5 text-brand-700" aria-hidden /> État des lieux en photos
+                </h2>
                 <p className="text-sm text-muted">
                   Photographiez le matériel ensemble à la remise et au retour : en cas de désaccord, ces photos datées font foi.
                 </p>
@@ -341,12 +354,18 @@ export default async function BookingPage({ params, searchParams }: Props) {
               </div>
             </Link>
             <div className="mt-4 space-y-2">
-              <Link href={`/messages/${conversationId}`} className="btn-secondary w-full">💬 Envoyer un message</Link>
+              <Link href={`/messages/${conversationId}`} className="btn-secondary w-full">
+                <MessageCircle className="size-4" aria-hidden /> Envoyer un message
+              </Link>
               {confirmed && wa && (
-                <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer" className="btn-secondary w-full">🟢 WhatsApp</a>
+                <a href={`https://wa.me/${wa}`} target="_blank" rel="noreferrer" className="btn-secondary w-full">
+                  <MessageCircleMore className="size-4" aria-hidden /> WhatsApp
+                </a>
               )}
               {confirmed && other.phone && (
-                <a href={`tel:${other.phone}`} className="btn-secondary w-full">📞 {other.phone}</a>
+                <a href={`tel:${other.phone}`} className="btn-secondary w-full">
+                  <Phone className="size-4" aria-hidden /> {other.phone}
+                </a>
               )}
             </div>
             {!confirmed && <p className="mt-3 text-xs text-muted">Les coordonnées sont partagées une fois la réservation confirmée.</p>}
@@ -392,7 +411,7 @@ export default async function BookingPage({ params, searchParams }: Props) {
                     ? booking.paymentStatus === "authorized"
                       ? "Empreinte posée"
                       : booking.paymentStatus === "paid"
-                      ? "Payé en ligne ✓"
+                      ? "Payé en ligne"
                       : booking.paymentStatus === "refunded"
                         ? "Remboursé"
                         : "En ligne"

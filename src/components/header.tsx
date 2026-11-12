@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Bell } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { pendingRequestCount } from "@/lib/services/bookings";
 import { unreadConversationCount } from "@/lib/services/messages";
@@ -54,7 +55,7 @@ export async function Header() {
                   <CountBadge n={pendingRequests} />
                 </Link>
                 <Link href="/compte/notifications" className="btn-ghost relative px-2.5" aria-label={`Notifications${unreadNotifications ? ` (${unreadNotifications} non lues)` : ""}`}>
-                  <span aria-hidden>🔔</span>
+                  <Bell className="size-5" aria-hidden />
                   {unreadNotifications > 0 && <span className="absolute top-1.5 right-1.5 size-2 rounded-full bg-flame-500" />}
                 </Link>
                 <Link href="/compte" className="hidden items-center gap-2 rounded-full py-1 pr-1 pl-3 hover:bg-black/5 md:inline-flex" aria-label="Mon compte">

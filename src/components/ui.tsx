@@ -1,3 +1,4 @@
+import { Star } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -41,12 +42,21 @@ export function Stars({ value, count, size = "sm" }: { value: number | null; cou
   }
   return (
     <span className={`inline-flex items-center gap-1 font-medium ${size === "md" ? "text-sm" : "text-xs"}`}>
-      <span className="text-sun-600" aria-hidden>
-        ★
-      </span>
+      <Star className="size-3.5 fill-current text-sun-600" aria-hidden />
       {value.toFixed(1).replace(".", ",")}
       {count != null && <span className="font-normal text-muted">({count})</span>}
       <span className="sr-only">sur 5</span>
+    </span>
+  );
+}
+
+/** Note sur 5 en étoiles pleines et vides (avis). */
+export function RatingStars({ rating, className = "size-3.5" }: { rating: number; className?: string }) {
+  return (
+    <span className="inline-flex items-center gap-0.5 align-[-2px]" role="img" aria-label={`${rating} sur 5`}>
+      {[1, 2, 3, 4, 5].map((n) => (
+        <Star key={n} className={`${className} ${n <= rating ? "fill-current text-sun-600" : "text-line"}`} aria-hidden />
+      ))}
     </span>
   );
 }
@@ -59,7 +69,7 @@ const tones = {
 } as const;
 
 export function Badge({ children, tone = "neutral" }: { children: ReactNode; tone?: keyof typeof tones }) {
-  return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${tones[tone]}`}>{children}</span>;
+  return <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold [&>svg]:size-3.5 ${tones[tone]}`}>{children}</span>;
 }
 
 export function EmptyState({
@@ -68,14 +78,14 @@ export function EmptyState({
   children,
   action,
 }: {
-  icon: string;
+  icon: ReactNode;
   title: string;
   children?: ReactNode;
   action?: { href: string; label: string };
 }) {
   return (
     <div className="card flex flex-col items-center px-6 py-12 text-center">
-      <span className="text-4xl" aria-hidden>
+      <span className="flex size-16 items-center justify-center rounded-full bg-brand-50 text-brand-700 [&>svg]:size-8" aria-hidden>
         {icon}
       </span>
       <h2 className="mt-3 text-lg font-semibold">{title}</h2>

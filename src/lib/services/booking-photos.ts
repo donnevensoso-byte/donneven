@@ -62,7 +62,7 @@ export async function addBookingPhotos(
   const conversationId = await getOrCreateConversation(booking.listingId, booking.renterId);
   await postSystemMessage(
     conversationId,
-    `📸 ${firstName(author?.name ?? "Un membre")} a ajouté ${photos.length} photo${photos.length > 1 ? "s" : ""} à l'état des lieux ${STAGE_LABELS[stage]}.`,
+    `${firstName(author?.name ?? "Un membre")} a ajouté ${photos.length} photo${photos.length > 1 ? "s" : ""} à l'état des lieux ${STAGE_LABELS[stage]}.`,
   );
   return imageIds.length;
 }

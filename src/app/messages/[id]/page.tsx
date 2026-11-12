@@ -2,6 +2,7 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { CalendarDays } from "lucide-react";
 import { MessageThread } from "@/components/message-thread";
 import { Avatar, Badge, imageUrl } from "@/components/ui";
 import { requireUser } from "@/lib/auth";
@@ -69,7 +70,10 @@ export default async function ConversationPage({ params }: { params: Promise<{ i
       </div>
       {activeBooking ? (
         <Link href={`/reservations/${activeBooking.id}`} className="mt-2 flex items-center justify-between gap-2 rounded-xl bg-brand-50 px-3 py-2 text-sm">
-          <span className="truncate">📅 {formatDateRange(activeBooking.startDate, activeBooking.endDate)}</span>
+          <span className="flex min-w-0 items-center gap-1.5">
+            <CalendarDays className="size-4 text-brand-700" aria-hidden />
+            <span className="truncate">{formatDateRange(activeBooking.startDate, activeBooking.endDate)}</span>
+          </span>
           <Badge tone="green">{bookingStatusLabel(activeBooking)}</Badge>
         </Link>
       ) : (

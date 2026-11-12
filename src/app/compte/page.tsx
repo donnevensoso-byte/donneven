@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Bell, CalendarDays, CreditCard, Heart, Inbox, LogOut, MessageCircle, ShieldCheck, Star, Toolbox, UserRound } from "lucide-react";
 import { logoutAction } from "@/app/actions/auth";
 import { DeleteAccountForm, PasswordForm, ResendVerificationButton } from "@/components/account-forms";
 import { Alert, Avatar, Badge, EmptyState, imageUrl, PageHeader } from "@/components/ui";
@@ -30,14 +31,14 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
   ]);
 
   const links = [
-    { href: "/reservations", icon: "📅", label: "Mes locations" },
-    { href: "/reservations?vue=recues", icon: "📬", label: `Demandes reçues${pending ? ` (${pending})` : ""}` },
-    { href: "/messages", icon: "💬", label: "Messages" },
-    { href: "/compte/favoris", icon: "❤️", label: "Favoris" },
-    { href: "/compte/notifications", icon: "🔔", label: "Notifications" },
-    { href: "/compte/profil", icon: "👤", label: "Modifier mon profil" },
-    ...(stripeEnabled() ? [{ href: "/compte/paiements", icon: "💳", label: "Paiements en ligne" }] : []),
-    ...(user.role === "admin" ? [{ href: "/admin", icon: "🛠️", label: "Administration" }] : []),
+    { href: "/reservations", icon: CalendarDays, label: "Mes locations" },
+    { href: "/reservations?vue=recues", icon: Inbox, label: `Demandes reçues${pending ? ` (${pending})` : ""}` },
+    { href: "/messages", icon: MessageCircle, label: "Messages" },
+    { href: "/compte/favoris", icon: Heart, label: "Favoris" },
+    { href: "/compte/notifications", icon: Bell, label: "Notifications" },
+    { href: "/compte/profil", icon: UserRound, label: "Modifier mon profil" },
+    ...(stripeEnabled() ? [{ href: "/compte/paiements", icon: CreditCard, label: "Paiements en ligne" }] : []),
+    ...(user.role === "admin" ? [{ href: "/admin", icon: ShieldCheck, label: "Administration" }] : []),
   ];
 
   return (
@@ -55,9 +56,17 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
       <div className="card mb-6 flex flex-wrap items-center gap-4 p-5">
         <Avatar name={user.name} imageId={user.avatarImageId} size={64} />
         <div className="flex-1">
-          <h1 className="text-xl font-bold">Bonjour {user.name.split(" ")[0]} 👋</h1>
+          <h1 className="text-xl font-bold">Bonjour {user.name.split(" ")[0]}</h1>
           <p className="text-sm text-muted">
-            {communeName(user.commune)} · {rating.count > 0 ? `${rating.average?.toFixed(1).replace(".", ",")} ★ (${rating.count} avis)` : "pas encore d'avis"} ·{" "}
+            {communeName(user.commune)} ·{" "}
+            {rating.count > 0 ? (
+              <>
+                <Star className="inline size-3.5 fill-current align-[-2px] text-sun-600" aria-hidden /> {rating.average?.toFixed(1).replace(".", ",")} ({rating.count} avis)
+              </>
+            ) : (
+              "pas encore d'avis"
+            )}{" "}
+            ·{" "}
             <Link href={`/profil/${user.id}`} className="text-brand-600 underline hover:no-underline">voir mon profil public</Link>
           </p>
         </div>
@@ -79,7 +88,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             {links.map((l) => (
               <li key={l.href}>
                 <Link href={l.href} className="flex items-center gap-3 px-4 py-3 hover:bg-sand">
-                  <span aria-hidden>{l.icon}</span>
+                  <l.icon className="size-5 text-brand-700" aria-hidden />
                   {l.label}
                 </Link>
               </li>
@@ -87,7 +96,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
             <li>
               <form action={logoutAction}>
                 <button type="submit" className="flex w-full items-center gap-3 px-4 py-3 text-left text-flame-500 hover:bg-sand">
-                  <span aria-hidden>🚪</span> Se déconnecter
+                  <LogOut className="size-5" aria-hidden /> Se déconnecter
                 </button>
               </form>
             </li>
@@ -101,7 +110,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               actions={<Link href="/annonces/nouvelle" className="btn-sun">+ Proposer un outil</Link>}
             />
             {myListings.length === 0 ? (
-              <EmptyState icon="🧰" title="Vous n'avez pas encore d'annonce" action={{ href: "/annonces/nouvelle", label: "Publier ma première annonce" }}>
+              <EmptyState icon={<Toolbox />} title="Vous n'avez pas encore d'annonce" action={{ href: "/annonces/nouvelle", label: "Publier ma première annonce" }}>
                 Débroussailleuse, perceuse, barnum… Ce qui dort dans votre carbet peut rendre service et vous rapporter.
               </EmptyState>
             ) : (

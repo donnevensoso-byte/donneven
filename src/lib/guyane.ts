@@ -62,24 +62,23 @@ export function isInGuyane(lat: number, lng: number): boolean {
 export type Category = {
   slug: string;
   name: string;
-  icon: string;
   examples: string;
 };
 
 export const CATEGORIES: Category[] = [
-  { slug: "bricolage", name: "Bricolage", icon: "🔧", examples: "Perceuse, perforateur, visseuse, scie sauteuse, ponceuse" },
-  { slug: "jardin", name: "Jardin & débroussaillage", icon: "🌿", examples: "Débroussailleuse, tronçonneuse, tondeuse, taille-haie, sabre" },
-  { slug: "nettoyage", name: "Nettoyage", icon: "🧽", examples: "Nettoyeur haute pression, aspirateur eau et poussière, shampouineuse" },
-  { slug: "construction", name: "Construction & BTP", icon: "🧱", examples: "Bétonnière, marteau-piqueur, échafaudage, disqueuse, compacteur" },
-  { slug: "peinture", name: "Peinture & finitions", icon: "🎨", examples: "Pistolet à peinture, décolleuse, escabeau, ponceuse à placo" },
-  { slug: "energie", name: "Électricité & énergie", icon: "⚡", examples: "Groupe électrogène, rallonges, projecteurs de chantier" },
-  { slug: "eau", name: "Pompes & plomberie", icon: "💧", examples: "Pompe vide-cave, motopompe, cuve, déboucheur" },
-  { slug: "demenagement", name: "Déménagement & transport", icon: "📦", examples: "Remorque, diable, sangles, couvertures de protection" },
-  { slug: "auto", name: "Auto & moto", icon: "🚗", examples: "Cric, chandelles, booster de batterie, compresseur" },
-  { slug: "fete", name: "Fête & réception", icon: "🎉", examples: "Barnum, tables, chaises, sono, éclairage, glacière géante" },
-  { slug: "fleuve", name: "Fleuve & nautisme", icon: "🛶", examples: "Kayak, moteur hors-bord, gilets de sauvetage, matériel de pêche" },
-  { slug: "carbet", name: "Carbet & camping", icon: "🏕️", examples: "Hamacs, moustiquaires, bâches, réchaud, lampes frontales" },
-  { slug: "autre", name: "Autre", icon: "🧰", examples: "Tout le reste" },
+  { slug: "bricolage", name: "Bricolage", examples: "Perceuse, perforateur, visseuse, scie sauteuse, ponceuse" },
+  { slug: "jardin", name: "Jardin & débroussaillage", examples: "Débroussailleuse, tronçonneuse, tondeuse, taille-haie, sabre" },
+  { slug: "nettoyage", name: "Nettoyage", examples: "Nettoyeur haute pression, aspirateur eau et poussière, shampouineuse" },
+  { slug: "construction", name: "Construction & BTP", examples: "Bétonnière, marteau-piqueur, échafaudage, disqueuse, compacteur" },
+  { slug: "peinture", name: "Peinture & finitions", examples: "Pistolet à peinture, décolleuse, escabeau, ponceuse à placo" },
+  { slug: "energie", name: "Électricité & énergie", examples: "Groupe électrogène, rallonges, projecteurs de chantier" },
+  { slug: "eau", name: "Pompes & plomberie", examples: "Pompe vide-cave, motopompe, cuve, déboucheur" },
+  { slug: "demenagement", name: "Déménagement & transport", examples: "Remorque, diable, sangles, couvertures de protection" },
+  { slug: "auto", name: "Auto & moto", examples: "Cric, chandelles, booster de batterie, compresseur" },
+  { slug: "fete", name: "Fête & réception", examples: "Barnum, tables, chaises, sono, éclairage, glacière géante" },
+  { slug: "fleuve", name: "Fleuve & nautisme", examples: "Kayak, moteur hors-bord, gilets de sauvetage, matériel de pêche" },
+  { slug: "carbet", name: "Carbet & camping", examples: "Hamacs, moustiquaires, bâches, réchaud, lampes frontales" },
+  { slug: "autre", name: "Autre", examples: "Tout le reste" },
 ];
 
 const categoryBySlug = new Map(CATEGORIES.map((c) => [c.slug, c]));

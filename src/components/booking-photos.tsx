@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Camera } from "lucide-react";
 import { addBookingPhotosAction } from "@/app/actions/bookings";
 import { ActionForm, FormMessage, SubmitButton, useActionForm } from "./form";
 import { PhotoInput } from "./photo-input";
@@ -43,7 +44,9 @@ export function BookingPhotosForm({ bookingId, stages, max }: { bookingId: strin
         <input className="input" id="photo-note" name="note" maxLength={300} placeholder="Ex. rayure existante sur le carter" />
       </div>
       <FormMessage state={form.state} />
-      <SubmitButton className="btn-secondary" pendingLabel="Envoi des photos…">📸 Ajouter à l'état des lieux</SubmitButton>
+      <SubmitButton className="btn-secondary" pendingLabel="Envoi des photos…">
+        <Camera className="size-4" aria-hidden /> Ajouter à l'état des lieux
+      </SubmitButton>
     </ActionForm>
   );
 }

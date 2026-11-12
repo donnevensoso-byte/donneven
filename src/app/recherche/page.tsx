@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChevronDown, SearchX, SlidersHorizontal } from "lucide-react";
 import { CommuneOptions } from "@/components/commune-select";
 import { ListingGrid } from "@/components/listing-card";
 import { ListingsMap } from "@/components/map";
@@ -80,8 +81,10 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
         </div>
         <details className="card group p-4 md:open:pb-4" open={activeFilters > 0 ? true : undefined}>
           <summary className="flex cursor-pointer list-none items-center justify-between text-sm font-semibold">
-            <span>⚙️ Filtres{activeFilters > 0 ? ` (${activeFilters})` : ""}</span>
-            <span className="text-muted group-open:rotate-180" aria-hidden>▾</span>
+            <span className="inline-flex items-center gap-2">
+                <SlidersHorizontal className="size-4" aria-hidden /> Filtres{activeFilters > 0 ? ` (${activeFilters})` : ""}
+              </span>
+            <ChevronDown className="size-4 text-muted group-open:rotate-180" aria-hidden />
           </summary>
           <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <div>
@@ -89,7 +92,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
               <select className="input" id="categorie" name="categorie" defaultValue={p.categorie ?? ""}>
                 <option value="">Toutes</option>
                 {CATEGORIES.map((c) => (
-                  <option key={c.slug} value={c.slug}>{c.icon} {c.name}</option>
+                  <option key={c.slug} value={c.slug}>{c.name}</option>
                 ))}
               </select>
             </div>
@@ -159,7 +162,7 @@ export default async function SearchPage({ searchParams }: { searchParams: Promi
       </div>
 
       {items.length === 0 ? (
-        <EmptyState icon="🔎" title="Aucune annonce ne correspond" action={{ href: "/annonces/nouvelle", label: "Proposer ce matériel" }}>
+        <EmptyState icon={<SearchX />} title="Aucune annonce ne correspond" action={{ href: "/annonces/nouvelle", label: "Proposer ce matériel" }}>
           Essayez d&apos;élargir la recherche à toute la Guyane ou à d&apos;autres dates. Vous avez ce matériel ? Proposez-le !
         </EmptyState>
       ) : view === "carte" ? (

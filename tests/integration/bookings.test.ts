@@ -185,7 +185,7 @@ describe("cycle de réservation", () => {
     // Chaque ajout est tracé dans la conversation
     const conversationId = await getOrCreateConversation(listingId, renter);
     const thread = await db.select().from(messages).where(eq(messages.conversationId, conversationId));
-    expect(thread.filter((m) => m.body.startsWith("📸"))).toHaveLength(4);
+    expect(thread.filter((m) => m.body.includes("à l'état des lieux"))).toHaveLength(4);
   });
 
   it("limite les essais de code de remise", async () => {

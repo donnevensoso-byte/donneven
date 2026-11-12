@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { Truck } from "lucide-react";
 import { communeName, getCategory } from "@/lib/guyane";
 import { formatEuros } from "@/lib/money";
 import type { ListingCard as Card } from "@/lib/services/listings";
 import { imageUrl, Stars } from "./ui";
+import { CategoryArt } from "./category-art";
 
 export function ListingCard({ listing, priority = false }: { listing: Card; priority?: boolean }) {
   const category = getCategory(listing.category);
@@ -18,10 +20,14 @@ export function ListingCard({ listing, priority = false }: { listing: Card; prio
             className="size-full object-cover transition-transform duration-300 group-hover:scale-[1.03]"
           />
         ) : (
-          <span className="flex size-full items-center justify-center text-4xl">{category?.icon ?? "🧰"}</span>
+          <span className="flex size-full items-center justify-center bg-brand-50">
+            <CategoryArt slug={category?.slug} />
+          </span>
         )}
         {listing.delivery && (
-          <span className="absolute top-2 left-2 rounded-full bg-white/95 px-2 py-0.5 text-[11px] font-semibold">🚚 Livraison possible</span>
+          <span className="absolute top-2 left-2 inline-flex items-center gap-1 rounded-full bg-white/95 px-2 py-0.5 text-[11px] font-semibold">
+            <Truck className="size-3.5 text-brand-700" aria-hidden /> Livraison possible
+          </span>
         )}
       </div>
       <div className="mt-2 px-0.5">

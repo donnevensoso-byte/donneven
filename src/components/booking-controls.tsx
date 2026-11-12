@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { Check, Handshake, Star } from "lucide-react";
 import {
   cancelBookingAction,
   handoverAction,
@@ -34,7 +35,7 @@ export function RespondForm({ bookingId }: { bookingId: string }) {
       ) : (
         <div className="flex flex-wrap gap-2">
           <SubmitButton className="btn-primary flex-1 py-3" name="decision" value="accept" pendingLabel="Validation…">
-            ✅ Accepter la demande
+            <Check className="size-4" aria-hidden /> Accepter la demande
           </SubmitButton>
           <button type="button" className="btn-secondary flex-1 py-3" onClick={() => setDeclining(true)}>
             Refuser
@@ -132,7 +133,9 @@ export function HandoverForm({ bookingId, onsite }: { bookingId: string; onsite:
         </p>
       </div>
       <FormMessage state={form.state} />
-      <SubmitButton className="btn-primary w-full py-3" pendingLabel="Vérification…">🤝 Confirmer la remise</SubmitButton>
+      <SubmitButton className="btn-primary w-full py-3" pendingLabel="Vérification…">
+        <Handshake className="size-4" aria-hidden /> Confirmer la remise
+      </SubmitButton>
     </ActionForm>
   );
 }
@@ -141,7 +144,7 @@ export function ReturnButton({ bookingId }: { bookingId: string }) {
   return (
     <OneClick
       action={() => returnAction(bookingId)}
-      label="📦 Le matériel m'a été rendu"
+      label="Le matériel m'a été rendu"
       pendingLabel="Enregistrement…"
       confirmText="Confirmez-vous que le matériel vous a été rendu ? Pensez à restituer la caution s'il est en bon état."
     />
@@ -149,7 +152,7 @@ export function ReturnButton({ bookingId }: { bookingId: string }) {
 }
 
 export function PayButton({ bookingId, amount }: { bookingId: string; amount: string }) {
-  return <OneClick action={() => payBookingAction(bookingId)} label={`💳 Valider l'empreinte de ${amount}`} pendingLabel="Redirection vers le paiement sécurisé…" />;
+  return <OneClick action={() => payBookingAction(bookingId)} label={`Valider l'empreinte de ${amount}`} pendingLabel="Redirection vers le paiement sécurisé…" />;
 }
 
 export function ReviewForm({ bookingId, targetName }: { bookingId: string; targetName: string }) {
@@ -163,9 +166,9 @@ export function ReviewForm({ bookingId, targetName }: { bookingId: string; targe
         <legend className="label">Votre note pour {targetName}</legend>
         <div className="flex gap-1" role="radiogroup">
           {[1, 2, 3, 4, 5].map((n) => (
-            <label key={n} className="cursor-pointer text-3xl leading-none" title={`${n} étoile${n > 1 ? "s" : ""}`}>
+            <label key={n} className="cursor-pointer leading-none" title={`${n} étoile${n > 1 ? "s" : ""}`}>
               <input type="radio" name="rating" value={n} className="sr-only" checked={rating === n} onChange={() => setRating(n)} />
-              <span className={n <= rating ? "text-sun-400" : "text-line"} aria-hidden>★</span>
+              <Star className={`size-8 ${n <= rating ? "fill-current text-sun-400" : "text-line"}`} aria-hidden />
               <span className="sr-only">{n} étoile{n > 1 ? "s" : ""}</span>
             </label>
           ))}

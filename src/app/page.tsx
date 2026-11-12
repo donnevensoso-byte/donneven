@@ -1,11 +1,13 @@
 import Image from "next/image";
 import Link from "next/link";
+import { CalendarCheck, CalendarDays, Camera, Check, CircleCheck, Clock, FileText, Handshake, KeyRound, MessageCircle, Toolbox } from "lucide-react";
 import { CommuneOptions } from "@/components/commune-select";
 import { ListingGrid } from "@/components/listing-card";
 import { EmptyState } from "@/components/ui";
 import { serviceFeePercent, stripeEnabled } from "@/lib/config";
 import { CATEGORIES } from "@/lib/guyane";
 import { countActiveListings, searchListings } from "@/lib/services/listings";
+import { CategoryIcon } from "@/components/category-icon";
 
 export const dynamic = "force-dynamic";
 
@@ -24,18 +26,18 @@ const problems = [
 ];
 
 const steps = [
-  { icon: "💬", title: "Posez votre question", text: "Écrivez au propriétaire gratuitement, sans carte bancaire : état, accessoires, lieu de retrait." },
-  { icon: "📅", title: "Demandez vos dates", text: "Il a 48 h pour répondre. S'il refuse ou ne répond pas, Zouti vous montre d'autres annonces libres." },
-  { icon: "🤝", title: "Récupérez, photographiez, rendez", text: "Le jour J, vous donnez votre code de remise, vous prenez l'état des lieux en photos, puis vous rendez le matériel." },
+  { icon: <MessageCircle />, title: "Posez votre question", text: "Écrivez au propriétaire gratuitement, sans carte bancaire : état, accessoires, lieu de retrait." },
+  { icon: <CalendarDays />, title: "Demandez vos dates", text: "Il a 48 h pour répondre. S'il refuse ou ne répond pas, Zouti vous montre d'autres annonces libres." },
+  { icon: <Handshake />, title: "Récupérez, photographiez, rendez", text: "Le jour J, vous donnez votre code de remise, vous prenez l'état des lieux en photos, puis vous rendez le matériel." },
 ];
 
 const features = [
-  { icon: "💬", title: "Question gratuite", text: "La messagerie est ouverte avant toute demande. Personne ne paie pour parler." },
+  { icon: <MessageCircle />, title: "Question gratuite", text: "La messagerie est ouverte avant toute demande. Personne ne paie pour parler." },
   { icon: "0 %", title: "Aucune commission en main propre", text: "Vous réglez le propriétaire sur place, en espèces, par virement ou Wero. Zouti ne prend rien." },
-  { icon: "📸", title: "État des lieux en photos", text: "Photos datées des deux côtés, à la remise et au retour, reprises dans le contrat. En cas de désaccord, elles font foi." },
-  { icon: "⏰", title: "Un propriétaire qui répond", text: "Rappel au propriétaire avant l'expiration, délai de réponse affiché, et un plan B si c'est non." },
-  { icon: "📆", title: "Annulation claire", text: "Gratuite jusqu'à la veille, avec la date exacte affichée avant que vous envoyiez la demande." },
-  { icon: "🔢", title: "Code de remise", text: "Le propriétaire saisit votre code quand il vous confie le matériel : la location démarre à ce moment-là, pas avant." },
+  { icon: <Camera />, title: "État des lieux en photos", text: "Photos datées des deux côtés, à la remise et au retour, reprises dans le contrat. En cas de désaccord, elles font foi." },
+  { icon: <Clock />, title: "Un propriétaire qui répond", text: "Rappel au propriétaire avant l'expiration, délai de réponse affiché, et un plan B si c'est non." },
+  { icon: <CalendarCheck />, title: "Annulation claire", text: "Gratuite jusqu'à la veille, avec la date exacte affichée avant que vous envoyiez la demande." },
+  { icon: <KeyRound />, title: "Code de remise", text: "Le propriétaire saisit votre code quand il vous confie le matériel : la location démarre à ce moment-là, pas avant." },
 ];
 
 const faq = [
@@ -131,7 +133,9 @@ export default async function HomePage() {
         <ol className="mt-6 grid gap-4 sm:grid-cols-3">
           {steps.map((s, i) => (
             <li key={s.title} className="card p-5">
-              <span className="text-3xl" aria-hidden>{s.icon}</span>
+              <span className="inline-flex size-12 items-center justify-center rounded-xl bg-brand-50 text-brand-700 [&>svg]:size-6" aria-hidden>
+                {s.icon}
+              </span>
               <h3 className="mt-3 font-semibold">
                 {i + 1}. {s.title}
               </h3>
@@ -146,7 +150,7 @@ export default async function HomePage() {
         <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {features.map((f) => (
             <li key={f.title} className="card p-5">
-              <span className="inline-flex h-10 min-w-10 items-center justify-center rounded-xl bg-brand-50 px-2 text-lg font-bold text-brand-700" aria-hidden>
+              <span className="inline-flex h-10 min-w-10 items-center justify-center rounded-xl bg-brand-50 px-2 text-lg font-bold text-brand-700 [&>svg]:size-5" aria-hidden>
                 {f.icon}
               </span>
               <h3 className="mt-3 font-semibold">{f.title}</h3>
@@ -165,7 +169,9 @@ export default async function HomePage() {
                 href={`/location-outils/${c.slug}`}
                 className="card flex h-full flex-col items-center gap-1.5 px-2 py-4 text-center text-xs font-medium hover:border-brand-200 hover:bg-brand-50 sm:text-sm"
               >
-                <span className="text-2xl" aria-hidden>{c.icon}</span>
+                <span className="inline-flex size-11 items-center justify-center rounded-full bg-brand-50 text-brand-700">
+                  <CategoryIcon slug={c.slug} className="size-6" />
+                </span>
                 {c.name}
               </Link>
             </li>
@@ -181,7 +187,7 @@ export default async function HomePage() {
         {latest.length > 0 ? (
           <ListingGrid listings={latest} />
         ) : (
-          <EmptyState icon="🧰" title="Aucune annonce pour l'instant" action={{ href: "/annonces/nouvelle", label: "Publier la première annonce" }}>
+          <EmptyState icon={<Toolbox />} title="Aucune annonce pour l'instant" action={{ href: "/annonces/nouvelle", label: "Publier la première annonce" }}>
             Zouti démarre : proposez votre matériel et lancez l&apos;entraide dans votre quartier.
           </EmptyState>
         )}
@@ -194,10 +200,10 @@ export default async function HomePage() {
             <h3 className="font-semibold">Pour louer ou proposer</h3>
             <p className="mt-2 text-3xl font-extrabold">0 €</p>
             <ul className="mt-3 space-y-1.5 text-sm text-muted">
-              <li>✓ Annonces gratuites, sans limite</li>
-              <li>✓ Messagerie gratuite avant toute demande</li>
-              <li>✓ Règlement en main propre : aucune commission</li>
-              <li>✓ Contrat et état des lieux en photos inclus</li>
+              <li className="flex gap-2"><Check className="mt-0.5 size-4 text-brand-600" aria-hidden /> Annonces gratuites, sans limite</li>
+              <li className="flex gap-2"><Check className="mt-0.5 size-4 text-brand-600" aria-hidden /> Messagerie gratuite avant toute demande</li>
+              <li className="flex gap-2"><Check className="mt-0.5 size-4 text-brand-600" aria-hidden /> Règlement en main propre : aucune commission</li>
+              <li className="flex gap-2"><Check className="mt-0.5 size-4 text-brand-600" aria-hidden /> Contrat et état des lieux en photos inclus</li>
             </ul>
           </div>
           <div className="card p-5">
@@ -205,9 +211,9 @@ export default async function HomePage() {
             <p className="mt-2 text-3xl font-extrabold">{fee} %</p>
             <p className="text-sm text-muted">de frais de service, payés par le locataire, sans frais fixes</p>
             <ul className="mt-3 space-y-1.5 text-sm text-muted">
-              <li>✓ Débit seulement si le propriétaire accepte</li>
-              <li>✓ Remboursement intégral si l&apos;annulation est faite à temps</li>
-              <li>✓ Virement au propriétaire dès la remise, sans frais de retrait</li>
+              <li className="flex gap-2"><Check className="mt-0.5 size-4 text-brand-600" aria-hidden /> Débit seulement si le propriétaire accepte</li>
+              <li className="flex gap-2"><Check className="mt-0.5 size-4 text-brand-600" aria-hidden /> Remboursement intégral si l&apos;annulation est faite à temps</li>
+              <li className="flex gap-2"><Check className="mt-0.5 size-4 text-brand-600" aria-hidden /> Virement au propriétaire dès la remise, sans frais de retrait</li>
             </ul>
             {!stripeEnabled() && <p className="mt-3 text-xs text-muted">Bientôt disponible : aujourd&apos;hui, tout se règle en main propre.</p>}
           </div>
@@ -257,9 +263,9 @@ export default async function HomePage() {
             <Link href="/annonces/nouvelle" className="btn mt-5 bg-ink text-white hover:bg-ink/85">Proposer un outil gratuitement</Link>
           </div>
           <ul className="space-y-3 text-sm font-medium">
-            <li className="rounded-2xl bg-white/80 p-4">✅ Annonce gratuite, sans engagement</li>
-            <li className="rounded-2xl bg-white/80 p-4">📸 Photos datées à la remise et au retour</li>
-            <li className="rounded-2xl bg-white/80 p-4">📄 Contrat de location prêt à imprimer</li>
+            <li className="flex items-center gap-3 rounded-2xl bg-white/80 p-4"><CircleCheck className="size-5 text-brand-700" aria-hidden /> Annonce gratuite, sans engagement</li>
+            <li className="flex items-center gap-3 rounded-2xl bg-white/80 p-4"><Camera className="size-5 text-brand-700" aria-hidden /> Photos datées à la remise et au retour</li>
+            <li className="flex items-center gap-3 rounded-2xl bg-white/80 p-4"><FileText className="size-5 text-brand-700" aria-hidden /> Contrat de location prêt à imprimer</li>
           </ul>
         </div>
       </section>

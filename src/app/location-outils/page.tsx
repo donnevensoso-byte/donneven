@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { CATEGORIES, COMMUNE_AREAS, COMMUNES } from "@/lib/guyane";
 import { listingCounts } from "@/lib/services/listings";
+import { CategoryIcon } from "@/components/category-icon";
 
 export const metadata: Metadata = {
   title: "Location d'outils en Guyane, par commune et par catégorie",
@@ -23,7 +24,7 @@ export default async function LocalIndexPage() {
           {CATEGORIES.map((c) => (
             <li key={c.slug}>
               <Link href={`/location-outils/${c.slug}`} className="chip">
-                {c.icon} {c.name} ({byCategory(c.slug)})
+                <CategoryIcon slug={c.slug} className="size-3.5 text-brand-600" /> {c.name} ({byCategory(c.slug)})
               </Link>
             </li>
           ))}

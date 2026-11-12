@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { Toolbox } from "lucide-react";
 import { ListingGrid } from "@/components/listing-card";
 import { EmptyState } from "@/components/ui";
 import { CATEGORIES, COMMUNES, type Category, type Commune } from "@/lib/guyane";
 import { listingCounts, searchListings } from "@/lib/services/listings";
+import { CategoryIcon } from "@/components/category-icon";
 
 /** Page locale (commune, catégorie, ou les deux) : vraie liste d'annonces + liens voisins. */
 export async function LocalLanding({ commune, category }: { commune?: Commune; category?: Category }) {
@@ -54,7 +56,7 @@ export async function LocalLanding({ commune, category }: { commune?: Commune; c
         )}
       </div>
       {items.length === 0 ? (
-        <EmptyState icon="🧰" title="Pas encore d'annonce ici" action={{ href: "/annonces/nouvelle", label: "Proposer un outil" }}>
+        <EmptyState icon={<Toolbox />} title="Pas encore d'annonce ici" action={{ href: "/annonces/nouvelle", label: "Proposer un outil" }}>
           Soyez le premier à proposer {category ? "ce type de matériel" : "du matériel"}
           {commune ? ` à ${commune.name}` : ""} : la publication est gratuite.
         </EmptyState>
@@ -71,7 +73,7 @@ export async function LocalLanding({ commune, category }: { commune?: Commune; c
                 {categoryLinks.map(({ c, n }) => (
                   <li key={c.slug}>
                     <Link href={`/location-outils/${c.slug}/${commune.slug}`} className="chip">
-                      {c.icon} {c.name} ({n})
+                      <CategoryIcon slug={c.slug} className="size-3.5 text-brand-600" /> {c.name} ({n})
                     </Link>
                   </li>
                 ))}
