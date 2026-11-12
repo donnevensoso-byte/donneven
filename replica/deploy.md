@@ -93,7 +93,9 @@ Choisis une seule adresse canonique (par exemple sans `www`) et redirige l'autre
 - **Disponibilité** : UptimeRobot ou Better Stack (gratuit) sur `https://zouti97.fr/api/health` toutes les 5 minutes, avec alerte par e-mail ou SMS.
 - **Erreurs** : journaux Render (`console.error` sur les paiements, les versements et `/api/cron`). Sentry est à brancher si le trafic monte ; il n'est pas intégré aujourd'hui.
 - **Audience** : Plausible ou Umami, sans cookie, donc sans bandeau. Pas encore intégré, à ajouter quand le domaine sera choisi.
-- **Sauvegardes** : Render sauvegarde la base chaque jour sur les offres payantes. Sur un VPS, `pg_dump` quotidien. Les photos sont stockées dans la base : surveille sa taille, car l'offre de 256 Mo se remplit avec quelques milliers de photos.
+- **Sauvegardes** : Render Postgres payant inclut la restauration à un instant donné (3 jours sur l'espace Hobby, 7 jours sur Pro). Sur un VPS, `pg_dump` quotidien.
+- **Stockage** : « basic-256mb » désigne la mémoire vive de la base, pas son disque. Le disque se règle à part (1 Go, puis par tranches de 5 Go, 0,30 $ par Go et par mois, jamais réductible). Une base pleine est suspendue par Render et le site tombe : **activer « Storage Autoscaling »** dans Render (zouti-db → Plan), qui ajoute 50 % d'espace dès 90 % de remplissage. Les photos sont dans la base, environ 150 à 300 Ko chacune (grande image WebP + vignette) : 1 Go contient de l'ordre de 4 000 photos. Au-delà de quelques milliers de photos, passer à un stockage objet (Cloudflare R2 ou équivalent). Sources : [Render, Create and Connect to Render Postgres](https://render.com/docs/postgresql-creating-connecting), [Render, Pricing](https://render.com/pricing), consultés le 2026-11-12.
+- **Bande passante** : l'espace Hobby de Render inclut 5 Go par mois, puis 0,15 $ par Go. Les photos passent par le serveur : c'est le poste qui grandit avec les visites.
 - **Cartes** : les tuiles OpenStreetMap conviennent à un petit trafic. Au-delà, passer à MapTiler ou Stadia (`NEXT_PUBLIC_MAP_TILE_URL`) et l'ajouter dans la confidentialité.
 
 ## 7. La première semaine
