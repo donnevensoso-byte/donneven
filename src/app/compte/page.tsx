@@ -117,7 +117,7 @@ export default async function AccountPage({ searchParams }: { searchParams: Prom
               <ul className="space-y-3">
                 {myListings.map((l) => (
                   <li key={l.id} className="card flex items-center gap-4 p-3">
-                    <Link href={`/annonces/${l.id}`} className="size-16 shrink-0 overflow-hidden rounded-xl bg-line">
+                    <Link href={`/annonces/${l.id}`} className="size-16 shrink-0 overflow-hidden rounded-xl bg-line" aria-hidden tabIndex={-1}>
                       {l.coverImageId && (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img src={imageUrl(l.coverImageId, "thumb")} alt="" className="size-full object-cover" />

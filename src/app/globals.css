@@ -120,3 +120,8 @@
   font: inherit;
   z-index: 0;
 }
+
+/* Liens de l'attribution de la carte : soulignés, repérables sans la couleur */
+.leaflet-container .leaflet-control-attribution a {
+  text-decoration: underline;
+}

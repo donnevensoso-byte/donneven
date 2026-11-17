@@ -43,6 +43,7 @@ export default function LocationPickerInner({
         <Marker
           position={[value.lat, value.lng]}
           icon={pin}
+          title="Emplacement du matériel (déplaçable)"
           draggable
           eventHandlers={{
             dragend: (e) => {
